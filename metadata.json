@@ -1,0 +1,6 @@
+{
+  "name": "AgniPariksha",
+  "description": "Indian Armed Forces & Government Jobs Preparation Portal: features GK mock tests, study notes, pdf library, job notifications, and Google AdSense compliance pages.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
