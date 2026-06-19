@@ -32,7 +32,159 @@ import {
 export default function App() {
   const [currentTab, setCurrentTab] = useState<string>("home");
   const [selectedPolicyId, setSelectedPolicyId] = useState<string>("about");
-  
+
+  // Router child item selected states
+  const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [activeBlogId, setActiveBlogId] = useState<string | null>(null);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+  const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
+
+  // Helper to convert text to slug
+  const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  // Path Parsing logic
+  const parseLocation = () => {
+    const path = window.location.pathname;
+    const segments = path.split("/").filter(Boolean);
+    
+    if (segments.length === 0) {
+      return { tab: "home" };
+    }
+    
+    if (segments.length === 1) {
+      const singleSegment = segments[0].toLowerCase();
+      
+      const validPolicies = ["about", "contact", "faq", "careers", "privacy", "terms", "cookies", "disclaimer", "dmca", "editorial", "factcheck", "refund", "sitemap-doc"];
+      if (validPolicies.includes(singleSegment)) {
+        return { tab: "policies", policyId: singleSegment };
+      }
+      
+      const tabMap: Record<string, string> = {
+        "home": "home",
+        "quizzes": "quizzes",
+        "quiz": "quizzes",
+        "study": "study",
+        "current": "current",
+        "current-affairs": "current",
+        "jobs": "jobs",
+        "pdfs": "pdfs",
+        "blog": "blog",
+        "dashboard": "dashboard",
+        "chat": "chat",
+        "admin": "admin"
+      };
+      
+      if (tabMap[singleSegment]) {
+        return { tab: tabMap[singleSegment] };
+      }
+      
+      return { tab: "home" };
+    }
+    
+    if (segments.length === 2) {
+      const category = segments[0].toLowerCase();
+      const subItem = segments[1];
+      
+      if (category === "quizzes" || category === "quiz") {
+        return { tab: "quizzes", subId: subItem };
+      }
+      if (category === "study") {
+        return { tab: "study", subId: subItem };
+      }
+      if (category === "jobs") {
+        return { tab: "jobs", subId: subItem };
+      }
+      if (category === "blog") {
+        return { tab: "blog", subId: subItem };
+      }
+      if (category === "current" || category === "current-affairs") {
+        return { tab: "current", subId: subItem };
+      }
+      if (category === "pdfs") {
+        return { tab: "pdfs", subId: subItem };
+      }
+    }
+    
+    return { tab: "home" };
+  };
+
+  // PushState navigation helper
+  const navigateTo = (tab: string, subId?: string | null, policyId?: string | null, replace = false) => {
+    let path = "/";
+    if (tab === "home") {
+      path = "/";
+    } else if (tab === "policies" && policyId) {
+      path = `/${policyId}`;
+    } else {
+      const catMap: Record<string, string> = {
+        "quizzes": "quizzes",
+        "study": "study",
+        "current": "current",
+        "jobs": "jobs",
+        "pdfs": "pdfs",
+        "blog": "blog",
+        "dashboard": "dashboard",
+        "chat": "chat",
+        "admin": "admin"
+      };
+      const catPath = catMap[tab] || tab;
+      if (subId) {
+        path = `/${catPath}/${subId}`;
+      } else {
+        path = `/${catPath}`;
+      }
+    }
+    
+    try {
+      if (replace) {
+        window.history.replaceState({ tab, subId, policyId }, "", path);
+      } else {
+        window.history.pushState({ tab, subId, policyId }, "", path);
+      }
+    } catch (e) {
+      console.warn("Could not modify location:", e);
+    }
+  };
+
+  // Central Navigation Handler
+  const handleNavigation = (tab: string, subId?: string | null, policyId?: string | null) => {
+    setCurrentTab(tab);
+    if (tab === "policies" && policyId) {
+      setSelectedPolicyId(policyId);
+    }
+    setSelectedQuizId(subId || null);
+    setSelectedNoteId(subId || null);
+    setActiveBlogId(subId || null);
+    setActiveJobId(subId || null);
+    setSelectedNewsId(subId || null);
+    
+    navigateTo(tab, subId, policyId);
+  };
+
+  // PopState & deep linking listener
+  React.useEffect(() => {
+    const handlePopState = () => {
+      const parsed = parseLocation();
+      setCurrentTab(parsed.tab);
+      if (parsed.tab === "policies" && parsed.policyId) {
+        setSelectedPolicyId(parsed.policyId);
+      }
+      setSelectedQuizId(parsed.subId || null);
+      setSelectedNoteId(parsed.subId || null);
+      setActiveBlogId(parsed.subId || null);
+      setActiveJobId(parsed.subId || null);
+      setSelectedNewsId(parsed.subId || null);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    handlePopState(); // Trigger initial routing match
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
   // Student Profile state (Authenticated)
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [profile, setProfile] = useState<UserProfile>({
@@ -180,7 +332,7 @@ export default function App() {
       {/* 1. Traditional Flag-Inspired Navigation Header */}
       <Header
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={(tab) => handleNavigation(tab)}
         isAuthenticated={isAuthenticated}
         onLoginClick={handleLoginToggle}
         onLogoutClick={handleLoginToggle}
@@ -234,7 +386,7 @@ export default function App() {
                   <div className="flex flex-wrap gap-2.5 pt-2" id="hero-cta-group">
                     <button
                       id="btn-quick-quiz"
-                      onClick={() => setCurrentTab("quizzes")}
+                      onClick={() => handleNavigation("quizzes")}
                       className="bg-[#FF9933] hover:bg-[#dd8822] text-black font-extrabold text-xs sm:text-sm py-3.5 px-5 rounded-xl transition-all shadow-md flex items-center space-x-1.5 cursor-pointer hover:scale-105 active:scale-95 border border-[#FF9933]/10"
                     >
                       <span>Start Quiz</span>
@@ -243,7 +395,7 @@ export default function App() {
 
                     <button
                       id="btn-quick-jobs"
-                      onClick={() => setCurrentTab("jobs")}
+                      onClick={() => handleNavigation("jobs")}
                       className="bg-[#138808] hover:bg-[#117706] text-white font-extrabold text-xs sm:text-sm py-3.5 px-5 rounded-xl transition-all shadow-md cursor-pointer hover:scale-105 active:scale-95"
                     >
                       Latest Jobs
@@ -251,7 +403,7 @@ export default function App() {
 
                     <button
                       id="btn-quick-study"
-                      onClick={() => setCurrentTab("study")}
+                      onClick={() => handleNavigation("study")}
                       className="border border-gray-200 bg-white hover:bg-gray-50 text-slate-800 font-extrabold text-xs sm:text-sm py-3.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
                     >
                       Study Material
@@ -259,7 +411,7 @@ export default function App() {
 
                     <button
                       id="btn-quick-current"
-                      onClick={() => setCurrentTab("current")}
+                      onClick={() => handleNavigation("current")}
                       className="border border-gray-200 bg-white hover:bg-gray-50 text-slate-800 font-extrabold text-xs sm:text-sm py-3.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
                     >
                       Current Affairs
@@ -412,7 +564,7 @@ export default function App() {
                           <button
                             id="btn-goto-full-quizzes"
                             onClick={() => {
-                              setCurrentTab("quizzes");
+                              handleNavigation("quizzes");
                               window.scrollTo({ top: 0, behavior: "smooth" });
                             }}
                             className="w-full bg-slate-100 hover:bg-slate-200 text-slate-950 font-extrabold text-xs py-3 rounded-xl transition-all flex items-center justify-center space-x-2 cursor-pointer"
@@ -563,7 +715,7 @@ export default function App() {
 
                     <button
                       id="btn-goto-profile-desk"
-                      onClick={() => setCurrentTab("dashboard")}
+                      onClick={() => handleNavigation("dashboard")}
                       className="text-xs font-black text-indigo-700 hover:text-indigo-900 tracking-wider uppercase flex items-center gap-1 cursor-pointer"
                     >
                       <span>Review Badges Desk</span>
@@ -924,7 +1076,7 @@ export default function App() {
                         key={idx}
                         id={`segment-card-${idx}`}
                         onClick={() => {
-                          setCurrentTab("quizzes");
+                          handleNavigation("quizzes");
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                         className="group relative cursor-pointer text-left bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-xl hover:border-gray-300 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between overflow-hidden"
@@ -1010,7 +1162,7 @@ export default function App() {
 
                   <button
                     id="btn-teaser-chat"
-                    onClick={() => setCurrentTab("chat")}
+                    onClick={() => handleNavigation("chat")}
                     className="bg-[#000080] hover:bg-[#000060] text-white text-xs font-black py-2.5 px-5 rounded-lg shrink-0 uppercase tracking-widest shadow"
                   >
                     Launch Tutor
@@ -1038,6 +1190,8 @@ export default function App() {
                 userBookmarks={profile.bookmarkedQuestionIds}
                 toggleBookmark={toggleBookmark}
                 userName={profile.name}
+                selectedQuizId={selectedQuizId}
+                onSelectQuiz={(quizId) => handleNavigation("quizzes", quizId)}
               />
             </div>
             
@@ -1049,12 +1203,18 @@ export default function App() {
 
         {/* COMPREHENSIVE STUDY MATERIAL NOTES */}
         {currentTab === "study" && (
-          <StudyMaterial />
+          <StudyMaterial
+            selectedNoteId={selectedNoteId}
+            onSelectNote={(noteId) => handleNavigation("study", noteId)}
+          />
         )}
 
         {/* DAILY INTERACTIVE समसामयिकी (CURRENT AFFAIRS) SECTION */}
         {currentTab === "current" && (
-          <CurrentAffairs />
+          <CurrentAffairs
+            selectedNewsId={selectedNewsId}
+            onSelectNews={(newsId) => handleNavigation("current", newsId)}
+          />
         )}
 
         {/* VERIFIED PDF CYCLING CENTER */}
@@ -1064,24 +1224,33 @@ export default function App() {
 
         {/* ACTIVE VACANCIES ALERTS MODULE */}
         {currentTab === "jobs" && (
-          <JobsSection />
+          <JobsSection
+            activeJobId={activeJobId}
+            onSelectJob={(jobId) => handleNavigation("jobs", jobId)}
+          />
         )}
 
         {/* GENERAL KNOWLEDGE TIPS ARTICLES */}
         {currentTab === "blog" && (
-          <BlogSection />
+          <BlogSection
+            activeBlogId={activeBlogId}
+            onSelectBlog={(blogId) => handleNavigation("blog", blogId)}
+          />
         )}
 
         {/* MANDATORY ADSENSE DISCLOSURES ACCORDION */}
         {currentTab === "policies" && (
-          <SeoPages initialPolicyId={selectedPolicyId} />
+          <SeoPages
+            initialPolicyId={selectedPolicyId}
+            onSelectPolicy={(policyId) => handleNavigation("policies", null, policyId)}
+          />
         )}
 
         {/* ACTIVE CANDIDATE ACCOUNT BOARD */}
         {currentTab === "dashboard" && (
           <Dashboard 
             profile={profile} 
-            setCurrentTab={setCurrentTab}
+            setCurrentTab={(tab) => handleNavigation(tab)}
           />
         )}
 
@@ -1158,13 +1327,13 @@ export default function App() {
       {/* 5. Indian National Flag-inspired Footer */}
       <Footer 
         setCurrentTab={(tab) => {
-          setCurrentTab(tab);
+          handleNavigation(tab);
           // if admin requested
           if (tab === "admin") {
             window.scrollTo({ top: 0, behavior: "smooth" });
           }
         }} 
-        setSelectedPolicy={setSelectedPolicyId}
+        setSelectedPolicy={(policyId) => handleNavigation("policies", null, policyId)}
       />
 
       {/* Secret Developer backlink to Admin Operations Panel placed humbly in the footer bar */}
@@ -1173,7 +1342,7 @@ export default function App() {
         <button
           id="btn-goto-admin"
           onClick={() => {
-            setCurrentTab("admin");
+            handleNavigation("admin");
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
           className="text-[#FF9933] hover:underline hover:text-[#ffbb55] font-black tracking-widest uppercase cursor-pointer underline ml-1"

@@ -3,12 +3,28 @@ import { Briefcase, Calendar, Award, Shield, Search, ExternalLink, Bell, Landmar
 import { JobPost } from "../types";
 import { MOCK_JOBS } from "../data/mockData";
 
-export default function JobsSection() {
+interface JobsSectionProps {
+  activeJobId?: string | null;
+  onSelectJob?: (jobId: string | null) => void;
+}
+
+const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+export default function JobsSection({ activeJobId, onSelectJob }: JobsSectionProps) {
   const [jobList, setJobList] = useState<JobPost[]>(MOCK_JOBS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [activeJob, setActiveJob] = useState<JobPost | null>(MOCK_JOBS[0]);
   const [isAlertSubscribed, setIsAlertSubscribed] = useState(false);
+
+  React.useEffect(() => {
+    if (activeJobId) {
+      const match = jobList.find(j => j.id === activeJobId || toSlug(j.title) === activeJobId);
+      if (match && (!activeJob || activeJob.id !== match.id)) {
+        setActiveJob(match);
+      }
+    }
+  }, [activeJobId, jobList]);
 
   const categories = ["All", "Agniveer", "UPSC", "SSC", "Railway", "Police", "Banking"];
 
@@ -100,7 +116,10 @@ export default function JobsSection() {
                 <div
                   key={job.id}
                   id={`job-card-select-${job.id}`}
-                  onClick={() => setActiveJob(job)}
+                  onClick={() => {
+                    setActiveJob(job);
+                    onSelectJob?.(toSlug(job.title));
+                  }}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     isActive
                       ? "bg-white border-[#000080] shadow"

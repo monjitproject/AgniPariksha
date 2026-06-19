@@ -3,10 +3,28 @@ import { Globe, User, Clock, ArrowRight, ArrowLeft, PenTool, Flame, Newspaper } 
 import { BlogPost } from "../types";
 import { MOCK_BLOGS } from "../data/mockData";
 
-export default function BlogSection() {
+interface BlogSectionProps {
+  activeBlogId?: string | null;
+  onSelectBlog?: (blogId: string | null) => void;
+}
+
+const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+export default function BlogSection({ activeBlogId, onSelectBlog }: BlogSectionProps) {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [activeBlog, setActiveBlog] = useState<BlogPost | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("All");
+
+  React.useEffect(() => {
+    if (activeBlogId && blogs.length > 0) {
+      const match = blogs.find(b => b.id === activeBlogId || toSlug(b.title) === activeBlogId);
+      if (match && (!activeBlog || activeBlog.id !== match.id)) {
+        setActiveBlog(match);
+      }
+    } else if (!activeBlogId && activeBlog) {
+      setActiveBlog(null);
+    }
+  }, [activeBlogId, blogs, activeBlog]);
 
   React.useEffect(() => {
     let localPublished: BlogPost[] = [];
@@ -88,6 +106,7 @@ export default function BlogSection() {
                 className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow flex flex-col justify-between cursor-pointer"
                 onClick={() => {
                   setActiveBlog(blog);
+                  onSelectBlog?.(toSlug(blog.title));
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               >
@@ -131,7 +150,10 @@ export default function BlogSection() {
           {/* Back button */}
           <button
             id="back-to-blogs-list"
-            onClick={() => setActiveBlog(null)}
+            onClick={() => {
+              setActiveBlog(null);
+              onSelectBlog?.(null);
+            }}
             className="flex items-center space-x-1.5 text-xs text-gray-500 hover:text-gray-900 font-bold cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />

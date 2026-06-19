@@ -102,13 +102,31 @@ const DAILY_CURRENT_NEWS: NewsItem[] = [
   }
 ];
 
-export default function CurrentAffairs() {
+interface CurrentAffairsProps {
+  selectedNewsId?: string | null;
+  onSelectNews?: (newsId: string | null) => void;
+}
+
+const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+export default function CurrentAffairs({ selectedNewsId, onSelectNews }: CurrentAffairsProps) {
   const [news, setNews] = useState<NewsItem[]>(DAILY_CURRENT_NEWS);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(DAILY_CURRENT_NEWS[0]);
   const [userAnswer, setUserAnswer] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
   const [completedQuizIds, setCompletedQuizIds] = useState<string[]>([]);
+
+  React.useEffect(() => {
+    if (selectedNewsId) {
+      const match = news.find(n => n.id === selectedNewsId || toSlug(n.titleEng) === selectedNewsId);
+      if (match && (!selectedNews || selectedNews.id !== match.id)) {
+        setSelectedNews(match);
+        setUserAnswer(null);
+        setIsSubmitted(false);
+      }
+    }
+  }, [selectedNewsId, news]);
 
   const handleOptionSelect = (idx: number) => {
     if (isSubmitted) return;
@@ -138,9 +156,11 @@ export default function CurrentAffairs() {
   const handleNextNews = () => {
     const currentIdx = news.findIndex(n => n.id === selectedNews?.id);
     const nextIdx = (currentIdx + 1) % news.length;
-    setSelectedNews(news[nextIdx]);
+    const nextItem = news[nextIdx];
+    setSelectedNews(nextItem);
     setUserAnswer(null);
     setIsSubmitted(false);
+    onSelectNews?.(toSlug(nextItem.titleEng));
   };
 
   return (
@@ -181,6 +201,7 @@ export default function CurrentAffairs() {
                     setSelectedNews(item);
                     setUserAnswer(null);
                     setIsSubmitted(false);
+                    onSelectNews?.(toSlug(item.titleEng));
                   }}
                   className={`p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden flex flex-col justify-between ${
                     isSelected

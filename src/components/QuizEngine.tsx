@@ -134,16 +134,48 @@ interface QuizEngineProps {
   userBookmarks: string[];
   toggleBookmark: (questionId: string) => void;
   userName?: string;
+  selectedQuizId?: string | null;
+  onSelectQuiz?: (quizId: string | null) => void;
 }
+
+const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 export default function QuizEngine({
   onQuizCompleted,
   userBookmarks,
   toggleBookmark,
-  userName = "Aspirant"
+  userName = "Aspirant",
+  selectedQuizId,
+  onSelectQuiz
 }: QuizEngineProps) {
   // Navigation active states
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
+
+  useEffect(() => {
+    if (selectedQuizId) {
+      const match = COMBINED_QUIZZES.find(q => q.id === selectedQuizId || toSlug(q.title) === selectedQuizId);
+      if (match) {
+        if (!selectedQuiz || selectedQuiz.id !== match.id) {
+          setSelectedQuiz(match);
+          setCurrentQuestionIndex(0);
+          setSelectedAnswers({});
+          setTimeRemaining(match.timeLimit);
+          setIsPlaying(true);
+          setShowResults(false);
+          setResultsData(null);
+          setIssuedCertificate(null);
+          setTimerActive(true);
+        }
+      }
+    } else {
+      if (selectedQuiz) {
+        setSelectedQuiz(null);
+        setIsPlaying(false);
+        setShowResults(false);
+      }
+    }
+  }, [selectedQuizId]);
+
   const [difficultyFilter, setDifficultyFilter] = useState<"All" | "Easy" | "Medium" | "Hard">("All");
   
   // Confetti state for real result celebration
@@ -210,6 +242,7 @@ export default function QuizEngine({
     setResultsData(null);
     setIssuedCertificate(null);
     setTimerActive(true);
+    onSelectQuiz?.(toSlug(quiz.title));
   };
 
   // Timekeeper thread
@@ -953,6 +986,7 @@ export default function QuizEngine({
                     onClick={() => {
                       setSelectedQuiz(null);
                       setShowResults(false);
+                      onSelectQuiz?.(null);
                     }}
                     className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg text-xs font-black uppercase tracking-wider transition-all text-center"
                   >
@@ -1057,6 +1091,7 @@ export default function QuizEngine({
                   onClick={() => {
                     setSelectedQuiz(null);
                     setShowResults(false);
+                    onSelectQuiz?.(null);
                   }}
                   className="text-xs font-bold text-gray-500 hover:text-gray-900 cursor-pointer"
                 >

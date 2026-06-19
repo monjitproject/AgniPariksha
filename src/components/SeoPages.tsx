@@ -6,10 +6,17 @@ import {
 
 interface SeoPagesProps {
   initialPolicyId?: string;
+  onSelectPolicy?: (policyId: string) => void;
 }
 
-export default function SeoPages({ initialPolicyId = "about" }: SeoPagesProps) {
+export default function SeoPages({ initialPolicyId = "about", onSelectPolicy }: SeoPagesProps) {
   const [activePolicy, setActivePolicy] = useState<string>(initialPolicyId);
+
+  React.useEffect(() => {
+    if (initialPolicyId && initialPolicyId !== activePolicy) {
+      setActivePolicy(initialPolicyId);
+    }
+  }, [initialPolicyId]);
 
   // Contact Us states
   const [contactName, setContactName] = useState("");
@@ -66,7 +73,10 @@ export default function SeoPages({ initialPolicyId = "about" }: SeoPagesProps) {
             <button
               key={p.id}
               id={`policy-tab-${p.id}`}
-              onClick={() => setActivePolicy(p.id)}
+              onClick={() => {
+                setActivePolicy(p.id);
+                onSelectPolicy?.(p.id);
+              }}
               className={`w-full text-left p-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
                 activePolicy === p.id
                   ? "bg-[#000080]/10 text-[#000080]"

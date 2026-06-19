@@ -3,7 +3,14 @@ import { BookOpen, Search, Eye, Bookmark, Check, Download, FileSpreadsheet, Prin
 import { StudyNote } from "../types";
 import { MOCK_NOTES } from "../data/mockData";
 
-export default function StudyMaterial() {
+interface StudyMaterialProps {
+  selectedNoteId?: string | null;
+  onSelectNote?: (noteId: string | null) => void;
+}
+
+const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+export default function StudyMaterial({ selectedNoteId, onSelectNote }: StudyMaterialProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [dynamicNotes, setDynamicNotes] = useState<StudyNote[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -28,10 +35,15 @@ export default function StudyMaterial() {
   const allNotes = [...dynamicNotes, ...MOCK_NOTES];
 
   React.useEffect(() => {
-    if (!selectedNote && allNotes.length > 0) {
+    if (selectedNoteId && allNotes.length > 0) {
+      const match = allNotes.find(n => n.id === selectedNoteId || toSlug(n.title) === selectedNoteId);
+      if (match && (!selectedNote || selectedNote.id !== match.id)) {
+        setSelectedNote(match);
+      }
+    } else if (!selectedNoteId && !selectedNote && allNotes.length > 0) {
       setSelectedNote(allNotes[0]);
     }
-  }, [allNotes, selectedNote]);
+  }, [selectedNoteId, allNotes, selectedNote]);
 
   const handleToggleBookmark = (noteId: string) => {
     setBookmarkedNotes(prev =>
@@ -139,6 +151,7 @@ export default function StudyMaterial() {
                     setDynamicNotes(data.studyNotes);
                     if (data.studyNotes.length > 0) {
                       setSelectedNote(data.studyNotes[0]);
+                      onSelectNote?.(toSlug(data.studyNotes[0].title));
                     }
                     alert("Success: Dynamic compiler completed research and instantly published 2 new PDF chapters written in Hindi!");
                   }
@@ -175,6 +188,7 @@ export default function StudyMaterial() {
                   onClick={() => {
                     setSelectedNote(note);
                     setCurrentPage(1);
+                    onSelectNote?.(toSlug(note.title));
                   }}
                   className={`p-4 rounded-xl border-2 transition-all duration-150 relative overflow-hidden flex flex-col justify-between ${
                     isSelected
