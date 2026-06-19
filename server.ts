@@ -534,6 +534,268 @@ Begin your answers with 'Jai Hind, Aspirant!' or a high-energy patriotic greetin
   }
 });
 
+// API: Dynamic Bilingual Quiz generator (Fetches fresh feeds + educational sites via Search Grounding)
+let cachedDailyQuiz: any[] | null = null;
+let lastDailyQuizFetch = 0;
+
+app.get("/api/daily-quiz", async (req: express.Request, res: express.Response) => {
+  const forceBypassCache = req.query.force === "true";
+  const now = Date.now();
+
+  // If cache is fresh (less than 15 minutes old), and not forced, return cached daily quiz
+  if (cachedDailyQuiz && (now - lastDailyQuizFetch < 15 * 60 * 1000) && !forceBypassCache) {
+    console.log("Serving daily-quiz from memory cache...");
+    return res.json({ questions: cachedDailyQuiz });
+  }
+
+  try {
+    if (ai) {
+      console.log("Fetching fresh bilingual quiz questions via Gemini Search Grounding...");
+      const promptString = `Retrieve a diverse and brand new set of 5 bilingual multiple choice GK questions (English/Hindi) inspired by current mock test feeds and general knowledge topics of major educational websites such as Jagran Josh, Testbook, GKToday, and Unacademy.
+Assign different, randomized questions covering Indian History, Geography, General Science, Indian Constitution, and Armed Forces current affairs. Keep the questions authentic.
+
+Return raw JSON strictly matching the structure below. Do NOT use markdown code blocks (\`\`\`json on the outer wrapper):
+[
+  {
+    "englishQ": "English question text here...",
+    "hindiQ": "हिन्दी में प्रश्न यहाँ लिखें...",
+    "options": [
+      { "key": "A", "text": "A. English text (हिन्दी विकल्प)", "isCorrect": false },
+      { "key": "B", "text": "B. English text (हिन्दी विकल्प)", "isCorrect": true },
+      { "key": "C", "text": "C. English text (हिन्दी विकल्प)", "isCorrect": false },
+      { "key": "D", "text": "D. English text (हिन्दी विकल्प)", "isCorrect": false }
+    ],
+    "explanationEng": "Brief English explanation details...",
+    "explanationHin": "हिन्दी में व्याख्या विवरण..."
+  }
+]`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: promptString,
+        config: {
+          tools: [{ googleSearch: {} }],
+          temperature: 0.95, // Higher temperature forces unique options
+          responseMimeType: "application/json"
+        }
+      });
+
+      let jsonText = response.text || "[]";
+      if (jsonText.includes("```json")) {
+        jsonText = jsonText.split("```json")[1].split("```")[0];
+      } else if (jsonText.includes("```")) {
+        jsonText = jsonText.split("```")[1].split("```")[0];
+      }
+      jsonText = jsonText.trim();
+
+      const questions = JSON.parse(jsonText);
+      if (Array.isArray(questions) && questions.length > 0) {
+        cachedDailyQuiz = questions;
+        lastDailyQuizFetch = now;
+        return res.json({ questions });
+      }
+    }
+  } catch (err: any) {
+    // Graceful error logging for 429 Rate Limits / Quotas or other API blockages
+    const errMessage = err?.message || String(err);
+    if (errMessage.includes("429") || errMessage.includes("quota") || errMessage.includes("RESOURCE_EXHAUSTED")) {
+      console.log("[INFO] Gemini API rate limit/quota reached (429/RESOURCE_EXHAUSTED). Instantly fallback to our premium randomized 15-question bilingual pool.");
+    } else {
+      console.warn("Dynamic quiz generation failed, using randomized offline fallback:", errMessage);
+    }
+  }
+
+  // Robust, extensive 15-question localized offline pool
+  const pool = [
+    {
+      "englishQ": "Who is known as the Father of the Indian Constitution?",
+      "hindiQ": "भारतीय संविधान के जनक के रूप में किसे जाना जाता है?",
+      "options": [
+        { "key": "A", "text": "A. Mahatma Gandhi (महात्मा गांधी)", "isCorrect": false },
+        { "key": "B", "text": "B. Dr. B.R. Ambedkar (डॉ. बी.आर. आंबेडकर)", "isCorrect": true },
+        { "key": "C", "text": "C. Jawaharlal Nehru (जवाहरलाल नेहरू)", "isCorrect": false },
+        { "key": "D", "text": "D. Dr. Rajendra Prasad (डॉ. राजेंद्र प्रसाद)", "isCorrect": false }
+      ],
+      "explanationEng": "Dr. Bhimrao Ramji Ambedkar served as the chairman of the Drafting Committee which drafted the Constitution of India.",
+      "explanationHin": "डॉ. भीमराव रामजी आंबेडकर ने भारतीय संविधान का प्रारूप तैयार करने वाली प्रारूप समिति के अध्यक्ष के रूप में कार्य किया।"
+    },
+    {
+      "englishQ": "The headquarter of the Southern Command of the Indian Army is located at:",
+      "hindiQ": "भारतीय सेना की दक्षिणी कमान का मुख्यालय कहाँ स्थित है?",
+      "options": [
+        { "key": "A", "text": "A. Pune (पुणे)", "isCorrect": true },
+        { "key": "B", "text": "B. Chennai (चेन्नई)", "isCorrect": false },
+        { "key": "C", "text": "C. Kochi (कोच्चि)", "isCorrect": false },
+        { "key": "D", "text": "D. Mumbai (मुंबई)", "isCorrect": false }
+      ],
+      "explanationEng": "The Southern Command of the Indian Army is headquartered at Pune, Maharashtra.",
+      "explanationHin": "भारतीय सेना की दक्षिणी कमान का मुख्यालय पुणे, महाराष्ट्र में स्थित है।"
+    },
+    {
+      "englishQ": "Which schedule of the Indian Constitution was added by the 1st Amendment Act of 1951?",
+      "hindiQ": "1951 के पहले संशोधन अधिनियम द्वारा भारतीय संविधान में कौन सी अनुसूची जोड़ी गई थी?",
+      "options": [
+        { "key": "A", "text": "A. 9th Schedule (9वीं अनुसूची)", "isCorrect": true },
+        { "key": "B", "text": "B. 10th Schedule (10वीं अनुसूची)", "isCorrect": false },
+        { "key": "C", "text": "C. 11th Schedule (11वीं अनुसूची)", "isCorrect": false },
+        { "key": "D", "text": "D. 12th Schedule (12वीं अनुसूची)", "isCorrect": false }
+      ],
+      "explanationEng": "The Ninth Schedule was added by the first amendment in 1951 to protect laws related to land reforms from judicial review.",
+      "explanationHin": "भूमि सुधारों से संबंधित कानूनों को न्यायिक समीक्षा से बचाने के लिए 1951 में पहले संशोधन द्वारा नौवीं अनुसूची जोड़ी गई थी।"
+    },
+    {
+      "englishQ": "Which of the following is the highest peacetime gallantry award in India?",
+      "hindiQ": "निम्नलिखित में से कौन भारत में सर्वोच्च शांतिकालीन वीरता पुरस्कार है?",
+      "options": [
+        { "key": "A", "text": "A. Param Vir Chakra (परमवीर चक्र)", "isCorrect": false },
+        { "key": "B", "text": "B. Ashoka Chakra (अशोक चक्र)", "isCorrect": true },
+        { "key": "C", "text": "C. Shaurya Chakra (शौर्य चक्र)", "isCorrect": false },
+        { "key": "D", "text": "D. Kirti Chakra (कीर्ति चक्र)", "isCorrect": false }
+      ],
+      "explanationEng": "The Ashoka Chakra is India's highest peacetime military decoration awarded for valor, courageous action or self-sacrifice away from the battlefield.",
+      "explanationHin": "अशोक चक्र भारत का सर्वोच्च शांतिकालीन सैन्य अलंकरण है जो युद्ध के मैदान से दूर वीरता, साहसी कार्रवाई या आत्म-बलिदान के लिए प्रदान किया जाता है।"
+    },
+    {
+      "englishQ": "In which state is the famous National Defence Academy (NDA) situated?",
+      "hindiQ": "प्रसिद्ध राष्ट्रीय रक्षा अकादमी (NDA) किस राज्य में स्थित है?",
+      "options": [
+        { "key": "A", "text": "A. Uttarakhand (उत्तराखंड)", "isCorrect": false },
+        { "key": "B", "text": "B. Maharashtra (महाराष्ट्र)", "isCorrect": true },
+        { "key": "C", "text": "C. Kerala (केरल)", "isCorrect": false },
+        { "key": "D", "text": "D. Haryana (हरियाणा)", "isCorrect": false }
+      ],
+      "explanationEng": "The National Defence Academy (NDA) is situated at Khadakwasla near Pune, Maharashtra.",
+      "explanationHin": "राष्ट्रीय रक्षा अकादमी (NDA) महाराष्ट्र के पुणे के निकट खड़कवासला में स्थित है।"
+    },
+    {
+      "englishQ": "Which of the following is India's first indigenously built aircraft carrier?",
+      "hindiQ": "निम्नलिखित में से कौन भारत का पहला स्वदेश निर्मित विमानवाहक पोत है?",
+      "options": [
+        { "key": "A", "text": "A. INS Vikramaditya (आईएनएस विक्रमादित्य)", "isCorrect": false },
+        { "key": "B", "text": "B. INS Vikrant (आईएनएस विक्रांत)", "isCorrect": true },
+        { "key": "C", "text": "C. INS Arihant (आईएनएस अरिहंत)", "isCorrect": false },
+        { "key": "D", "text": "D. INS Virat (आईएनएस विराट)", "isCorrect": false }
+      ],
+      "explanationEng": "INS Vikrant is India's first indigenously designed and built aircraft carrier, commissioned in 2022.",
+      "explanationHin": "आईएनएस विक्रांत भारत का पहला स्वदेश में डिजाइन और निर्मित विमानवाहक पोत है, जिसे 2022 में नौसेना में शामिल किया गया था।"
+    },
+    {
+      "englishQ": "What is the official motto of the Indian Army?",
+      "hindiQ": "भारतीय सेना का आधिकारिक आदर्श वाक्य (Motto) क्या है?",
+      "options": [
+        { "key": "A", "text": "A. Touch the Sky with Glory (नभः स्पृशं दीप्तम्)", "isCorrect": false },
+        { "key": "B", "text": "B. Service Before Self (सेवा परमो धर्मः)", "isCorrect": true },
+        { "key": "C", "text": "C. Sham No Varunah (शं नो वरुणः)", "isCorrect": false },
+        { "key": "D", "text": "D. Valour and Faith (सौर्य और निष्ठा)", "isCorrect": false }
+      ],
+      "explanationEng": "The official motto of the Indian Army is 'Service Before Self' (Seva Parmo Dharma).",
+      "explanationHin": "भारतीय सेना का आधिकारिक आदर्श वाक्य 'सेवा परमो धर्मः' (सैलफलेस सर्विस) है।"
+    },
+    {
+      "englishQ": "Which river is widely known as the 'Dakshin Ganga' (Ganges of the South)?",
+      "hindiQ": "किस नदी को 'दक्षिण गंगा' (दक्षिण की गंगा) के रूप में जाना जाता है?",
+      "options": [
+        { "key": "A", "text": "A. Krishna River (कृष्णा नदी)", "isCorrect": false },
+        { "key": "B", "text": "B. Kaveri River (कावेरी नदी)", "isCorrect": false },
+        { "key": "C", "text": "C. Godavari River (गोदावरी नदी)", "isCorrect": true },
+        { "key": "D", "text": "D. Narmada River (नर्मदा नदी)", "isCorrect": false }
+      ],
+      "explanationEng": "The Godavari is India's second longest river and is called Dakshin Ganga due to its large size and span.",
+      "explanationHin": "गोदावरी भारत की दूसरी सबसे लंबी नदी है और अपने विशाल आकार तथा विस्तार के कारण इसे दक्षिण गंगा कहा जाता है।"
+    },
+    {
+      "englishQ": "The historic Battle of Haldighati was fought in which year?",
+      "hindiQ": "ऐतिहासिक हल्दीघाटी का युद्ध किस वर्ष लड़ा गया था?",
+      "options": [
+        { "key": "A", "text": "A. 1526 AD (1526 ई.)", "isCorrect": false },
+        { "key": "B", "text": "B. 1556 AD (1556 ई.)", "isCorrect": false },
+        { "key": "C", "text": "C. 1576 AD (1576 ई.)", "isCorrect": true },
+        { "key": "D", "text": "D. 1761 AD (1761 ई.)", "isCorrect": false }
+      ],
+      "explanationEng": "The Battle of Haldighati was fought on 18 June 1576 between Maharana Pratap of Mewar and the Mughal forces led by Man Singh I of Amber.",
+      "explanationHin": "हल्दीघाटी का युद्ध 18 जून 1576 को मेवाड़ के राजा महाराणा प्रताप और आमेर के मान सिंह प्रथम के नेतृत्व वाली मुगल सेना के बीच लड़ा गया था।"
+    },
+    {
+      "englishQ": "Deficiency of Vitamin C causes which of the following diseases?",
+      "hindiQ": "विटामिन C की कमी से निम्नलिखित में से कौन सा रोग होता है?",
+      "options": [
+        { "key": "A", "text": "A. Rickets (रिकेट्स)", "isCorrect": false },
+        { "key": "B", "text": "B. Beriberi (बेरीबेरी)", "isCorrect": false },
+        { "key": "C", "text": "C. Scurvy (स्कर्वी)", "isCorrect": true },
+        { "key": "D", "text": "D. Night Blindness (रतौंधी)", "isCorrect": false }
+      ],
+      "explanationEng": "Scurvy is a disease resulting from a lack of vitamin C, leading to weakness, gum disease, and skin hemorrhages.",
+      "explanationHin": "स्कर्वी विटामिन C की कमी से होने वाला रोग है, जिससे कमजोरी, मसूड़ों की बीमारी और त्वचा से खून बहने जैसी समस्याएं होती हैं।"
+    },
+    {
+      "englishQ": "Who was appointed as the first Chief of Defence Staff (CDS) of India?",
+      "hindiQ": "भारत के पहले चीफ ऑफ डिफेंस स्टाफ (CDS) के रूप में किसे नियुक्त किया गया था?",
+      "options": [
+        { "key": "A", "text": "A. Gen. Manoj Mukund Naravane (जनरल एम.एम. नरवणे)", "isCorrect": false },
+        { "key": "B", "text": "B. Gen. Bipin Rawat (जनरल बिपिन रावत)", "isCorrect": true },
+        { "key": "C", "text": "C. Admin. Sunil Lanba (एडमिरल सुनील लांबा)", "isCorrect": false },
+        { "key": "D", "text": "D. ACM Birender Singh Dhanoa (एयर चीफ मार्शल बी.एस. धनोआ)", "isCorrect": false }
+      ],
+      "explanationEng": "General Bipin Rawat was appointed as the first Chief of Defence Staff (CDS) on 1 January 2020.",
+      "explanationHin": "जनरल बिपिन रावत को 1 जनवरी 2020 को भारत के पहले चीफ ऑफ डिफेंस स्टाफ (CDS) के रूप में नियुक्त किया गया था।"
+    },
+    {
+      "englishQ": "Under which Article of the Constitution of India can a National Emergency be declared?",
+      "hindiQ": "भारत के संविधान के किस अनुच्छेद के तहत राष्ट्रीय आपातकाल की घोषणा की जा सकती है?",
+      "options": [
+        { "key": "A", "text": "A. Article 352 (अनुच्छेद 352)", "isCorrect": true },
+        { "key": "B", "text": "B. Article 356 (अनुच्छेद 356)", "isCorrect": false },
+        { "key": "C", "text": "C. Article 360 (अनुच्छेद 360)", "isCorrect": false },
+        { "key": "D", "text": "D. Article 368 (अनुच्छेद 368)", "isCorrect": false }
+      ],
+      "explanationEng": "Article 352 deals with the proclamation of National Emergency due to war, external aggression, or armed rebellion.",
+      "explanationHin": "अनुच्छेद 352 युद्ध, बाहरी आक्रमण या सशस्त्र विद्रोह के कारण राष्ट्रीय आपातकाल की घोषणा से संबंधित है।"
+    },
+    {
+      "englishQ": "Which scientific instrument is used to determine atmospheric pressure?",
+      "hindiQ": "वायुमंडलीय दबाव को मापने के लिए किस वैज्ञानिक उपकरण का उपयोग किया जाता है?",
+      "options": [
+        { "key": "A", "text": "A. Hydrometer (हाइड्रोमीटर)", "isCorrect": false },
+        { "key": "B", "text": "B. Barometer (बैरोमीटर)", "isCorrect": true },
+        { "key": "C", "text": "C. Hygrometer (हाइग्रोमीटर)", "isCorrect": false },
+        { "key": "D", "text": "D. Lactometer (लेक्टोमीटर)", "isCorrect": false }
+      ],
+      "explanationEng": "A barometer is a scientific instrument used in meteorology to measure atmospheric pressure.",
+      "explanationHin": "बैरोमीटर एक वैज्ञानिक उपकरण है जिसका उपयोग मौसम विज्ञान में वायुमंडलीय दबाव को मापने के लिए किया जाता है।"
+    },
+    {
+      "englishQ": "Where is the Indian Military Academy (IMA) located?",
+      "hindiQ": "भारतीय सैन्य अकादमी (IMA) कहाँ स्थित है?",
+      "options": [
+        { "key": "A", "text": "A. Chennai (चेन्नई)", "isCorrect": false },
+        { "key": "B", "text": "B. Dehradun (देहरादून)", "isCorrect": true },
+        { "key": "C", "text": "C. Gaya (गया)", "isCorrect": false },
+        { "key": "D", "text": "D. Shimla (शिमला)", "isCorrect": false }
+      ],
+      "explanationEng": "The Indian Military Academy (IMA) is located at Dehradun, Uttarakhand, established in 1932.",
+      "explanationHin": "भारतीय सैन्य अकादमी (IMA) देहरादून, उत्तराखंड में स्थित है, जिसकी स्थापना 1932 में हुई थी।"
+    },
+    {
+      "englishQ": "Who was the first Indian to receive a Nobel Prize?",
+      "hindiQ": "नोबेल पुरस्कार पाने वाले पहले भारतीय कौन थे?",
+      "options": [
+        { "key": "A", "text": "A. C. V. Raman (सी. वी. रमन)", "isCorrect": false },
+        { "key": "B", "text": "B. Rabindranath Tagore (रवींद्रनाथ टैगोर)", "isCorrect": true },
+        { "key": "C", "text": "C. Mother Teresa (मदर टेरेसा)", "isCorrect": false },
+        { "key": "D", "text": "D. Har Gobind Khorana (हरगोविंद खुराना)", "isCorrect": false }
+      ],
+      "explanationEng": "Rabindranath Tagore won the Nobel Prize in Literature in 1913 for his work Gitanjali.",
+      "explanationHin": "रवींद्रनाथ टैगोर को उनकी रचना गीतांजलि के लिए 1913 में साहित्य का नोबेल पुरस्कार मिला था।"
+    }
+  ];
+
+  // Pick 5 completely random questions from the pool of 15
+  const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
+  const selectedQuestions = shuffledPool.slice(0, 5);
+  
+  res.json({ questions: selectedQuestions });
+});
+
 // API: Get Automated Daily Researched Exam Notes & Blogs (Checks 12h gap)
 app.get("/api/get-automated-content", async (req: express.Request, res: express.Response) => {
   try {

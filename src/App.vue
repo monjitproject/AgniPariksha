@@ -179,6 +179,7 @@ const handlePopState = () => {
 onMounted(() => {
   window.addEventListener("popstate", handlePopState);
   handlePopState();
+  fetchDailyQuiz(); // Load dynamic live educational feed questions on compile/session launch
 });
 
 onUnmounted(() => {
@@ -221,6 +222,27 @@ const selectedArmyOption = ref<string | null>(null);
 const armyAnswered = ref<boolean>(false);
 const armyScore = ref<number>(0);
 const armyQuizFinished = ref<boolean>(false);
+
+// Dynamic Quiz of the Day questions from online educational feeds
+const dailyQuestions = ref<any[]>(ARMY_PREV_QUESTIONS);
+const isFetchingDaily = ref<boolean>(false);
+
+const fetchDailyQuiz = async (force = false) => {
+  isFetchingDaily.value = true;
+  try {
+    const res = await fetch(`/api/daily-quiz${force ? "?force=true" : ""}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.questions && data.questions.length > 0) {
+        dailyQuestions.value = data.questions;
+      }
+    }
+  } catch (err) {
+    console.error("Error fetching dynamic feed questions:", err);
+  } finally {
+    isFetchingDaily.value = false;
+  }
+};
 
 // Detailed PYQs Feed states
 const pyqQuizIdx = ref<number>(0);
@@ -424,17 +446,37 @@ const handleAdminAddJob = (newJob: JobPost) => {
                   <div class="space-y-1">
                     <span class="text-[10px] font-black tracking-widest text-[#FF9933] uppercase font-mono flex items-center">
                       <Flame class="h-4 w-4 mr-1 animate-pulse" />
-                      PREVIOUS PAPER QUIZ
+                      LIVE FEED QUIZ
                     </span>
-                    <h4 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight">
-                      Agniveer Army GD Prep
+                    <h4 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight flex flex-wrap items-center gap-2">
+                      <span>Agniveer Army GD Prep</span>
+                      <button 
+                        @click="fetchDailyQuiz(true)" 
+                        class="text-xs text-[#000080] hover:text-[#2563EB] font-black font-mono transition-colors uppercase tracking-wider flex items-center gap-1 bg-slate-50 border border-slate-200 py-1 px-2.5 rounded-lg cursor-pointer select-none"
+                        title="Click to fetch an entirely different, live quiz set from online websites feeds"
+                        :disabled="isFetchingDaily"
+                      >
+                        <RefreshCw class="h-3 w-3" :class="{'animate-spin': isFetchingDaily}" />
+                        <span class="text-[9px]">Fetch New Set</span>
+                      </button>
                     </h4>
                   </div>
                   <Award class="h-8 w-8 text-[#FF9933] shrink-0" />
                 </div>
 
+                <!-- Live Loading State -->
+                <div v-if="isFetchingDaily" class="flex flex-col items-center justify-center py-20 space-y-3" id="daily-quiz-loading-state">
+                  <RefreshCw class="h-9 w-9 text-[#000080] animate-spin" />
+                  <p class="text-xs font-black text-slate-600 uppercase tracking-widest font-sans animate-pulse">
+                    Fetching dynamic questions...
+                  </p>
+                  <p class="text-[10.5px] text-gray-400 italic font-medium">
+                    शैक्षणिक वेबसाइट फ़ीड्स से नए प्रश्न खोजे जा रहे हैं...
+                  </p>
+                </div>
+
                 <!-- Finished state -->
-                <div v-if="armyQuizFinished" class="space-y-5 text-center py-4 animate-fade-in" id="army-quiz-finished-view">
+                <div v-else-if="armyQuizFinished" class="space-y-5 text-center py-4 animate-fade-in" id="army-quiz-finished-view">
                   <div class="mx-auto w-16 h-16 bg-emerald-50 rounded-full border border-emerald-200 flex items-center justify-center text-3xl shadow-sm mb-1 animate-bounce">
                     🏆
                   </div>
@@ -442,23 +484,25 @@ const handleAdminAddJob = (newJob: JobPost) => {
                   
                   <div class="bg-slate-50 border border-slate-100 p-4 rounded-xl max-w-xs mx-auto">
                     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Score / स्कोर</p>
-                    <p class="text-3xl font-black text-slate-800 font-mono">{{ armyScore }} / {{ ARMY_PREV_QUESTIONS.length }}</p>
+                    <p class="text-3xl font-black text-slate-800 font-mono">{{ armyScore }} / {{ dailyQuestions.length }}</p>
                     <span class="text-[10px] bg-amber-50 text-amber-800 font-extrabold px-3 py-1 rounded inline-block mt-1">
-                      {{ Math.round((armyScore / ARMY_PREV_QUESTIONS.length) * 100) }}% Accuracy Rate
+                      {{ Math.round((armyScore / dailyQuestions.length) * 100) }}% Accuracy Rate
                     </span>
                   </div>
 
                   <button
-                    @click="() => {
+                    @click="async () => {
                       armyQuizIdx = 0;
                       selectedArmyOption = null;
                       armyAnswered = false;
                       armyScore = 0;
                       armyQuizFinished = false;
+                      await fetchDailyQuiz(true);
                     }"
-                    class="w-full bg-[#138808] hover:bg-emerald-800 text-white font-extrabold text-xs py-3 rounded-xl transition-all shadow cursor-pointer font-sans uppercase"
+                    class="w-full bg-[#138808] hover:bg-emerald-800 text-white font-extrabold text-xs py-3 rounded-xl transition-all shadow cursor-pointer font-sans uppercase flex items-center justify-center space-x-1.5"
                   >
-                    Repeat practice (दोबारा अभ्यास करें)
+                    <RefreshCw class="h-3.5 w-3.5" />
+                    <span>Repeat with different questions (दोबारा अभ्यास)</span>
                   </button>
                 </div>
 
@@ -466,29 +510,29 @@ const handleAdminAddJob = (newJob: JobPost) => {
                 <div v-else class="space-y-5" id="army-quiz-active-view">
                   <div class="flex items-center justify-between text-[11px] font-bold font-mono">
                     <span class="text-[#000080] bg-blue-50 px-2.5 py-1 rounded">BILINGUAL</span>
-                    <span class="text-slate-500">Q. {{ armyQuizIdx + 1 }} of {{ ARMY_PREV_QUESTIONS.length }}</span>
+                    <span class="text-slate-500">Q. {{ armyQuizIdx + 1 }} of {{ dailyQuestions.length }}</span>
                   </div>
 
                   <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                     <div 
                       class="bg-gradient-to-r from-[#FF9933] to-[#138808] h-full transition-all duration-300"
-                      :style="{ width: `${((armyQuizIdx + 1) / ARMY_PREV_QUESTIONS.length) * 100}%` }"
+                      :style="{ width: `${((armyQuizIdx + 1) / dailyQuestions.length) * 100}%` }"
                     />
                   </div>
 
-                  <div class="bg-slate-50 rounded-xl p-4 border border-slate-150 text-left space-y-1">
+                  <div v-if="dailyQuestions[armyQuizIdx]" class="bg-slate-50 rounded-xl p-4 border border-slate-150 text-left space-y-1">
                     <p class="text-slate-900 text-sm font-black tracking-tight font-sans">
                       <span class="text-[#FF9933] font-mono mr-1">Q{{ armyQuizIdx + 1 }}.</span>
-                      {{ ARMY_PREV_QUESTIONS[armyQuizIdx].englishQ }}
+                      {{ dailyQuestions[armyQuizIdx].englishQ }}
                     </p>
                     <p class="text-[#138808] text-xs font-bold border-t border-dashed border-gray-200 pt-1">
-                      🇮🇳 {{ ARMY_PREV_QUESTIONS[armyQuizIdx].hindiQ }}
+                      🇮🇳 {{ dailyQuestions[armyQuizIdx].hindiQ }}
                     </p>
                   </div>
 
-                  <div class="space-y-2 text-xs text-left">
+                  <div v-if="dailyQuestions[armyQuizIdx]" class="space-y-2 text-xs text-left">
                     <button
-                      v-for="opt in ARMY_PREV_QUESTIONS[armyQuizIdx].options"
+                      v-for="opt in dailyQuestions[armyQuizIdx].options"
                       :key="opt.key"
                       @click="() => {
                         if (armyAnswered) return;
@@ -518,17 +562,17 @@ const handleAdminAddJob = (newJob: JobPost) => {
                   </div>
 
                   <!-- Explanation feedback card -->
-                  <div v-if="armyAnswered" class="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-[11px] leading-relaxed text-left text-slate-700 space-y-1">
+                  <div v-if="armyAnswered && dailyQuestions[armyQuizIdx]" class="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-[11px] leading-relaxed text-left text-slate-700 space-y-1">
                     <strong class="text-amber-900 block border-b border-amber-200/50 pb-1 font-sans uppercase">💡 ANALYSIS / विश्लेषण:</strong>
-                    <p><span class="font-bold">Eng:</span> {{ ARMY_PREV_QUESTIONS[armyQuizIdx].explanationEng }}</p>
-                    <p><span class="font-bold text-[#138808]">Hin:</span> {{ ARMY_PREV_QUESTIONS[armyQuizIdx].explanationHin }}</p>
+                    <p><span class="font-bold">Eng:</span> {{ dailyQuestions[armyQuizIdx].explanationEng }}</p>
+                    <p><span class="font-bold text-[#138808]">Hin:</span> {{ dailyQuestions[armyQuizIdx].explanationHin }}</p>
                   </div>
 
                   <!-- Next Action btn -->
                   <button
                     v-if="armyAnswered"
                     @click="() => {
-                      if (armyQuizIdx === ARMY_PREV_QUESTIONS.length - 1) {
+                      if (armyQuizIdx === dailyQuestions.length - 1) {
                         armyQuizFinished = true;
                         triggerCelebration();
                       } else {
@@ -539,7 +583,7 @@ const handleAdminAddJob = (newJob: JobPost) => {
                     }"
                     class="w-full bg-[#0f172a] hover:bg-slate-900 text-white font-extrabold text-xs py-3.5 rounded-xl cursor-pointer font-sans"
                   >
-                    {{ armyQuizIdx === ARMY_PREV_QUESTIONS.length - 1 ? 'Finish & Check Results 🏆' : 'Next bilingual question (अगला प्रश्न) ➔' }}
+                    {{ armyQuizIdx === dailyQuestions.length - 1 ? 'Finish & Check Results 🏆' : 'Next bilingual question (अगला प्रश्न) ➔' }}
                   </button>
                 </div>
               </div>
