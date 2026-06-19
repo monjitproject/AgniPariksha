@@ -746,50 +746,48 @@ const handleAdminAddJob = (newJob: JobPost) => {
             <div class="space-y-6 text-left" id="exam-catalog-sec">
               <h3 class="font-extrabold text-sm uppercase text-gray-500 tracking-wider font-mono">Exam Segments & Key Quizzes</h3>
               
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5" id="exam-segments-grid">
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="exam-segments-grid">
                 <div
                   v-for="(seg, idx) in [
-                    { emoji: '🪖', title: 'Indian Army GK', desc: 'Test your knowledge on the Indian Army\'s history, ranks and operations.', q: '10 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-amber-50/20', borderClass: 'border-amber-100 hover:border-amber-300', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '⚓', title: 'Indian Navy GK', desc: 'Naval history, vessels, ranks and operations of the Indian Navy.', q: '8 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-blue-50/20', borderClass: 'border-blue-100 hover:border-blue-300', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '✈️', title: 'Indian Air Force GK', desc: 'Aircraft, squadrons and history of the IAF.', q: '7 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-indigo-50/20', borderClass: 'border-indigo-100 hover:border-indigo-300', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '🏛️', title: 'Indian Constitution', desc: 'Articles, schedules and key provisions of the Constitution of India.', q: '8 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-purple-50/20', borderClass: 'border-purple-100 hover:border-purple-300', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '📜', title: 'Indian History', desc: 'Ancient, medieval and modern Indian history.', q: '7 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-orange-50/20', borderClass: 'border-orange-100 hover:border-orange-300', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '🗺️', title: 'Indian Geography', desc: 'Physical and economic geography of India.', q: '7 Qs', badge: 'Easy', gradient: 'bg-gradient-to-tr from-white via-white to-emerald-50/20', borderClass: 'border-emerald-100 hover:border-emerald-300', badgeBg: 'bg-emerald-50 text-emerald-700' },
-                    { emoji: '📰', title: 'Current Affairs', desc: 'Daily updates from India and the world.', q: '5 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-slate-50', borderClass: 'border-slate-200 hover:border-slate-350', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '🛡️', title: 'Agniveer Quiz', desc: 'Practice for Agniveer Army/Navy/Air Force.', q: '5 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-cyan-50/20', borderClass: 'border-cyan-100 hover:border-cyan-300', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '🎯', title: 'NDA Quiz', desc: 'Combined Defence Service entry.', q: '5 Qs', badge: 'Hard', gradient: 'bg-gradient-to-tr from-white via-white to-rose-50/20', borderClass: 'border-rose-105 hover:border-rose-300', badgeBg: 'bg-rose-50 text-rose-700' },
-                    { emoji: '🎖️', title: 'CDS Quiz', desc: 'Officer entry to IMA, INA, AFA, OTA.', q: '5 Qs', badge: 'Hard', gradient: 'bg-gradient-to-tr from-white via-white to-fuchsia-50/20', borderClass: 'border-fuchsia-105 hover:border-fuchsia-300', badgeBg: 'bg-rose-50 text-rose-700' },
-                    { emoji: '🛩️', title: 'AFCAT Quiz', desc: 'Air Force Common Admission Test.', q: '5 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-sky-50/20', borderClass: 'border-sky-100 hover:border-sky-300', badgeBg: 'bg-amber-50 text-amber-700' },
-                    { emoji: '🧠', title: 'General Knowledge', desc: 'Mixed GK from every topic.', q: '5 Qs', badge: 'Easy', gradient: 'bg-gradient-to-tr from-white via-white to-pink-50/20', borderClass: 'border-pink-100 hover:border-pink-300', badgeBg: 'bg-emerald-50 text-emerald-700' }
+                    { emoji: '🪖', title: 'Indian Army GK', desc: 'Test your knowledge on the Indian Army\'s history, ranks and operations.', q: '10 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-amber-50/40', borderClass: 'border-amber-100 hover:border-amber-300', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '⚓', title: 'Indian Navy GK', desc: 'Naval history, vessels, ranks and operations of the Indian Navy.', q: '8 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-blue-50/40', borderClass: 'border-blue-100 hover:border-blue-300', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '✈️', title: 'Indian Air Force GK', desc: 'Aircraft, squadrons and history of the IAF.', q: '7 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-indigo-50/40', borderClass: 'border-indigo-100 hover:border-indigo-300', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '🏛️', title: 'Indian Constitution', desc: 'Articles, schedules and key provisions of the Constitution of India.', q: '8 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-purple-50/40', borderClass: 'border-purple-100 hover:border-purple-300', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '📜', title: 'Indian History', desc: 'Ancient, medieval and modern Indian history.', q: '7 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-orange-50/40', borderClass: 'border-orange-100 hover:border-orange-300', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '🗺️', title: 'Indian Geography', desc: 'Physical and economic geography of India.', q: '7 Qs', badge: 'Easy', gradient: 'bg-gradient-to-tr from-white via-white to-emerald-50/40', borderClass: 'border-emerald-100 hover:border-emerald-300', badgeBg: 'bg-[#DCFCE7] text-[#166534]' },
+                    { emoji: '📰', title: 'Current Affairs', desc: 'Daily updates from India and the world.', q: '5 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-slate-100/50', borderClass: 'border-slate-200 hover:border-slate-350', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '🛡️', title: 'Agniveer Quiz', desc: 'Practice for Agniveer Army/Navy/Air Force.', q: '5 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-cyan-50/40', borderClass: 'border-cyan-100 hover:border-cyan-300', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '🎯', title: 'NDA Quiz', desc: 'Combined Defence Service entry.', q: '5 Qs', badge: 'Hard', gradient: 'bg-gradient-to-tr from-white via-white to-rose-50/40', borderClass: 'border-rose-105 hover:border-rose-300', badgeBg: 'bg-[#FEE2E2] text-[#991B1B]' },
+                    { emoji: '🎖️', title: 'CDS Quiz', desc: 'Officer entry to IMA, INA, AFA, OTA.', q: '5 Qs', badge: 'Hard', gradient: 'bg-gradient-to-tr from-white via-white to-fuchsia-50/40', borderClass: 'border-fuchsia-105 hover:border-fuchsia-300', badgeBg: 'bg-[#FEE2E2] text-[#991B1B]' },
+                    { emoji: '🛩️', title: 'AFCAT Quiz', desc: 'Air Force Common Admission Test.', q: '5 Qs', badge: 'Medium', gradient: 'bg-gradient-to-tr from-white via-white to-sky-50/40', borderClass: 'border-sky-100 hover:border-sky-300', badgeBg: 'bg-[#FEF08A] text-[#854D0E]' },
+                    { emoji: '🧠', title: 'General Knowledge', desc: 'Mixed GK from every topic.', q: '5 Qs', badge: 'Easy', gradient: 'bg-gradient-to-tr from-white via-white to-pink-50/40', borderClass: 'border-pink-100 hover:border-pink-300', badgeBg: 'bg-[#DCFCE7] text-[#166534]' }
                   ]"
                   :key="idx"
                   @click="handleNavigation('quizzes')"
-                  class="group relative cursor-pointer text-left p-5 rounded-[1.5rem] border transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1"
+                  class="group relative cursor-pointer text-left p-6 rounded-[1.5rem] border transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 min-h-[220px]"
                   :class="[seg.gradient, seg.borderClass]"
                 >
                   <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                      <div class="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-xl select-none">
-                        {{ seg.emoji }}
-                      </div>
+                    <div class="text-3xl select-none mb-1">
+                      {{ seg.emoji }}
                     </div>
 
                     <div class="space-y-1.5 text-left">
-                      <h4 class="text-sm sm:text-base font-extrabold text-slate-800 group-hover:text-[#000080] font-sans transition-colors duration-150">
+                      <h4 class="text-[17px] font-extrabold text-slate-800 group-hover:text-[#000080] font-sans transition-colors duration-150">
                         {{ seg.title }}
                       </h4>
-                      <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed font-sans line-clamp-2">
+                      <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed font-sans line-clamp-3">
                         {{ seg.desc }}
                       </p>
                     </div>
                   </div>
 
                   <!-- Footer row -->
-                  <div class="mt-5 pt-3 border-t border-gray-50 flex items-center justify-between text-xs font-sans">
-                    <span class="text-[10px] font-mono font-black uppercase text-gray-500 bg-gray-100/80 px-2.5 py-1 rounded-full">
+                  <div class="mt-6 pt-2 flex items-center justify-between text-xs font-sans">
+                    <span class="text-[11px] font-mono font-bold text-slate-500 bg-slate-100/90 px-3 py-1 rounded-full">
                       {{ seg.q }}
                     </span>
-                    <span :class="['text-[10px] font-bold uppercase px-3 py-1 rounded-full tracking-wider font-sans', seg.badgeBg]">
+                    <span :class="['text-[11px] font-bold uppercase px-3 py-1 rounded-full tracking-wider font-sans', seg.badgeBg]">
                       {{ seg.badge }}
                     </span>
                   </div>
