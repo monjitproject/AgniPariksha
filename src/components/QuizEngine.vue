@@ -5,6 +5,7 @@ import {
   CheckCircle, XCircle, RefreshCw, Sparkles, Printer, Play, 
   AlertCircle, FileText, Flame
 } from 'lucide-vue-next';
+import canvasConfetti from 'canvas-confetti';
 import { Quiz, QuizHistoryItem, UserCertificate } from '../types';
 import { MOCK_QUIZZES, ARMY_PREV_QUESTIONS } from '../data/mockData';
 
@@ -106,6 +107,160 @@ const getBilingualOption = (qText: string, optionText: string) => {
   }
 
   return optionText;
+};
+
+const getBilingualExplanation = (q: any) => {
+  // 1. If it's a previous year question from ARMY_PREV_QUESTIONS (like pyq-question-*), we can find it
+  if (q.id && q.id.startsWith("pyq-")) {
+    const idx = parseInt(q.id.replace("pyq-question-", ""));
+    const pq = ARMY_PREV_QUESTIONS[idx];
+    if (pq) {
+      return {
+        english: pq.explanationEng || q.explanation,
+        hindi: pq.explanationHin || "सशस्त्र सेना शिक्षा बोर्ड दिशानिर्देशों द्वारा सत्यापित सही विकल्प।"
+      };
+    }
+  }
+
+  // 2. Or, if it has a slash separator in the explanation itself, extract them
+  if (q.explanation && q.explanation.includes(" / ")) {
+    const parts = q.explanation.split(" / ");
+    return {
+      english: parts[0].trim(),
+      hindi: parts[1].trim()
+    };
+  } else if (q.explanation && q.explanation.includes("/")) {
+    const parts = q.explanation.split("/");
+    return {
+      english: parts[0].trim(),
+      hindi: parts[1].trim()
+    };
+  }
+
+  // 3. Exact dictionary for Mock Quizzes
+  const mockExpls: Record<string, { english: string; hindi: string }> = {
+    "af-1": {
+      english: "Article 53 of the Constitution of India provides that the Supreme Command of the Defence Forces of the Union shall be vested in the President of India.",
+      hindi: "भारत के संविधान का अनुच्छेद 53 प्रावधान करता है कि संघ के रक्षा बलों की सर्वोच्च कमान भारत के राष्ट्रपति में निहित होगी।"
+    },
+    "af-2": {
+      english: "The Indian Military Academy (IMA) was established in 1932 and is located in Dehradun, Uttarakhand.",
+      hindi: "भारतीय सैन्य अकादमी (IMA) की स्थापना 1932 में हुई थी और यह देहरादून, उत्तराखंड में स्थित है।"
+    },
+    "af-3": {
+      english: "The official motto of the Indian Army is 'Service Before Self' ('Seva Parmo Dharma').",
+      hindi: "भारतीय सेना का आधिकारिक आदर्श वाक्य 'सेवा परमो धर्मः' है।"
+    },
+    "af-4": {
+      english: "The commissioned naval rank sequence from lowest to highest starts with Sub-Lieutenant, Lieutenant, Lieutenant Commander, then Commander.",
+      hindi: "कमीशन प्राप्त नौसेना रैंक का अनुक्रम सबसे निचले स्थान से क्रमशः सब-लेफ्टिनेंट, लेफ्टिनेंट, लेफ्टिनेंट कमांडर और फिर कमांडर होता है।"
+    },
+    "af-5": {
+      english: "The Agniveer recruitment under Agnipath scheme is a tour of duty style enrollment for a duration of 4 years.",
+      hindi: "अग्निपथ योजना के तहत अग्निवीर भर्ती 4 वर्ष की अवधि के लिए 'टूर ऑफ ड्यूटी' प्रणाली है।"
+    },
+    "navy-1": {
+      english: "Chhatrapati Shivaji Maharaj, the Maratha emperor, is considered the Father of the Indian Navy due to his visionary creation of a formidable coastal naval fleet to combat foreign invaders.",
+      hindi: "मराठा सम्राट छत्रपति शिवाजी महाराज को विदेशी आक्रांताओं के मुकाबले के लिए मजबूत तटीय नौसैनिक बेड़े के निर्माण के कारण भारतीय नौसेना का जनक माना जाता है।"
+    },
+    "navy-2": {
+      english: "INS Vikrant (IAC-1) is the first aircraft carrier designed by the Warship Design Bureau of the Indian Navy and constructed by Cochin Shipyard.",
+      hindi: "INS विक्रांत (IAC-1) भारत में स्वदेशी रूप से डिजाइन और निर्मित होने वाला पहला विमानवाहक पोत है, जिसे कोचीन शिपयार्ड ने बनाया है।"
+    },
+    "navy-3": {
+      english: "The Southern Naval Command of the Indian Navy is headquartered at Kochi, Kerala.",
+      hindi: "भारतीय नौसेना की दक्षिणी नौसैनिक कमान का मुख्य कार्यालय कोच्चि, केरल में स्थित है।"
+    },
+    "af-tech-1": {
+      english: "Marshal of the Indian Air Force Arjan Singh DFC was the first five-star rank officer and the only Marshal of the IAF.",
+      hindi: "मार्शल ऑफ द इंडियन एयर फोर्स अर्जन सिंह भारतीय वायुसेना के एकमात्र पांच-सितारा अधिकारी और मार्शल थे।"
+    },
+    "af-tech-2": {
+      english: "India purchased the Rafale multi-role combat fighter aircraft from Dassault Aviation of France.",
+      hindi: "भारत ने फ्रांस के डसॉल्ट एविऐशन से अत्याधुनिक राफेल मल्टीरोल लड़ाकू विमान खरीदे हैं।"
+    },
+    "polity-1": {
+      english: "Dr. Bhimrao Ramji Ambedkar served as the chairman of the Drafting Committee which prepared the Constitution of India.",
+      hindi: "डॉ. भीमराव रामजी आंबेडकर ने भारतीय संविधान का मसौदा तैयार करने वाली प्रारूप समिति के अध्यक्ष के रूप में कार्य किया।"
+    },
+    "polity-2": {
+      english: "Articles 14 to 18 of the Constitution of India guarantee the Right to Equality as a fundamental right.",
+      hindi: "भारतीय संविधान के अनुच्छेद 14 से 18 संपूर्ण नागरिकों को समानता के मौलिक अधिकार की गारंटी प्रदान करते हैं।"
+    },
+    "polity-3": {
+      english: "Originally, there were 8 schedules. Currently, the Constitution of India has 12 schedules after various amendments.",
+      hindi: "मूल संविधान में 8 अनुसूचियां थीं। विभिन्न संवैधानिक संशोधनों के उपरांत वर्तमान में 12 अनुसूचियां हैं।"
+    },
+    "ca-1": {
+      english: "The 20th G20 summit was hosted by South Africa in late 2025 as the presidency rotated, continuing diplomatic cooperation.",
+      hindi: "20वें जी-20 शिखर सम्मेलन की मेजबानी 2025 के अंत में दक्षिण अफ्रीका द्वारा की गई क्योंकि अध्यक्षता घूमती रही।"
+    },
+    "ca-2": {
+      english: "The K9 Vajra-T tracked self-propelled Howitzer gun system is manufactured by Larsen & Toubro in India with Korean technology transfer.",
+      hindi: "K9 वज्र-T स्व-चालित होवित्जर तोप प्रणाली का निर्माण भारत में लार्सन एंड टुब्रो द्वारा कोरियाई तकनीकी हस्तांतरण के साथ किया जाता है।"
+    },
+    "ssc-gd-1": {
+      english: "Chandragupta Maurya established the Maurya Empire in 322 BCE after defeating Dhanananda.",
+      hindi: "चन्द्रगुप्त मौर्य ने 322 ईसा पूर्व में धनानंद को पराजित कर महान मौर्य साम्राज्य की स्थापना की थी।"
+    },
+    "ssc-gd-2": {
+      english: "Article 17 of the Constitution of India abolishes 'untouchability' and forbids its practice.",
+      hindi: "भारतीय संविधान का अनुच्छेद 17 अस्पृश्यता (छुआछूत) का पूर्ण उन्मूलन करता है और इसका आचरण निषिद्ध करता है।"
+    },
+    "ssc-gd-3": {
+      english: "The capital of India was shifted from Calcutta to Delhi in 1911 during the Delhi Durbar.",
+      hindi: "वर्ष 1911 में दिल्ली दरबार के आयोजन के दौरान भारत की राजधानी को कलकत्ता से दिल्ली स्थानांतरित किया गया था।"
+    },
+    "ssc-gd-4": {
+      english: "The antonym of 'Sankshipt' (brief) is 'Vistrit' (detailed).",
+      hindi: "हिंदी व्याकरण के अनुसार शब्द 'संक्षिप्त' का सही विलोम शब्द 'विस्तृत' होता है।"
+    },
+    "rrb-1": {
+      english: "Shree Siddharoodha Swamiji Hubballi Station platform in Karnataka is the longest in the world (1507m).",
+      hindi: "कर्नाटक के हुबली में स्थित श्री सिद्धारूढ़ स्वामीजी हुबली रेलवे स्टेशन का प्लेटफॉर्म वर्तमान में विश्व का सबसे लंबा (1507 मीटर) प्लेटफॉर्म है।"
+    },
+    "rrb-2": {
+      english: "The first passenger train ran on April 16, 1853, covering 34 km with 400 passengers.",
+      hindi: "भारत की प्रथम यात्री रेलगाड़ी 16 अप्रैल 1853 को मुंबई से ठाणे के बीच 34 किलोमीटर की दूरी पर चलाई गई थी।"
+    },
+    "up-ex-1": {
+      english: "The holy confluence (Triveni Sangam) at Prayagraj is formed by the Ganga, Yamuna, and mythical Saraswati.",
+      hindi: "प्रयागराज में स्थित पवित्र त्रिवेणी संगम गंगा, यमुना और अदृश्य/पौराणिक सरस्वती नदी के मिलन से बनता है।"
+    },
+    "up-ex-2": {
+      english: "Since the face is compared to the Moon (Moon-like face), it is a Karmadharaya Samas.",
+      hindi: "मुख की तुलना चंद्रमा से की जाने के कारण (चंद्रमा के समान मुख), इसमें कर्मधारय समास प्रयुक्त हुआ है।"
+    },
+    "bank-1": {
+      english: "The Reserve Bank of India (RBI) has sole authority to control currency supply and govern monetary policies.",
+      hindi: "भारतीय रिजर्व बैंक (RBI) देश की मुद्रा आपूर्ति को नियंत्रित करने तथा देश की मौद्रिक नीति निर्धारित करने का सर्वोच्च बैंक है।"
+    },
+    "bank-2": {
+      english: "An asset becomes non-performing when it ceases to generate income for the bank, typically past due for 90 days.",
+      hindi: "कोई परिसंपत्ति तब गैर-निष्पादित (NPA) श्रेणी में आती है जब वह बैंक के लिए ब्याज या आय उत्पन्न करना बंद कर देती है, जो सामान्यतः 90 दिनों तक बकाया रहने पर होता है।"
+    },
+    "civils-1": {
+      english: "The Bill of Rights of the United States Constitution inspired the Drafting Committee to implement Part III Fundamental Rights.",
+      hindi: "संयुक्त राज्य अमेरिका (USA) के संविधान के 'बिल ऑफ राइट्स' ने भारतीय संविधान के भाग III में मौलिक अधिकारों को शामिल करने की प्रेरणा दी।"
+    },
+    "civils-2": {
+      english: "Raja Ram Mohan Roy founded Brahmo Samaj in Calcutta in 1828 to fight social evils like Sati.",
+      hindi: "राजा राम मोहन राय ने सती प्रथा जैसी कुरीतियों के विरुद्ध सामाजिक जागृति के लिए वर्ष 1828 में कलकत्ता में 'ब्रह्म समाज' की स्थापना की थी।"
+    },
+    "bihar-p-1": {
+      english: "Kosi is known as Sorrow of Bihar because its frequent course changes cause extreme seasonal floods.",
+      hindi: "कोसी नदी को अपना मार्ग बदलने तथा अत्यधिक बाढ़ के प्रकोप के कारण 'बिहार का शोक' कहा जाता है।"
+    }
+  };
+
+  if (q.id && mockExpls[q.id]) {
+    return mockExpls[q.id];
+  }
+
+  return {
+    english: q.explanation || "Correct choice validated by the official Armed Services education guidelines.",
+    hindi: "आधिकारिक सशस्त्र सेना शिक्षा परीक्षा दिशानिर्देशों द्वारा सविस्तार सत्यापित सही विकल्प।"
+  };
 };
 
 const GENUINE_PYQ_QUIZ: Quiz = {
@@ -312,7 +467,7 @@ const submitQuiz = () => {
   showResults.value = true;
   isPlaying.value = false;
 
-  // Fire celebration confetti
+  // Fire celebration confetti elements for background
   const list = Array.from({ length: 50 }).map((_, idx) => {
     const colors = ["#FF9933", "#FFFFFF", "#138808", "#FFD700", "#000080", "#2563EB", "#10B981"];
     return {
@@ -324,6 +479,48 @@ const submitQuiz = () => {
     };
   });
   confetti.value = list;
+
+  // Trigger high engagement canvas-confetti particle engine
+  if (scorePercentage >= 50) {
+    if (scorePercentage >= 75) {
+      // Grand high score celebration (continuous canon side bursts)
+      const duration = 3.5 * 1000;
+      const end = Date.now() + duration;
+      
+      const celebrativeInterval = setInterval(() => {
+        if (Date.now() > end) {
+          clearInterval(celebrativeInterval);
+          return;
+        }
+        
+        // Left side cannon
+        canvasConfetti({
+          particleCount: 25,
+          angle: 60,
+          spread: 60,
+          origin: { x: 0, y: 0.7 },
+          colors: ["#FF9933", "#FFFFFF", "#138808", "#FFD700", "#000080"]
+        });
+        
+        // Right side cannon
+        canvasConfetti({
+          particleCount: 25,
+          angle: 120,
+          spread: 60,
+          origin: { x: 1, y: 0.7 },
+          colors: ["#FF9933", "#FFFFFF", "#138808", "#FFD700", "#000080"]
+        });
+      }, 250);
+    } else {
+      // Standard passing score celebration
+      canvasConfetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ["#FF9933", "#FFFFFF", "#138808", "#FFD700", "#000080"]
+      });
+    }
+  }
 };
 
 const issueCertificate = () => {
@@ -510,13 +707,40 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Progress bar -->
-          <div class="px-6 sm:px-8">
-            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <!-- Progress bar & Questions Left Tracker -->
+          <div class="px-6 sm:px-8 space-y-1.5" id="quiz-progress-tracker-box">
+            <!-- Progress Bar -->
+            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/40 relative">
               <div 
-                class="h-full bg-gradient-to-r from-[#FF9933] to-[#138808] rounded-full transition-all duration-300"
+                class="h-full bg-gradient-to-r from-[#FF9933] via-yellow-400 to-[#138808] rounded-full transition-all duration-300 relative animate-pulse"
                 :style="{ width: `${((currentQuestionIndex + 1) / selectedQuiz.questions.length) * 100}%` }"
-              />
+              >
+                <!-- subtle shine pulse overlay -->
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              </div>
+            </div>
+            
+            <!-- Progress Details Sub-row specifying questions left -->
+            <div class="flex items-center justify-between text-[11px] font-sans font-bold text-slate-500">
+              <span class="flex items-center space-x-1 select-none">
+                <span class="text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full font-mono">
+                  📊 Progress: {{ Math.round(((currentQuestionIndex + 1) / selectedQuiz.questions.length) * 100) }}% Completed
+                </span>
+              </span>
+              
+              <span 
+                v-if="selectedQuiz.questions.length - (currentQuestionIndex + 1) > 0" 
+                class="bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded flex items-center space-x-1 shadow-sm font-mono text-[10.5px] uppercase tracking-wider font-extrabold"
+              >
+                <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping mr-0.5" />
+                <span>⏳ {{ selectedQuiz.questions.length - (currentQuestionIndex + 1) }} Questions Left / {{ selectedQuiz.questions.length - (currentQuestionIndex + 1) }} प्रश्न शेष</span>
+              </span>
+              <span 
+                v-else
+                class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded flex items-center space-x-1 shadow-sm font-mono text-[10.5px] uppercase tracking-wider font-extrabold"
+              >
+                <span>🏁 Last Question! / अंतिम प्रश्न</span>
+              </span>
             </div>
           </div>
 
@@ -606,13 +830,13 @@ onUnmounted(() => {
               </div>
               <div class="space-y-2 text-slate-705 leading-relaxed">
                 <p class="font-semibold text-[12px] sm:text-[13px] text-slate-800">
-                  <span class="text-amber-800 font-extrabold mr-1 font-mono uppercase">English Description:</span>
-                  {{ selectedQuiz.questions[currentQuestionIndex].explanation || "Correct choice validated by the Board of Armed Services Education guidelines." }}
+                  <span class="text-amber-800 font-extrabold mr-1 font-mono uppercase">English Explanation:</span>
+                  {{ getBilingualExplanation(selectedQuiz.questions[currentQuestionIndex]).english }}
                 </p>
                 <div class="border-t border-dashed border-amber-200/60" />
                 <p class="font-semibold text-[12px] sm:text-[13px] text-[#138808]">
-                  <span class="text-[#138808] font-extrabold mr-1">हिन्दी विवरण:</span>
-                  सशस्त्र सेना शिक्षा बोर्ड दिशानिर्देशों द्वारा सत्यापित सही विकल्प।
+                  <span class="text-[#138808] font-extrabold mr-1">हिन्दी व्याख्या:</span>
+                  {{ getBilingualExplanation(selectedQuiz.questions[currentQuestionIndex]).hindi }}
                 </p>
               </div>
             </div>
@@ -990,50 +1214,112 @@ onUnmounted(() => {
         </div>
 
         <div class="space-y-6" id="review-explanations-list">
-          <div v-for="(q, qidx) in selectedQuiz.questions" :key="q.id" class="p-4 sm:p-5 rounded-xl border border-gray-100 flex flex-col space-y-3 bg-gray-50/50 text-left">
-            <div class="flex justify-between items-start">
-              <span class="text-xs font-bold bg-gray-200 text-gray-700 font-mono py-0.5 px-2 rounded">
-                Question {{ qidx + 1 }}
+          <div v-for="(q, qidx) in selectedQuiz.questions" :key="q.id" class="p-5 sm:p-6 rounded-2xl border border-gray-150 flex flex-col space-y-4 bg-white shadow-sm text-left">
+            
+            <!-- Question stats / metadata header -->
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
+              <span class="text-xs font-extrabold bg-[#000080]/10 text-[#000080] font-mono py-1 px-3 rounded-full">
+                QUESTION {{ qidx + 1 }} OF {{ selectedQuiz.questions.length }}
               </span>
               
-              <span v-if="selectedAnswers[q.id] === undefined" class="text-[10px] uppercase font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded border">
-                Skipped
-              </span>
-              <span v-else-if="selectedAnswers[q.id] === q.correctAnswer" class="text-[10px] uppercase font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200 flex items-center space-x-0.5" style="padding: 2px 8px;">
-                <CheckCircle class="h-3 w-3 inline" />
-                <span>Correct</span>
-              </span>
-              <span v-else class="text-[10px] uppercase font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 flex items-center space-x-0.5" style="padding: 2px 8px;">
-                <XCircle class="h-3 w-3 inline" />
-                <span>Incorrect</span>
-              </span>
-            </div>
-
-            <h5 class="font-bold text-gray-800 text-sm leading-relaxed">{{ q.text }}</h5>
-
-            <!-- Display choices breakdown -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <div 
-                v-for="(opt, oindex) in q.options"
-                :key="oindex"
-                :class="[
-                  'p-2.5 rounded border text-left',
-                  q.correctAnswer === oindex 
-                    ? 'bg-green-50 border-green-300 text-green-800 font-bold' 
-                    : (selectedAnswers[q.id] === oindex 
-                      ? 'bg-red-50 border-red-200 text-red-800' 
-                      : 'bg-white border-gray-100 text-gray-600')
-                ]"
-              >
-                <span>{{ String.fromCharCode(65 + oindex) }}. {{ opt }}</span>
+              <div class="flex items-center space-x-2">
+                <span v-if="selectedAnswers[q.id] === undefined" class="text-[10px] uppercase font-black text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
+                  ⚠️ Skipped / अनुत्तरित
+                </span>
+                <span v-else-if="selectedAnswers[q.id] === q.correctAnswer" class="text-[10px] uppercase font-black text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 flex items-center space-x-1">
+                  <CheckCircle class="h-3.5 w-3.5" />
+                  <span>Correct / सही उत्तर</span>
+                </span>
+                <span v-else class="text-[10px] uppercase font-black text-red-800 bg-red-50 px-2.5 py-1 rounded-md border border-red-200 flex items-center space-x-1">
+                  <XCircle class="h-3.5 w-3.5" />
+                  <span>Incorrect / गलत उत्तर</span>
+                </span>
               </div>
             </div>
 
-            <!-- Explanation box -->
-            <div class="bg-[#000080]/5 p-3 rounded-lg border border-[#000080]/15 text-xs text-indigo-950 font-sans mt-2 text-left">
-              <strong class="text-[#000080] font-black uppercase tracking-wider block mb-1">Answer explanation key:</strong>
-              <p class="leading-relaxed">{{ q.explanation }}</p>
+            <!-- Bilingual Question Text -->
+            <div class="space-y-2">
+              <h5 class="font-black text-slate-900 text-sm sm:text-base leading-relaxed">
+                <span class="text-[#FF9933] font-mono mr-1">Q.</span> 
+                {{ getBilingualQuestion(q.text).english }}
+              </h5>
+              <h5 v-if="getBilingualQuestion(q.text).hindi" class="font-bold text-slate-700 text-xs sm:text-sm leading-relaxed italic border-l-2 border-[#138808] pl-2.5 ml-1">
+                {{ getBilingualQuestion(q.text).hindi }}
+              </h5>
             </div>
+
+            <!-- Display choices breakdown with full bilingual options -->
+            <div class="space-y-2.5">
+              <p class="text-[10px] uppercase font-black tracking-wider text-gray-400">Multiple Choice Answers / विकल्प:</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+                <div 
+                  v-for="(opt, oindex) in q.options"
+                  :key="oindex"
+                  :class="[
+                    'p-3.5 rounded-xl border text-left flex items-start space-x-2.5 transition-all',
+                    q.correctAnswer === oindex 
+                      ? 'bg-emerald-50/70 border-emerald-400 text-emerald-900 font-bold ring-1 ring-emerald-300' 
+                      : (selectedAnswers[q.id] === oindex 
+                        ? 'bg-red-50/70 border-red-300 text-red-900 font-medium' 
+                        : 'bg-slate-50 border-gray-200 text-gray-700')
+                  ]"
+                >
+                  <span class="font-mono font-black shrink-0 px-1.5 py-0.5 bg-white/80 border rounded text-xs">
+                    {{ String.fromCharCode(65 + oindex) }}
+                  </span>
+                  <span class="leading-relaxed">{{ getBilingualOption(q.text, opt) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Response Assessment Banner -->
+            <div 
+              :class="[
+                'p-3.5 rounded-xl text-xs flex items-center space-x-2 border transition-all mt-1',
+                selectedAnswers[q.id] === undefined
+                  ? 'bg-amber-50/40 border-amber-200 text-amber-900'
+                  : (selectedAnswers[q.id] === q.correctAnswer
+                    ? 'bg-emerald-50/40 border-emerald-200 text-emerald-900'
+                    : 'bg-red-50/40 border-red-200 text-red-900')
+              ]"
+            >
+              <span class="font-extrabold mr-1">Candidate Choice / आपका चयन:</span>
+              <span v-if="selectedAnswers[q.id] === undefined" class="font-semibold italic">
+                You skipped this question. (0 Marks Allocated)
+              </span>
+              <span v-else-if="selectedAnswers[q.id] === q.correctAnswer" class="font-bold flex items-center">
+                Option {{ String.fromCharCode(65 + selectedAnswers[q.id]) }} (Correct ✓)
+              </span>
+              <span v-else class="font-semibold flex flex-wrap items-center gap-1">
+                <span class="line-through text-red-700">Option {{ String.fromCharCode(65 + selectedAnswers[q.id]) }} (Incorrect ✗)</span>
+                <span class="mx-1 font-black">|</span>
+                <span class="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded font-black">Correct Key: Option {{ String.fromCharCode(65 + q.correctAnswer) }}</span>
+              </span>
+            </div>
+
+            <!-- Advanced Bilingual Explanations Container -->
+            <div class="bg-amber-50/50 p-4 sm:p-5 rounded-2xl border border-amber-200/60 space-y-3.5 text-xs text-left mt-2 shadow-inner">
+              <div class="flex items-center space-x-2 font-black text-amber-950 uppercase tracking-widest border-b border-amber-200/40 pb-2">
+                <Flame class="h-4 w-4 text-[#FF9933]" />
+                <span>EXPLANATION ANALYSIS / व्याख्यात्मक विश्लेषण</span>
+              </div>
+              <div class="space-y-3 text-slate-750 leading-relaxed">
+                <div>
+                  <p class="font-black text-[10px] text-amber-800 uppercase tracking-wide mb-0.5 font-mono">English Key Detail:</p>
+                  <p class="font-medium text-[12px] sm:text-[13px] text-slate-800">
+                    {{ getBilingualExplanation(q).english }}
+                  </p>
+                </div>
+                <div class="border-t border-dashed border-amber-200/70" />
+                <div>
+                  <p class="font-black text-[10px] text-[#138808] uppercase tracking-wide mb-0.5 font-mono">हिन्दी व्याख्या विश्लेषण:</p>
+                  <p class="font-bold text-[12px] sm:text-[13px] text-[#138808]">
+                    {{ getBilingualExplanation(q).hindi }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
