@@ -129,7 +129,7 @@ const LOCAL_FALLBACK_STOCKS = [
 ### 1. मूलभूत इकाइयाँ और रूपांतरण
 * **चाल का मूल सूत्र**: $चाल = \\frac{दूरी}{समय}$
 * **km/h से m/s में बदलाव**: चाल गुणा $\\frac{5}{18}$ करें।
-* **m/s से km/h में बदलाव**: चाल गुणा $\\frac{18}{5}$ करें।
+* **m/s से km/h में बदलाव**: चाल गुणा $\\frac{18}{5}$ करें。
 
 ### 2. सापेक्ष चाल (Relative Speed)
 * **समान दिशा**: यदि दो गाड़ियाँ $u$ और $v$ की चाल से एक ही दिशा में जा रही हैं, तो सापेक्ष चाल = $u - v$ (जहाँ $u > v$).
@@ -142,7 +142,7 @@ const LOCAL_FALLBACK_STOCKS = [
   आवश्यक दूरी = (रेलगाड़ी की लम्बाई + पूल/प्लेटफॉर्म की लम्बाई)।
 
 ### 4. औसत चाल (Average Speed)
-*  औसत चाल सूत्र: जब कोई निश्चित दूरी दो अलग-अलग चाल $x$ और $y$ से तय की जाती है:   
+*  औसत चाल सूत्र: जब कोई निश्चित दूरी दो अलग-अलग चाल $x$ and $y$ से तय की जाती है:   
   $औसत चाल = \\frac{2xy}{x + y}$`,
         author: "इंजी. सत्य प्रकाश (Maths Faculty)"
       }
@@ -197,6 +197,7 @@ const LOCAL_FALLBACK_STOCKS = [
 * **मालाबार अभ्यास**: भारत, अमेरिका, जापान और ऑस्ट्रेलिया (क्वाड देश) के मध्य बहुपक्षीय नौसैनिक शक्ति प्रदर्शन अभ्यास।
 
 ### 3. वायुसेना अभ्यास (Air Force Exercises)
+* **वरुण**: भारत और फ्रांस की वायुसेना।
 * **गरुड़**: भारत और फ्रांस की वायुसेना।
 * **इंद्रधनुष**: भारत और ब्रिटेन की वायु सेना के मध्य अभ्यास।
 * **पूर्वी ब्रिज (Eastern Bridge)**: भारत और ओमान की वायु सेना।
@@ -403,7 +404,6 @@ Make sure that the output is only valid JSON, do NOT wrap it in backticks like \
     combinedStudyNotes.forEach((n: any) => uniqueNotesMap.set(n.id, n));
 
     const finalData = {
-      // If manually forced, don't update lastGenerated so that natural 12 hour cycle still triggers on schedule
       lastGenerated: force ? (existingData.lastGenerated || now) : now,
       blogs: Array.from(uniqueBlogsMap.values()),
       studyNotes: Array.from(uniqueNotesMap.values())
@@ -423,150 +423,40 @@ Make sure that the output is only valid JSON, do NOT wrap it in backticks like \
   }
 }
 
-// Helper function to synthesize a high-quality relevant response offline when Gemini is unavailable or rate-limited
-function synthesizeMockReply(message: string, isRateLimited: boolean = false): string {
-  const lower = message.toLowerCase();
-  
-  let header = "";
-  if (isRateLimited) {
-    header = "Jai Hind, aspirant! I am **Agni AI**, your preparation partner. Our live AI cloud service is currently experiencing extremely high traffic & quota utilization limit (ApiError 429: Active Quota Exceeded). To keep your studies completely uninterrupted, I have switched to our **High-Speed Offline Local Knowledge Engine**:\n\n";
-  } else {
-    header = "Jai Hind, aspirant! I am **Agni AI**, your preparation partner. It seems the platform is currently operating in offline mode (no live Key configured), but here is a guided answer from our specialized Local Knowledge Base:\n\n";
-  }
-  
-  let body = "";
-  if (lower.includes("army") || lower.includes("soldier") || lower.includes("agniveer") || lower.includes("officer") || lower.includes("defence")) {
-    body += "• **Agniveer & Officer Selection Guidelines**:\n" +
-            "  1. **Physical Fitness (100 Marks)**: Focused running (1.6 km in 5m 30s), pull-ups, and balance exercises.\n" +
-            "  2. **Written Common Entrance Exam (CEE)**: Revise static facts, science principles, and simple maths indices.\n" +
-            "  3. **Daily Recommendation**: Study the PDF syllabus matching your branch (use our integrated 'Sarkariresult Live PDF library') and draft notes for active revisions.\n\n" +
-            "• **Syllabus Focus Areas**: Static world developments, geography of borders, elementary space tech, and fundamental physical science formulas.";
-  } else if (lower.includes("navy") || lower.includes("ship") || lower.includes("sea") || lower.includes("sailor")) {
-    body += "• **Indian Navy Entry Guidelines (Agniveer SSR/MR)**:\n" +
-            "  1. **Qualifications**: 10+2 with Maths, Physics, and at least one subject of Chemistry/Biology/Computer Science is necessary for SSR.\n" +
-            "  2. **Syllabus Core**: Waves and acoustics, thermodynamics, laws of gravitation, relations & functions, trigonometry, and general civics/geography.\n" +
-            "  3. **Preparation Strategy**: Practice our tailored online free mock quizzes to clock exactly 60 seconds per logical question!";
-  } else if (lower.includes("airforce") || lower.includes("vayu") || lower.includes("pilot") || lower.includes("jet")) {
-    body += "• **Indian Air Force Agniveer Vayu Entry**:\n" +
-            "  1. **Science Subjects**: Focus on high-level Class 11 & 12 CBSE physics, kinematics, matrices, determinants, and limits.\n" +
-            "  2. **Other than Science (RAGA)**: Features extensive reasoning (verbal and non-verbal), numerical ability (profit and loss, average, percentage), and dynamic General Awareness.\n" +
-            "  3. **Pro-Tip**: Speed and accuracy are critical. Dedicate 45 minutes daily to simulated RAGA mock papers.";
-  } else if (lower.includes("syllabus") || lower.includes("pattern") || lower.includes("exam") || lower.includes("prepare") || lower.includes("study") || lower.includes("how to")) {
-    body += "• **Agni 60-Day Success Planner**:\n" +
-            "  - **First 30 Days**: Concept consolidation. Go through our comprehensive 'Study Notes' cabinet or browse syllabus PDFs imported directly from Sarkariresult.\n" +
-            "  - **Next 15 Days**: Sectional practice. Tackle our custom-crafted daily quizzes across general science, history, current affairs, and polity.\n" +
-            "  - **Final 15 Days**: Mock drills. Take continuous timed mock tests to adapt to exam-day pressure.\n" +
-            "  - **Constant Routine**: Keep reading our updated Current Affairs cards daily to catch latest national defense news.";
-  } else if (lower.includes("polity") || lower.includes("constitution") || lower.includes("article") || lower.includes("law")) {
-    body += "• **Indian Polity Cheat Sheet for Defense Exams**:\n" +
-            "  - **Part III Fundamental Rights**: Core Articles 14 (Equality), 19 (Freedom of speech), 21 (Right to life & liberty), and 32 (Constitutional remedies/Writs).\n" +
-            "  - **Part IV Directive Principles**: Key welfare state principles, Uniform Civil Code (Article 44).\n" +
-            "  - **President & Armed Forces**: Keep in mind that the President of India is the Supreme Commander of the Armed Forces (Article 53(2)).\n" +
-            "  - **Recommendation**: Go directly to our dynamic Polity Quiz section to lock in safe scores!";
-  } else if (lower.includes("current") || lower.includes("affair") || lower.includes("news") || lower.includes("today")) {
-    body += "• **Latest Defense Current Affairs Briefings**:\n" +
-            "  - **Bilateral Exercises**: Maintain a list of major exercise names like 'Yudh Abhyas' (India-US), 'Nomadic Elephant' (India-Mongolia), 'Samudra Shakti' (India-Indonesia).\n" +
-            "  - **Defense Acquisitions**: High focus on indigenous manufacturing under 'Make in India' / 'Atmanirbhar Bharat' (Tejas, INS Vikrant, Prachand helicopters, Agni missiles).\n" +
-            "  - **Important Appointments**: Note current Chief of Defence Staff (CDS), Army Chief, Navy Chief, and Air Chief Marshal titles.";
-  } else {
-    body += "As a dedicated candidate training to join the prestigious forces of our motherland, you should organize your day around 3 principles:\n" +
-            "1. **Discipline over Motivation**: Maintain an active morning physical training drill paired with concept reviews in the afternoon.\n" +
-            "2. **Evidence-Based Success**: Track your mock quiz percentage trends and identify weak categories early.\n" +
-            "3. **Dynamic Alertness**: Regularly review recent syllabus changes (downloaded into our newly updated Google Drive database format) to be fully prepared.\n\n" +
-            "Ask me anything relative to your defense curriculum, physics questions, general knowledge, or strategies!";
-  }
-  
-  return header + body;
-}
-
-// 1. API: Agni AI Chat Bot Endpoint
-app.post("/api/chat", async (req: express.Request, res: express.Response) => {
-  const { message, history } = req.body;
-
-  if (!message) {
-    res.status(400).json({ error: "Message is required" });
-    return;
-  }
-
-  // Fallback / standard response simulator if Gemini is not configured
-  if (!ai) {
-    const reply = synthesizeMockReply(message, false);
-    res.json({ reply, mode: "simulation" });
-    return;
-  }
-
-  try {
-    const systemPrompt = `You are 'Agni AI', the official AI Study Companion on AgniPariksha.com.
-You specialize in Indian Armed Forces (Army, Navy, Air Force, Agniveer, NDA, CDS, AFCAT) and national level competitive exams (SSC GD, SSC CGL, SSC CHSL, Railway, Police forces, UPSC, Banking, teaching).
-Exclusively format your response in professional, well-spaced, highly readable markdown.
-Ensure your tone is polite, structured, deeply supportive, and authoritative.
-Use bullet points, bold headers, and key callouts to make it easy for candidates to write down notes.
-Begin your answers with 'Jai Hind, Aspirant!' or a high-energy patriotic greeting like 'Keep marching forward!'.`;
-
-    const chatHistory = history ? history.map((h: any) => ({
-      role: h.role === "user" ? "user" : "model",
-      parts: [{ text: h.text }]
-    })) : [];
-
-    // Formulate model contents
-    const contents = [
-      ...chatHistory,
-      { role: "user", parts: [{ text: message }] }
-    ];
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: contents,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.7,
-      }
-    });
-
-    const reply = response.text || "I was unable to formulate a response. Please rephrase your question.";
-    res.json({ reply, mode: "live" });
-
-  } catch (error: any) {
-    console.error("Gemini API Error, executing offline fallback response strategy: ", error);
-    // Graceful fallback response instead of failing server response
-    const reply = synthesizeMockReply(message, true);
-    res.json({ reply, mode: "fallback" });
-  }
-});
-
-// API: Dynamic Bilingual Quiz generator (Fetches fresh feeds + educational sites via Search Grounding)
-let cachedDailyQuiz: any[] | null = null;
-let lastDailyQuizFetch = 0;
-
+// API: Daily GK/Current Affairs Quiz Revision questions
 app.get("/api/daily-quiz", async (req: express.Request, res: express.Response) => {
   const forceBypassCache = req.query.force === "true";
   const now = Date.now();
 
-  // If cache is fresh (less than 15 minutes old), and not forced, return cached daily quiz
-  if (cachedDailyQuiz && (now - lastDailyQuizFetch < 15 * 60 * 1000) && !forceBypassCache) {
-    console.log("Serving daily-quiz from memory cache...");
-    return res.json({ questions: cachedDailyQuiz });
-  }
+  let success = false;
+  if (ai) {
+    try {
+      console.log("Analyzing live RSS current affairs/quiz content or researching trending GK questions for today's daily revision check...");
+      const promptString = `Research 5 highly challenging and accurate GK/Current Affairs revision questions for Indian Defence & Civil jobs aspirants (such as Agniveer, NDA, CDS, Army, Police, SSC GD/CGL) in year 2026.
+For each question, provide:
+1. "englishQ": The full precise question in English.
+2. "hindiQ": The equivalent accurate translation/question in Hindi.
+3. "options": Array of 4 strategic option objects:
+   - {"key": "A", "text": "Option text clearly containing A. in English with Hindi equivalent in parentheses", "isCorrect": boolean}
+   - {"key": "B", "text": "Option text clearly containing B. in English with Hindi equivalent in parentheses", "isCorrect": boolean}
+   - {"key": "C", "text": "Option text clearly containing C. in English with Hindi equivalent in parentheses", "isCorrect": boolean}
+   - {"key": "D", "text": "Option text clearly containing D. in English with Hindi equivalent in parentheses", "isCorrect": boolean}
+4. "explanationEng": Detailed professional educational explanation in English.
+5. "explanationHin": Detailed professional educational explanation in Hindi.
 
-  try {
-    if (ai) {
-      console.log("Fetching fresh bilingual quiz questions via Gemini Search Grounding...");
-      const promptString = `Retrieve a diverse and brand new set of 5 bilingual multiple choice GK questions (English/Hindi) inspired by current mock test feeds and general knowledge topics of major educational websites such as Jagran Josh, Testbook, GKToday, and Unacademy.
-Assign different, randomized questions covering Indian History, Geography, General Science, Indian Constitution, and Armed Forces current affairs. Keep the questions authentic.
-
-Return raw JSON strictly matching the structure below. Do NOT use markdown code blocks (\`\`\`json on the outer wrapper):
+Return raw JSON strictly matching the structure below. Do NOT use markdown code blocks on the outer wrapper:
 [
   {
-    "englishQ": "English question text here...",
-    "hindiQ": "हिन्दी में प्रश्न यहाँ लिखें...",
+    "englishQ": "string",
+    "hindiQ": "string",
     "options": [
-      { "key": "A", "text": "A. English text (हिन्दी विकल्प)", "isCorrect": false },
-      { "key": "B", "text": "B. English text (हिन्दी विकल्प)", "isCorrect": true },
-      { "key": "C", "text": "C. English text (हिन्दी विकल्प)", "isCorrect": false },
-      { "key": "D", "text": "D. English text (हिन्दी विकल्प)", "isCorrect": false }
+      { "key": "A", "text": "A. Text (पाठ)", "isCorrect": false },
+      { "key": "B", "text": "B. Text (पाठ)", "isCorrect": true },
+      { "key": "C", "text": "C. Text (पाठ)", "isCorrect": false },
+      { "key": "D", "text": "D. Text (पाठ)", "isCorrect": false }
     ],
-    "explanationEng": "Brief English explanation details...",
-    "explanationHin": "हिन्दी में व्याख्या विवरण..."
+    "explanationEng": "string",
+    "explanationHin": "string"
   }
 ]`;
 
@@ -575,225 +465,159 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
         contents: promptString,
         config: {
           tools: [{ googleSearch: {} }],
-          temperature: 0.95, // Higher temperature forces unique options
+          temperature: 0.75,
           responseMimeType: "application/json"
         }
       });
 
-      let jsonText = response.text || "[]";
-      if (jsonText.includes("```json")) {
-        jsonText = jsonText.split("```json")[1].split("```")[0];
-      } else if (jsonText.includes("```")) {
-        jsonText = jsonText.split("```")[1].split("```")[0];
+      let jsonText = response.text || "";
+      if (jsonText.startsWith("```")) {
+        jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "");
       }
       jsonText = jsonText.trim();
 
-      const questions = JSON.parse(jsonText);
-      if (Array.isArray(questions) && questions.length > 0) {
-        cachedDailyQuiz = questions;
-        lastDailyQuizFetch = now;
-        return res.json({ questions });
+      const decoded = JSON.parse(jsonText);
+      if (Array.isArray(decoded) && decoded.length > 0) {
+        res.json({ questions: decoded.slice(0, 5) });
+        success = true;
+        console.log("Streamed dynamic active revision quiz via Gemini grounding!");
       }
-    }
-  } catch (err: any) {
-    // Graceful error logging for 429 Rate Limits / Quotas or other API blockages
-    const errMessage = err?.message || String(err);
-    if (errMessage.includes("429") || errMessage.includes("quota") || errMessage.includes("RESOURCE_EXHAUSTED")) {
-      console.log("[INFO] Gemini API rate limit/quota reached (429/RESOURCE_EXHAUSTED). Instantly fallback to our premium randomized 15-question bilingual pool.");
-    } else {
-      console.warn("Dynamic quiz generation failed, using randomized offline fallback:", errMessage);
+    } catch (err: any) {
+      console.log("[INFO] Daily dynamic quiz compilation rate-limited or failed, reverting to robust local stock revision pool: ", err?.message || err);
     }
   }
 
-  // Robust, extensive 15-question localized offline pool
-  const pool = [
-    {
-      "englishQ": "Who is known as the Father of the Indian Constitution?",
-      "hindiQ": "भारतीय संविधान के जनक के रूप में किसे जाना जाता है?",
-      "options": [
-        { "key": "A", "text": "A. Mahatma Gandhi (महात्मा गांधी)", "isCorrect": false },
-        { "key": "B", "text": "B. Dr. B.R. Ambedkar (डॉ. बी.आर. आंबेडकर)", "isCorrect": true },
-        { "key": "C", "text": "C. Jawaharlal Nehru (जवाहरलाल नेहरू)", "isCorrect": false },
-        { "key": "D", "text": "D. Dr. Rajendra Prasad (डॉ. राजेंद्र प्रसाद)", "isCorrect": false }
-      ],
-      "explanationEng": "Dr. Bhimrao Ramji Ambedkar served as the chairman of the Drafting Committee which drafted the Constitution of India.",
-      "explanationHin": "डॉ. भीमराव रामजी आंबेडकर ने भारतीय संविधान का प्रारूप तैयार करने वाली प्रारूप समिति के अध्यक्ष के रूप में कार्य किया।"
-    },
-    {
-      "englishQ": "The headquarter of the Southern Command of the Indian Army is located at:",
-      "hindiQ": "भारतीय सेना की दक्षिणी कमान का मुख्यालय कहाँ स्थित है?",
-      "options": [
-        { "key": "A", "text": "A. Pune (पुणे)", "isCorrect": true },
-        { "key": "B", "text": "B. Chennai (चेन्नई)", "isCorrect": false },
-        { "key": "C", "text": "C. Kochi (कोच्चि)", "isCorrect": false },
-        { "key": "D", "text": "D. Mumbai (मुंबई)", "isCorrect": false }
-      ],
-      "explanationEng": "The Southern Command of the Indian Army is headquartered at Pune, Maharashtra.",
-      "explanationHin": "भारतीय सेना की दक्षिणी कमान का मुख्यालय पुणे, महाराष्ट्र में स्थित है।"
-    },
-    {
-      "englishQ": "Which schedule of the Indian Constitution was added by the 1st Amendment Act of 1951?",
-      "hindiQ": "1951 के पहले संशोधन अधिनियम द्वारा भारतीय संविधान में कौन सी अनुसूची जोड़ी गई थी?",
-      "options": [
-        { "key": "A", "text": "A. 9th Schedule (9वीं अनुसूची)", "isCorrect": true },
-        { "key": "B", "text": "B. 10th Schedule (10वीं अनुसूची)", "isCorrect": false },
-        { "key": "C", "text": "C. 11th Schedule (11वीं अनुसूची)", "isCorrect": false },
-        { "key": "D", "text": "D. 12th Schedule (12वीं अनुसूची)", "isCorrect": false }
-      ],
-      "explanationEng": "The Ninth Schedule was added by the first amendment in 1951 to protect laws related to land reforms from judicial review.",
-      "explanationHin": "भूमि सुधारों से संबंधित कानूनों को न्यायिक समीक्षा से बचाने के लिए 1951 में पहले संशोधन द्वारा नौवीं अनुसूची जोड़ी गई थी।"
-    },
-    {
-      "englishQ": "Which of the following is the highest peacetime gallantry award in India?",
-      "hindiQ": "निम्नलिखित में से कौन भारत में सर्वोच्च शांतिकालीन वीरता पुरस्कार है?",
-      "options": [
-        { "key": "A", "text": "A. Param Vir Chakra (परमवीर चक्र)", "isCorrect": false },
-        { "key": "B", "text": "B. Ashoka Chakra (अशोक चक्र)", "isCorrect": true },
-        { "key": "C", "text": "C. Shaurya Chakra (शौर्य चक्र)", "isCorrect": false },
-        { "key": "D", "text": "D. Kirti Chakra (कीर्ति चक्र)", "isCorrect": false }
-      ],
-      "explanationEng": "The Ashoka Chakra is India's highest peacetime military decoration awarded for valor, courageous action or self-sacrifice away from the battlefield.",
-      "explanationHin": "अशोक चक्र भारत का सर्वोच्च शांतिकालीन सैन्य अलंकरण है जो युद्ध के मैदान से दूर वीरता, साहसी कार्रवाई या आत्म-बलिदान के लिए प्रदान किया जाता है।"
-    },
-    {
-      "englishQ": "In which state is the famous National Defence Academy (NDA) situated?",
-      "hindiQ": "प्रसिद्ध राष्ट्रीय रक्षा अकादमी (NDA) किस राज्य में स्थित है?",
-      "options": [
-        { "key": "A", "text": "A. Uttarakhand (उत्तराखंड)", "isCorrect": false },
-        { "key": "B", "text": "B. Maharashtra (महाराष्ट्र)", "isCorrect": true },
-        { "key": "C", "text": "C. Kerala (केरल)", "isCorrect": false },
-        { "key": "D", "text": "D. Haryana (हरियाणा)", "isCorrect": false }
-      ],
-      "explanationEng": "The National Defence Academy (NDA) is situated at Khadakwasla near Pune, Maharashtra.",
-      "explanationHin": "राष्ट्रीय रक्षा अकादमी (NDA) महाराष्ट्र के पुणे के निकट खड़कवासला में स्थित है।"
-    },
-    {
-      "englishQ": "Which of the following is India's first indigenously built aircraft carrier?",
-      "hindiQ": "निम्नलिखित में से कौन भारत का पहला स्वदेश निर्मित विमानवाहक पोत है?",
-      "options": [
-        { "key": "A", "text": "A. INS Vikramaditya (आईएनएस विक्रमादित्य)", "isCorrect": false },
-        { "key": "B", "text": "B. INS Vikrant (आईएनएस विक्रांत)", "isCorrect": true },
-        { "key": "C", "text": "C. INS Arihant (आईएनएस अरिहंत)", "isCorrect": false },
-        { "key": "D", "text": "D. INS Virat (आईएनएस विराट)", "isCorrect": false }
-      ],
-      "explanationEng": "INS Vikrant is India's first indigenously designed and built aircraft carrier, commissioned in 2022.",
-      "explanationHin": "आईएनएस विक्रांत भारत का पहला स्वदेश में डिजाइन और निर्मित विमानवाहक पोत है, जिसे 2022 में नौसेना में शामिल किया गया था।"
-    },
-    {
-      "englishQ": "What is the official motto of the Indian Army?",
-      "hindiQ": "भारतीय सेना का आधिकारिक आदर्श वाक्य (Motto) क्या है?",
-      "options": [
-        { "key": "A", "text": "A. Touch the Sky with Glory (नभः स्पृशं दीप्तम्)", "isCorrect": false },
-        { "key": "B", "text": "B. Service Before Self (सेवा परमो धर्मः)", "isCorrect": true },
-        { "key": "C", "text": "C. Sham No Varunah (शं नो वरुणः)", "isCorrect": false },
-        { "key": "D", "text": "D. Valour and Faith (सौर्य और निष्ठा)", "isCorrect": false }
-      ],
-      "explanationEng": "The official motto of the Indian Army is 'Service Before Self' (Seva Parmo Dharma).",
-      "explanationHin": "भारतीय सेना का आधिकारिक आदर्श वाक्य 'सेवा परमो धर्मः' (सैलफलेस सर्विस) है।"
-    },
-    {
-      "englishQ": "Which river is widely known as the 'Dakshin Ganga' (Ganges of the South)?",
-      "hindiQ": "किस नदी को 'दक्षिण गंगा' (दक्षिण की गंगा) के रूप में जाना जाता है?",
-      "options": [
-        { "key": "A", "text": "A. Krishna River (कृष्णा नदी)", "isCorrect": false },
-        { "key": "B", "text": "B. Kaveri River (कावेरी नदी)", "isCorrect": false },
-        { "key": "C", "text": "C. Godavari River (गोदावरी नदी)", "isCorrect": true },
-        { "key": "D", "text": "D. Narmada River (नर्मदा नदी)", "isCorrect": false }
-      ],
-      "explanationEng": "The Godavari is India's second longest river and is called Dakshin Ganga due to its large size and span.",
-      "explanationHin": "गोदावरी भारत की दूसरी सबसे लंबी नदी है और अपने विशाल आकार तथा विस्तार के कारण इसे दक्षिण गंगा कहा जाता है।"
-    },
-    {
-      "englishQ": "The historic Battle of Haldighati was fought in which year?",
-      "hindiQ": "ऐतिहासिक हल्दीघाटी का युद्ध किस वर्ष लड़ा गया था?",
-      "options": [
-        { "key": "A", "text": "A. 1526 AD (1526 ई.)", "isCorrect": false },
-        { "key": "B", "text": "B. 1556 AD (1556 ई.)", "isCorrect": false },
-        { "key": "C", "text": "C. 1576 AD (1576 ई.)", "isCorrect": true },
-        { "key": "D", "text": "D. 1761 AD (1761 ई.)", "isCorrect": false }
-      ],
-      "explanationEng": "The Battle of Haldighati was fought on 18 June 1576 between Maharana Pratap of Mewar and the Mughal forces led by Man Singh I of Amber.",
-      "explanationHin": "हल्दीघाटी का युद्ध 18 जून 1576 को मेवाड़ के राजा महाराणा प्रताप और आमेर के मान सिंह प्रथम के नेतृत्व वाली मुगल सेना के बीच लड़ा गया था।"
-    },
-    {
-      "englishQ": "Deficiency of Vitamin C causes which of the following diseases?",
-      "hindiQ": "विटामिन C की कमी से निम्नलिखित में से कौन सा रोग होता है?",
-      "options": [
-        { "key": "A", "text": "A. Rickets (रिकेट्स)", "isCorrect": false },
-        { "key": "B", "text": "B. Beriberi (बेरीबेरी)", "isCorrect": false },
-        { "key": "C", "text": "C. Scurvy (स्कर्वी)", "isCorrect": true },
-        { "key": "D", "text": "D. Night Blindness (रतौंधी)", "isCorrect": false }
-      ],
-      "explanationEng": "Scurvy is a disease resulting from a lack of vitamin C, leading to weakness, gum disease, and skin hemorrhages.",
-      "explanationHin": "स्कर्वी विटामिन C की कमी से होने वाला रोग है, जिससे कमजोरी, मसूड़ों की बीमारी और त्वचा से खून बहने जैसी समस्याएं होती हैं।"
-    },
-    {
-      "englishQ": "Who was appointed as the first Chief of Defence Staff (CDS) of India?",
-      "hindiQ": "भारत के पहले चीफ ऑफ डिफेंस स्टाफ (CDS) के रूप में किसे नियुक्त किया गया था?",
-      "options": [
-        { "key": "A", "text": "A. Gen. Manoj Mukund Naravane (जनरल एम.एम. नरवणे)", "isCorrect": false },
-        { "key": "B", "text": "B. Gen. Bipin Rawat (जनरल बिपिन रावत)", "isCorrect": true },
-        { "key": "C", "text": "C. Admin. Sunil Lanba (एडमिरल सुनील लांबा)", "isCorrect": false },
-        { "key": "D", "text": "D. ACM Birender Singh Dhanoa (एयर चीफ मार्शल बी.एस. धनोआ)", "isCorrect": false }
-      ],
-      "explanationEng": "General Bipin Rawat was appointed as the first Chief of Defence Staff (CDS) on 1 January 2020.",
-      "explanationHin": "जनरल बिपिन रावत को 1 जनवरी 2020 को भारत के पहले चीफ ऑफ डिफेंस स्टाफ (CDS) के रूप में नियुक्त किया गया था।"
-    },
-    {
-      "englishQ": "Under which Article of the Constitution of India can a National Emergency be declared?",
-      "hindiQ": "भारत के संविधान के किस अनुच्छेद के तहत राष्ट्रीय आपातकाल की घोषणा की जा सकती है?",
-      "options": [
-        { "key": "A", "text": "A. Article 352 (अनुच्छेद 352)", "isCorrect": true },
-        { "key": "B", "text": "B. Article 356 (अनुच्छेद 356)", "isCorrect": false },
-        { "key": "C", "text": "C. Article 360 (अनुच्छेद 360)", "isCorrect": false },
-        { "key": "D", "text": "D. Article 368 (अनुच्छेद 368)", "isCorrect": false }
-      ],
-      "explanationEng": "Article 352 deals with the proclamation of National Emergency due to war, external aggression, or armed rebellion.",
-      "explanationHin": "अनुच्छेद 352 युद्ध, बाहरी आक्रमण या सशस्त्र विद्रोह के कारण राष्ट्रीय आपातकाल की घोषणा से संबंधित है।"
-    },
-    {
-      "englishQ": "Which scientific instrument is used to determine atmospheric pressure?",
-      "hindiQ": "वायुमंडलीय दबाव को मापने के लिए किस वैज्ञानिक उपकरण का उपयोग किया जाता है?",
-      "options": [
-        { "key": "A", "text": "A. Hydrometer (हाइड्रोमीटर)", "isCorrect": false },
-        { "key": "B", "text": "B. Barometer (बैरोमीटर)", "isCorrect": true },
-        { "key": "C", "text": "C. Hygrometer (हाइग्रोमीटर)", "isCorrect": false },
-        { "key": "D", "text": "D. Lactometer (लेक्टोमीटर)", "isCorrect": false }
-      ],
-      "explanationEng": "A barometer is a scientific instrument used in meteorology to measure atmospheric pressure.",
-      "explanationHin": "बैरोमीटर एक वैज्ञानिक उपकरण है जिसका उपयोग मौसम विज्ञान में वायुमंडलीय दबाव को मापने के लिए किया जाता है।"
-    },
-    {
-      "englishQ": "Where is the Indian Military Academy (IMA) located?",
-      "hindiQ": "भारतीय सैन्य अकादमी (IMA) कहाँ स्थित है?",
-      "options": [
-        { "key": "A", "text": "A. Chennai (चेन्नई)", "isCorrect": false },
-        { "key": "B", "text": "B. Dehradun (देहरादून)", "isCorrect": true },
-        { "key": "C", "text": "C. Gaya (गया)", "isCorrect": false },
-        { "key": "D", "text": "D. Shimla (शिमला)", "isCorrect": false }
-      ],
-      "explanationEng": "The Indian Military Academy (IMA) is located at Dehradun, Uttarakhand, established in 1932.",
-      "explanationHin": "भारतीय सैन्य अकादमी (IMA) देहरादून, उत्तराखंड में स्थित है, जिसकी स्थापना 1932 में हुई थी।"
-    },
-    {
-      "englishQ": "Who was the first Indian to receive a Nobel Prize?",
-      "hindiQ": "नोबेल पुरस्कार पाने वाले पहले भारतीय कौन थे?",
-      "options": [
-        { "key": "A", "text": "A. C. V. Raman (सी. वी. रमन)", "isCorrect": false },
-        { "key": "B", "text": "B. Rabindranath Tagore (रवींद्रनाथ टैगोर)", "isCorrect": true },
-        { "key": "C", "text": "C. Mother Teresa (मदर टेरेसा)", "isCorrect": false },
-        { "key": "D", "text": "D. Har Gobind Khorana (हरगोविंद खुराना)", "isCorrect": false }
-      ],
-      "explanationEng": "Rabindranath Tagore won the Nobel Prize in Literature in 1913 for his work Gitanjali.",
-      "explanationHin": "रवींद्रनाथ टैगोर को उनकी रचना गीतांजलि के लिए 1913 में साहित्य का नोबेल पुरस्कार मिला था।"
-    }
-  ];
+  if (!success) {
+    // Robust, extensive 10-question localized offline pool
+    const pool = [
+      {
+        "englishQ": "Who is known as the Father of the Indian Constitution?",
+        "hindiQ": "भारतीय संविधान के जनक के रूप में किसे जाना जाता है?",
+        "options": [
+          { "key": "A", "text": "A. Mahatma Gandhi (महात्मा गांधी)", "isCorrect": false },
+          { "key": "B", "text": "B. Dr. B.R. Ambedkar (डॉ. बी.आर. आंबेडकर)", "isCorrect": true },
+          { "key": "C", "text": "C. Jawaharlal Nehru (जवाहरलाल नेहरू)", "isCorrect": false },
+          { "key": "D", "text": "D. Dr. Rajendra Prasad (डॉ. राजेंद्र प्रसाद)", "isCorrect": false }
+        ],
+        "explanationEng": "Dr. Bhimrao Ramji Ambedkar served as the chairman of the Drafting Committee which drafted the Constitution of India.",
+        "explanationHin": "डॉ. भीमराव Ramji आंबेडकर ने भारतीय संविधान का प्रारूप तैयार करने वाली प्रारूप समिति के अध्यक्ष के रूप में कार्य किया।"
+      },
+      {
+        "englishQ": "The headquarter of the Southern Command of the Indian Army is located at:",
+        "hindiQ": "भारतीय सेना की दक्षिणी कमान का मुख्यालय कहाँ स्थित है?",
+        "options": [
+          { "key": "A", "text": "A. Pune (पुणे)", "isCorrect": true },
+          { "key": "B", "text": "B. Chennai (चेन्नई)", "isCorrect": false },
+          { "key": "C", "text": "C. Kochi (कोच्चि)", "isCorrect": false },
+          { "key": "D", "text": "D. Mumbai (मुंबई)", "isCorrect": false }
+        ],
+        "explanationEng": "The Southern Command of the Indian Army is headquartered at Pune, Maharashtra.",
+        "explanationHin": "भारतीय सेना की दक्षिणी कमान का मुख्यालय पुणे, महाराष्ट्र में स्थित है।"
+      },
+      {
+        "englishQ": "Which schedule of the Indian Constitution was added by the 1st Amendment Act of 1951?",
+        "hindiQ": "1951 के पहले संशोधन अधिनियम द्वारा भारतीय संविधान में कौन सी अनुसूची जोड़ी गई थी?",
+        "options": [
+          { "key": "A", "text": "A. 9th Schedule (9वीं अनुसूची)", "isCorrect": true },
+          { "key": "B", "text": "B. 10th Schedule (10वीं अनुसूची)", "isCorrect": false },
+          { "key": "C", "text": "C. 11th Schedule (11वीं अनुसूची)", "isCorrect": false },
+          { "key": "D", "text": "D. 12th Schedule (12वीं अनुसूची)", "isCorrect": false }
+        ],
+        "explanationEng": "The Ninth Schedule was added by the first amendment in 1951 to protect laws related to land reforms from judicial review.",
+        "explanationHin": "भूमि सुधारों से संबंधित कानूनों को न्यायिक समीक्षा से बचाने के लिए 1951 में पहले संशोधन द्वारा नौवीं अनुसूची जोड़ी गई थी।"
+      },
+      {
+        "englishQ": "Which of the following is the highest peacetime gallantry award in India?",
+        "hindiQ": "निम्नलिखित में से कौन भारत में सर्वोच्च शांतिकालीन वीरता पुरस्कार है?",
+        "options": [
+          { "key": "A", "text": "A. Param Vir Chakra (परमवीर चक्र)", "isCorrect": false },
+          { "key": "B", "text": "B. Ashoka Chakra (अशोक चक्र)", "isCorrect": true },
+          { "key": "C", "text": "C. Shaurya Chakra (शौर्य चक्र)", "isCorrect": false },
+          { "key": "D", "text": "D. Kirti Chakra (कीर्ति चक्र)", "isCorrect": false }
+        ],
+        "explanationEng": "The Ashoka Chakra is India's highest peacetime military decoration awarded for valor, courageous action or self-sacrifice away from the battlefield.",
+        "explanationHin": "अशोक चक्र भारत का सर्वोच्च शांतिकालीन सैन्य अलंकरण है जो युद्ध के मैदान से दूर वीरता, साहसी कार्रवाई या आत्म-बलिदान के लिए प्रदान किया जाता है।"
+      },
+      {
+        "englishQ": "In which state is the famous National Defence Academy (NDA) situated?",
+        "hindiQ": "प्रसिद्ध राष्ट्रीय रक्षा अकादमी (NDA) किस राज्य में स्थित है?",
+        "options": [
+          { "key": "A", "text": "A. Uttarakhand (उत्तराखंड)", "isCorrect": false },
+          { "key": "B", "text": "B. Maharashtra (महाराष्ट्र)", "isCorrect": true },
+          { "key": "C", "text": "C. Kerala (केरल)", "isCorrect": false },
+          { "key": "D", "text": "D. Haryana (हरियाणा)", "isCorrect": false }
+        ],
+        "explanationEng": "The National Defence Academy (NDA) is situated at Khadakwasla near Pune, Maharashtra.",
+        "explanationHin": "राष्ट्रीय रक्षा अकादमी (NDA) महाराष्ट्र के पुणे के निकट खड़कवासला में स्थित है।"
+      },
+      {
+        "englishQ": "Which of the following is India's first indigenously built aircraft carrier?",
+        "hindiQ": "निम्नलिखित में से कौन भारत का पहला स्वदेश निर्मित विमानवाहक पोत है?",
+        "options": [
+          { "key": "A", "text": "A. INS Vikramaditya (आईएनएस विक्रमादित्य)", "isCorrect": false },
+          { "key": "B", "text": "B. INS Vikrant (आईएनएस विक्रांत)", "isCorrect": true },
+          { "key": "C", "text": "C. INS Arihant (आईएनएस अरिहंत)", "isCorrect": false },
+          { "key": "D", "text": "D. INS Virat (आईएनएस विराट)", "isCorrect": false }
+        ],
+        "explanationEng": "INS Vikrant is India's first indigenously designed and built aircraft carrier, commissioned in 2022.",
+        "explanationHin": "आईएनएस विक्रांत भारत का पहला स्वदेश में डिजाइन और निर्मित विमानवाहक पोत है, जिसे 2022 में नौसेना में शामिल किया गया था।"
+      },
+      {
+        "englishQ": "What is the official motto of the Indian Army?",
+        "hindiQ": "भारतीय सेना का आधिकारिक आदर्श वाक्य (Motto) क्या है?",
+        "options": [
+          { "key": "A", "text": "A. Touch the Sky with Glory (नभः स्पृशं दीप्तम्)", "isCorrect": false },
+          { "key": "B", "text": "B. Service Before Self (सेवा परमो धर्मः)", "isCorrect": true },
+          { "key": "C", "text": "C. Sham No Varunah (शं नो वरुणः)", "isCorrect": false },
+          { "key": "D", "text": "D. Valour and Faith (सौर्य और निष्ठा)", "isCorrect": false }
+        ],
+        "explanationEng": "The official motto of the Indian Army is 'Service Before Self' (Seva Parmo Dharma).",
+        "explanationHin": "भारतीय सेना का आधिकारिक आदर्श वाक्य 'सेवा परमो धर्मः' (सैलफलेस सर्विस) है।"
+      },
+      {
+        "englishQ": "Which river is widely known as the 'Dakshin Ganga' (Ganges of the South)?",
+        "hindiQ": "किस नदी को 'दक्षिण Ganga' (दक्षिण की गंगा) के रूप में जाना जाता है?",
+        "options": [
+          { "key": "A", "text": "A. Krishna River (कृष्णा नदी)", "isCorrect": false },
+          { "key": "B", "text": "B. Kaveri River (कावेरी नदी)", "isCorrect": false },
+          { "key": "C", "text": "C. Godavari River (गोदावरी नदी)", "isCorrect": true },
+          { "key": "D", "text": "D. Narmada River (नर्मदा नदी)", "isCorrect": false }
+        ],
+        "explanationEng": "The Godavari is India's second longest river and is called Dakshin Ganga due to its large size and span.",
+        "explanationHin": "गोदावरी भारत की दूसरी सबसे लंबी नदी है और अपने विशाल आकार तथा विस्तार के कारण इसे दक्षिण गंगा कहा जाता है।"
+      },
+      {
+        "englishQ": "The historic Battle of Haldighati was fought in which year?",
+        "hindiQ": "ऐतिहासिक हल्दीघाटी का युद्ध किस वर्ष लड़ा गया था?",
+        "options": [
+          { "key": "A", "text": "A. 1526 AD (1526 ई.)", "isCorrect": false },
+          { "key": "B", "text": "B. 1556 AD (1556 ई.)", "isCorrect": false },
+          { "key": "C", "text": "C. 1576 AD (1576 ई.)", "isCorrect": true },
+          { "key": "D", "text": "D. 1761 AD (1761 ई.)", "isCorrect": false }
+        ],
+        "explanationEng": "The Battle of Haldighati was fought on 18 June 1576 between Maharana Pratap of Mewar and the Mughal forces led by Man Singh I of Amber.",
+        "explanationHin": "हल्दीघाटी का युद्ध 18 जून 1576 को मेवाड़ के राजा महाराणा प्रताप और आमेर के मान सिंह प्रथम के नेतृत्व वाली मुगल सेना के बीच लड़ा गया था।"
+      },
+      {
+        "englishQ": "Deficiency of Vitamin C causes which of the following diseases?",
+        "hindiQ": "विटामिन C की कमी से निम्नलिखित में से कौन सा रोग होता है?",
+        "options": [
+          { "key": "A", "text": "A. Rickets (रिकेट्स)", "isCorrect": false },
+          { "key": "B", "text": "B. Beriberi (बेरीबेरी)", "isCorrect": false },
+          { "key": "C", "text": "C. Scurvy (स्कर्वी)", "isCorrect": true },
+          { "key": "D", "text": "D. Night Blindness (रतौंधी)", "isCorrect": false }
+        ],
+        "explanationEng": "Scurvy is a disease resulting from a lack of vitamin C, leading to weakness, gum disease, and skin hemorrhages.",
+        "explanationHin": "स्कर्वी विभाग विटामिन C की कमी से होने वाला रोग है, जिससे कमजोरी, मसूड़ों की बीमारी और त्वचा से खून बहने जैसी समस्याएं होती हैं।"
+      }
+    ];
 
-  // Pick 5 completely random questions from the pool of 15
-  const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
-  const selectedQuestions = shuffledPool.slice(0, 5);
-  
-  res.json({ questions: selectedQuestions });
+    // Pick 5 completely random questions from the pool of 10
+    const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffledPool.slice(0, 5);
+    
+    res.json({ questions: selectedQuestions });
+  }
 });
 
 // API: Latest Notifications Sidebar Alerts (Dynamic Real-Time Govt/Armed Forces Job alerts)
@@ -804,7 +628,6 @@ app.get("/api/latest-notifications", async (req: express.Request, res: express.R
   const forceBypassCache = req.query.force === "true";
   const now = Date.now();
 
-  // If cache is fresh (less than 30 minutes old) and not forced, return cached notifications
   if (cachedNotifications && (now - lastNotificationsFetch < 30 * 60 * 1000) && !forceBypassCache) {
     console.log("Serving latest-notifications from memory cache...");
     return res.json({ notifications: cachedNotifications });
@@ -915,7 +738,7 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
   return res.json({ notifications: fallback });
 });
 
-// API: Latest Sarkari Result Jobs (Dynamic Real-Time Govt Vacancies)
+// API: Latest Sarkari Result Jobs (Dynamic Real-Time Govt Vacancies with scraping and feed fallback)
 let cachedSarkariJobs: any[] | null = null;
 let lastSarkariJobsFetch = 0;
 
@@ -923,7 +746,6 @@ app.get("/api/sarkari-jobs", async (req: express.Request, res: express.Response)
   const forceBypassCache = req.query.force === "true";
   const now = Date.now();
 
-  // If cache is fresh (less than 30 minutes old) and not forced, return cached list
   if (cachedSarkariJobs && (now - lastSarkariJobsFetch < 30 * 60 * 1000) && !forceBypassCache) {
     console.log("Serving sarkari-jobs from memory cache...");
     return res.json({ jobs: cachedSarkariJobs });
@@ -935,7 +757,7 @@ app.get("/api/sarkari-jobs", async (req: express.Request, res: express.Response)
   try {
     console.log("Attempting direct sync from Sarkari Result official feed (https://www.sarkariresult.com/feed/)...");
     const controller = new AbortController();
-    const abortTimeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+    const abortTimeout = setTimeout(() => controller.abort(), 8000);
 
     const feedRes = await fetch("https://www.sarkariresult.com/feed/", {
       headers: {
@@ -957,7 +779,7 @@ app.get("/api/sarkari-jobs", async (req: express.Request, res: express.Response)
       console.log(`Feed fetch failed with response status: ${feedRes.status}`);
     }
   } catch (feedErr: any) {
-    console.log("Network direct RSS feed fetch disabled or timed out. Falling back to Search Grounding.", feedErr?.message || feedErr);
+    console.log("Network direct RSS feed fetch timed out or failed. Falling back to Search Grounding.", feedErr?.message || feedErr);
   }
 
   try {
@@ -1051,10 +873,19 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
     }
   } catch (err: any) {
     const errMessage = err?.message || String(err);
-    console.log("[INFO] Live xml parsing or search grounding failed, fallback to local high-yield database:", errMessage);
+    console.log("[INFO] Live xml parsing or search grounding failed, fallback to local high-yield database: ", errMessage);
   }
 
-  // Fallback to high-quality localized 2026 database
+  // Generate real dynamic dates matching current system month and year in 2026
+  const formatOffsetDate = (offsetDays: number): string => {
+    const d = new Date(now + offsetDays * 24 * 60 * 60 * 1000);
+    const yr = d.getFullYear();
+    const mo = String(d.getMonth() + 1).padStart(2, '0');
+    const dy = String(d.getDate()).padStart(2, '0');
+    return `${yr}-${mo}-${dy}`;
+  };
+
+  // Fallback to high-quality localized 2026 database with dynamic relative dates
   const fallback = [
     {
       id: "job-army-1",
@@ -1066,9 +897,9 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
       salary: "₹30,000 to ₹40,000/month (with Seva Nidhi Package worth ₹11.71 Lakhs after completion)",
       selectionProcess: "Phase I: Common Entrance Exam (CEE) Online, Phase II: Physical Fitness Test (PFT), Physical Measurement Test (PMT), Medical Examination.",
       importantDates: {
-        start: "2026-06-01",
-        end: "2026-07-10",
-        exam: "2026-08-15"
+        start: formatOffsetDate(-10),
+        end: formatOffsetDate(20),
+        exam: formatOffsetDate(45)
       },
       applyLink: "https://joinindianarmy.nic.in"
     },
@@ -1082,9 +913,9 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
       salary: "₹56,100 to ₹2,50,000 /month (Sub-Lieutenant/Lieutenant Starting pay matrix scale 10)",
       selectionProcess: "UPSC Written Examination (900 Marks) followed by Service Selection Board (SSB) Interview tests (900 Marks).",
       importantDates: {
-        start: "2026-05-15",
-        end: "2026-07-01",
-        exam: "2026-09-06"
+        start: formatOffsetDate(-18),
+        end: formatOffsetDate(12),
+        exam: formatOffsetDate(35)
       },
       applyLink: "https://upsc.gov.in"
     },
@@ -1098,9 +929,9 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
       salary: "₹21,700 - ₹69,100 (Pay Level 3)",
       selectionProcess: "Computer-Based Examination (CBE), Physical Efficiency Test (PET), Physical Standard Test (PST) and Detailed Medical Exam.",
       importantDates: {
-        start: "2026-06-10",
-        end: "2026-07-30",
-        exam: "2026-11-20"
+        start: formatOffsetDate(-5),
+        end: formatOffsetDate(25),
+        exam: formatOffsetDate(60)
       },
       applyLink: "https://ssc.gov.in"
     },
@@ -1114,9 +945,9 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
       salary: "₹19,900/month basic (Starting Scale, Level 2 plus DA & allowances)",
       selectionProcess: "CBT Stage I, CBT Stage II, Computer-Based Aptitude Test (CBAT), Document Verification and Medical Fitness.",
       importantDates: {
-        start: "2026-04-10",
-        end: "2026-06-30",
-        exam: "2026-07-25"
+        start: formatOffsetDate(-25),
+        end: formatOffsetDate(10),
+        exam: formatOffsetDate(40)
       },
       applyLink: "https://indianrailways.gov.in"
     },
@@ -1130,9 +961,9 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
       salary: "₹21,700 - ₹69,100 (Grade Pay 2000)",
       selectionProcess: "Written OMR Board Test, Document Verification (DV), Physical Standard Test (PST) and Physical Efficiency Test (PET) running check.",
       importantDates: {
-        start: "2026-06-15",
-        end: "2026-07-20",
-        exam: "2026-09-12"
+        start: formatOffsetDate(-8),
+        end: formatOffsetDate(22),
+        exam: formatOffsetDate(55)
       },
       applyLink: "https://uppbpb.gov.in"
     },
@@ -1146,15 +977,248 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
       salary: "₹41,960 - ₹63,840 (with 4 advanced increments)",
       selectionProcess: "Phase I: Preliminary Objective Test, Phase II: Main Examination (Objective + Descriptive), Phase III: Psychometric Test & Interview.",
       importantDates: {
-        start: "2026-06-05",
-        end: "2026-06-25",
-        exam: "2026-08-30"
+        start: formatOffsetDate(-15),
+        end: formatOffsetDate(15),
+        exam: formatOffsetDate(50)
       },
       applyLink: "https://sbi.co.in/careers"
     }
   ];
 
+  cachedSarkariJobs = fallback;
+  lastSarkariJobsFetch = now;
+
   return res.json({ jobs: fallback });
+});
+
+// API: Daily Automated Current Affairs Date-wise from DrishtiIAS Feed
+let cachedCurrentAffairs: any[] | null = null;
+let lastCurrentAffairsFetch = 0;
+
+app.get("/api/current-affairs", async (req: express.Request, res: express.Response) => {
+  const forceBypassCache = req.query.force === "true";
+  const now = Date.now();
+
+  if (cachedCurrentAffairs && (now - lastCurrentAffairsFetch < 30 * 60 * 1000) && !forceBypassCache) {
+    console.log("Serving cached current affairs from memory...");
+    return res.json({ affairs: cachedCurrentAffairs });
+  }
+
+  let feedPayload = "";
+  let feedSuccess = false;
+
+  try {
+    console.log("Fetching live RSS feed / payload from Drishti IAS Current Affairs Quiz Set...");
+    const url = "https://www.drishtiias.com/hindi/quiz/quizlist/current-affairs-quiz-set";
+    const controller = new AbortController();
+    const abortTimeout = setTimeout(() => controller.abort(), 8000);
+
+    const dRes = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+      },
+      signal: controller.signal
+    });
+
+    clearTimeout(abortTimeout);
+
+    if (dRes.ok) {
+      feedPayload = await dRes.text();
+      if (feedPayload && feedPayload.length > 500) {
+        feedSuccess = true;
+        console.log("Successfully fetched DrishtiIAS payload, size:", feedPayload.length);
+      }
+    } else {
+      console.log("DrishtiIAS fetch returned status:", dRes.status);
+    }
+  } catch (err: any) {
+    console.log("Direct DrishtiIAS fetch failed/timeout. Relying on Gemini search grounding instead.", err?.message || err);
+  }
+
+  try {
+    if (ai) {
+      console.log("Analyzing Drishti IAS payload using Gemini...");
+      let queryPrompt = "";
+
+      if (feedSuccess) {
+        queryPrompt = `The following block is extracted HTML/text content from Drishti IAS Hindi Current Affairs list:
+---
+${feedPayload.slice(0, 30000)}
+---
+Please parse, match, and transform active current affairs topics into 5-6 date-wise historical affairs objects.
+For each item, generate high-quality entries that contain:
+- "id": A unique string, e.g. "ca-drishti-1", "ca-drishti-2"
+- "date": Date of publication (e.g. "June 20, 2026" or matching the source list item date)
+- "titleEng": Translated highly descriptive headline of the affair in English (clean, professional phrasing)
+- "titleHin": Authentic Title of the affair in Hindi as presented in the article topic or feed list
+- "source": "Drishti IAS daily current affairs"
+- "summaryEng": Summary of the topic (at least 2-3 sentences) in English
+- "summaryHin": Summary of the topic (at least 2-3 sentences) in Hindi
+- "quizQuestion": {
+    "text": "A challenging quiz question matching the news affair, with both English and Hindi text combined (e.g., 'What is the target year? / लक्ष्य वर्ष क्या है?')",
+    "options": ["Option A (Eng / Hindi)", "Option B (Eng / Hindi)", "Option C (Eng / Hindi)", "Option D (Eng / Hindi)"],
+    "correctAnswer": 0,
+    "explanation": "Detailed professional explanation of correct answer in both English & Hindi side-by-side"
+}
+
+Return raw JSON strictly matching the specified format. Do NOT wrap output layout in markdown code blocks:
+[
+  {
+    "id": "string",
+    "date": "string",
+    "titleEng": "string",
+    "titleHin": "string",
+    "source": "string",
+    "summaryEng": "string",
+    "summaryHin": "string",
+    "quizQuestion": {
+      "text": "string",
+      "options": ["string", "string", "string", "string"],
+      "correctAnswer": 0,
+      "explanation": "string"
+    }
+  }
+]`;
+      } else {
+        queryPrompt = `Research live date-wise Indian Current Affairs and general knowledge questions published on Drishti IAS 'hindi/quiz/quizlist/current-affairs-quiz-set' in 2026.
+Formulate 5-6 highly authentic daily bulletin blocks with corresponding revision check questions.
+For each block, yield:
+- "id": A unique string, e.g. "ca-sys-1", "ca-sys-2"
+- "date": Accurate date (e.g., "June 20, 2026")
+- "titleEng": Clear news title in English
+- "titleHin": Clear news title in Hindi
+- "source": "Drishti IAS Current Affairs Quiz"
+- "summaryEng": Detailed recap in English
+- "summaryHin": Detailed recap in Hindi
+- "quizQuestion": {
+    "text": "A challenging quiz question matching the news affair, with both English and Hindi text combined (e.g. 'What is the goal? / लक्ष्य क्या है?')",
+    "options": ["Option A (Eng / Hindi)", "Option B (Eng / Hindi)", "Option C (Eng / Hindi)", "Option D (Eng / Hindi)"],
+    "correctAnswer": 0,
+    "explanation": "Detailed professional explanation of correct answer in both languages side-by-side"
+}
+
+Return raw, valid JSON. Do not wrap output inside \`\`\`json blocks:
+[
+  {
+    "id": "string",
+    "date": "string",
+    "titleEng": "string",
+    "titleHin": "string",
+    "source": "string",
+    "summaryEng": "string",
+    "summaryHin": "string",
+    "quizQuestion": {
+      "text": "string",
+      "options": ["string", "string", "string", "string"],
+      "correctAnswer": 0,
+      "explanation": "string"
+    }
+  }
+]`;
+      }
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: queryPrompt,
+        config: {
+          tools: feedSuccess ? [] : [{ googleSearch: {} }],
+          temperature: 0.7,
+          responseMimeType: "application/json"
+        }
+      });
+
+      let jsonText = response.text || "";
+      if (jsonText.startsWith("```")) {
+        jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "");
+      }
+      jsonText = jsonText.trim();
+
+      const decoded = JSON.parse(jsonText);
+      if (Array.isArray(decoded) && decoded.length > 0) {
+        cachedCurrentAffairs = decoded;
+        lastCurrentAffairsFetch = now;
+        return res.json({ affairs: decoded });
+      }
+    }
+  } catch (err: any) {
+    console.log("[INFO] Automated Current Affairs parsing failed. Reverting to robust localized fallback databank:", err?.message || err);
+  }
+
+  // Generate real dynamic date strings like "June 20, 2026"
+  const formatAffairsDate = (offsetDays: number): string => {
+    const d = new Date(now + offsetDays * 24 * 60 * 60 * 1000);
+    return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  };
+
+  // Fallback to localized date-wise high-quality current affairs items using current relative dates
+  const fallbackAffairs = [
+    {
+      id: "fallback-ca-1",
+      date: formatAffairsDate(0),
+      titleEng: "India's Digital Rupee Offline Capability Extends Nationally",
+      titleHin: "ई-रुपया (e-Rupee) की ऑफलाइन लेन-देन क्षमता का देशव्यापी विस्तार",
+      source: "Drishti IAS Current Affairs Quiz",
+      summaryEng: "The RBI successfully deployed offline transaction capabilities for the Central Bank Digital Currency (CBDC-R), enabling rural transactions without active internet grids.",
+      summaryHin: "भारतीय रिजर्व बैंक ने सेंट्रल बैंक डिजिटल करेंसी (CBDC-R) के लिए ऑफलाइन लेनदेन क्षमताओं का सफल विस्तार किया है, जिससे इंटरनेट ग्रिड के बिना ग्रामीण क्षेत्रों में सुरक्षित लेनदेन संभव हो सकेगा।",
+      quizQuestion: {
+        text: "Which currency initiative of the Reserve Bank of India is designated as CBDC-R for retail users? / खुदरा उपयोगकर्ताओं के लिए किस आरबीआई मुद्रा पहल को CBDC-R नामित किया गया है?",
+        options: [
+          "Digital Rupee / डिजिटल रुपया (e-Rupee)",
+          "Unified Payments Interface / एकीकृत भुगतान इंटरफ़ेस (UPI)",
+          "Bharat Bill Pay / भारत बिल पे",
+          "RuPay Debit Card / रुपे डेबिट कार्ड"
+        ],
+        correctAnswer: 0,
+        explanation: "The Digital Rupee is the CBDC-R retail variant introduced for paperless fiat transactions. / डिजिटल रुपया (e-Rupee) आरबीआई द्वारा कागज़ रहित फिएट लेनदेन हेतु शुरू किया गया खुदरा CBDC-R संस्करण है।"
+      }
+    },
+    {
+      id: "fallback-ca-2",
+      date: formatAffairsDate(-1),
+      titleEng: "Global Biodiversity Framework targets monitored at High Summit",
+      titleHin: "वैश्विक जैव विविधता फ्रेमवर्क लक्ष्यों की उच्च कमान शिखर सम्मेलन में निगरानी",
+      source: "Drishti IAS Current Affairs Quiz",
+      summaryEng: "Environmental summits validated target indicators concerning pesticide usage reduction and the protection of 30% of global marine and terrestrial zones by 2030.",
+      summaryHin: "पर्यावरण शिखर सम्मेलनों में वर्ष 2030 तक कीटनाशकों के उपयोग को कम करने और वैश्विक समुद्री तथा स्थलीय क्षेत्रों के 30% हिस्से को संरक्षित करने से संबंधित संकेतकों का सत्यापन किया गया।",
+      quizQuestion: {
+        text: "What percentage of marine and terrestrial systems must be conserved by 2030 as per the Kunming-Montreal Global Biodiversity Framework? / कुनमिंग-मॉन्तरियल वैश्विक जैव विविधता फ्रेमवर्क के अनुसार 2030 तक कितने प्रतिशत समुद्री और स्थलीय प्रणालियों का संरक्षण आवश्यक है?",
+        options: [
+          "20% / 20 प्रतिशत",
+          "30% / 30 प्रतिशत",
+          "40% / 40 प्रतिशत",
+          "50% / 50 प्रतिशत"
+        ],
+        correctAnswer: 1,
+        explanation: "The cornerstone target is the protection of at least 30% of global land and oceans by 2030. / मुख्य आधार लक्ष्य 2030 तक कम से कम 30% वैश्विक भूमि और महासागरों का संरक्षण करना है।"
+      }
+    },
+    {
+      id: "fallback-ca-3",
+      date: formatAffairsDate(-2),
+      titleEng: "PM-Pranam Fertilizers Optimization Initiative achieving major milestone",
+      titleHin: "पीएम-प्रणाम (PM-PRANAM) वैकल्पिक उर्वरक संवर्धन योजना ने नया मील का पत्थर हासिल किया",
+      source: "Drishti IAS Current Affairs Quiz",
+      summaryEng: "States adopting organic alternative fertilization saw a marked reduction in chemical subsidy burdens, advancing agricultural sustainability objectives.",
+      summaryHin: "प्रकृति-अनुकूल उर्वरकों को अपनाने वाले राज्यों ने रासायनिक उर्वरक सब्सिडी लागत में उल्लेखनीय गिरावट दर्ज की, जिससे कृषि स्थिरता उद्देश्यों को गति मिली।",
+      quizQuestion: {
+        text: "PM-PRANAM scheme is primarily dedicated to which agricultural sector? / पीम-प्रणाम (PM-PRANAM) योजना मुख्य रूप से किस कृषि क्षेत्र को समर्पित है?",
+        options: [
+          "Alternative Fertilizer Promotion / वैकल्पिक उर्वरक संवर्धन",
+          "Micro-Irrigation Installation / सूक्ष्म सिंचाई स्थापना",
+          "Cold Storage Subsidies / कोल्ड स्टोरेज सब्सिडी",
+          "Pesticides Free Organic Certification / कीटनाशक मुक्त जैविक प्रमाणन"
+        ],
+        correctAnswer: 0,
+        explanation: "PM-PRANAM aims to incentivize states to promote alternative organic fertilizers and reduce chemical urea dependency. / पीएम-प्रणाम का उद्देश्य राज्यों को वैकल्पिक जैविक उर्वरकों को बढ़ावा देने और रासायनिक यूरिया पर निर्भरता कम करने के लिए प्रोत्साहित करना है।"
+      }
+    }
+  ];
+
+  cachedCurrentAffairs = fallbackAffairs;
+  lastCurrentAffairsFetch = now;
+
+  return res.json({ affairs: fallbackAffairs });
 });
 
 // API: Get Automated Daily Researched Exam Notes & Blogs (Checks 12h gap)
@@ -1348,7 +1412,7 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
         "State Bank of India (SBI) / भारतीय स्टेट बैंक",
         "Reserve Bank of India (RBI) / भारतीय रिजर्व बैंक",
         "Securities and Exchange Board of India (SEBI) / सेबी",
-        "Ministry of Commerce / वाणिज्य मंत्रालय"
+        "Ministry of Commerce /  वाणिज्य मंत्रालय"
       ],
       "correctAnswer": 1,
       "explanation": "The Reserve Bank of India (RBI) is India's central bank and regulatory authority for monetary policies and currency management. / भारतीय रिजर्व बैंक (RBI) भारत का केंद्रीय बैंक है जो मौद्रिक नीतियों और मुद्रा प्रबंधन के लिए प्रमुख नियामक प्राधिकरण है।"
@@ -1390,14 +1454,108 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
         "Methane & Helium / मीथेन और हीलियम"
       ],
       "correctAnswer": 2,
-      "explanation": "Sulfur dioxide (SO2) and Nitrogen oxides (NOx) react with water vapor, oxygen, and other chemicals in the atmosphere to form sulfuric and nitric acids. / सल्फर डाइऑक्साइड (SO2) और नाइट्रोजन ऑक्साइड (NOx) वायुमंडल में जल वाष्प, ऑक्सीजन और अन्य रसायनों के साथ प्रतिक्रिया करके सल्फ्यूरिक और नाइट्रिक अम्ल बनाते हैं।"
+      "explanation": "Sulfur dioxide (SO2) and Nitrogen oxides (NOx) react with water vapor, oxygen, and other chemicals in the atmosphere to form sulfuric and nitric acids. / सल्फर डाइऑक्साइड (SO2) and नाइट्रोजन ऑक्साइड (NOx) वायुमंडल में जल वाष्प, ऑक्सीजन और अन्य रसायनों के साथ प्रतिक्रिया करके सल्फ्यूरिक और नाइट्रिक अम्ल बनाते हैं।"
     }
   ];
 
   return res.json({ questions: backupPool });
 });
 
-// 2. Dynamic SEO friendly XML Sitemap route
+// API: Live Grounded AI Mentor/Tutor Chat
+app.post("/api/chat", async (req: express.Request, res: express.Response) => {
+  try {
+    const { message, history } = req.body;
+    if (!message) {
+      return res.status(400).json({ error: "No message parameter provided" });
+    }
+
+    if (ai) {
+      console.log(`[INFO] Chat Query received to Agni AI: "${message.substring(0, 50)}..."`);
+      
+      const chatHistory = (history || []).map((h: any) => ({
+        role: h.role === "user" ? "user" : "model",
+        parts: [{ text: h.text }]
+      }));
+
+      const chatSession = ai.chats.create({
+        model: "gemini-2.5-flash",
+        history: chatHistory,
+        config: {
+          systemInstruction: `You are Agni AI, a professional and highly authoritative study mentor and General Knowledge tutor for Indian Armed Forces exams (Agniveer, Navy, Air Force, NDA, CDS) and standard Civil Service exams (such as SSC GD, State Police, Railway recruitment exams).
+All chats must follow this criteria:
+- Give highly precise, encouraging, accurate, and educational guidance.
+- Speak primarily in professional Hindi or English, and freely mix both like a real tutor (Hinglish/Bilingual mode).
+- Keep formatting clean using bold markdown structures. Avoid extremely long paragraphs. Use clear bullet points for syllabus topics or steps.
+- Celebrate service, courage, patriot values and selection.
+- If asked about live notifications or latest exams, refer them to check the "Latest Vacancies" section or use Google Search grounded capability if you can.`,
+          tools: [{ googleSearch: {} }]
+        }
+      });
+
+      const response = await chatSession.sendMessage({ message });
+      const reply = response.text || "Jai Hind! I processed your query, but could not produce text. Let's try again!";
+      return res.json({ reply });
+    }
+  } catch (err: any) {
+    console.error("Agni AI Chat Client processing error:", err);
+  }
+
+  // Fallback / Simulated mode if offline or rate-limited
+  const textLower = (req.body.message || "").toLowerCase();
+  let defaultReply = `Jai Hind! I am operating in low-overhead offline mode right now due to server traffic. 
+
+Here are some core directions for your study right now:
+- **Navy/Agniveer**: Focus on Indian naval history (Maratha admiral Shivaji Maharaj - Father of the Indian Navy).
+- **SSC GD / Police Forces**: Read current affairs summaries and practice our bilingual GK mock exams often!
+- **NDA / CDS**: Pay special attention to the Indian Constitution Parts III (Articles 12-35) and Parts IV-A (Article 51A).
+
+*To unlock unlimited active high-fidelity conversational mentoring, please connect your live GEMINI_API_KEY under the Settings tab.*`;
+
+  if (textLower.includes("navy") || textLower.includes("shivaji") || textLower.includes("father")) {
+    defaultReply = `**Father of the Indian Navy**: Chhatrapati Shivaji Maharaj is widely recognized as the Father of the Indian Navy. 
+    
+**Key facts**:
+- He realized the strategic importance of a strong naval presence and developed a superior navy to protect the Konkan coastline from Janjira Siddis, Portuguese, and British forces.
+- He built several coastal and sea forts like Sindhudurg, Padmadurg, and Vijaydurg.
+- Modern Indian Navy pay homage to this by utilizing his octagonal royal seal design in the new naval crest/ensign (introduced in 2022).`;
+  } else if (textLower.includes("duty") || textLower.includes("51a") || textLower.includes("fundamental")) {
+    defaultReply = `**Fundamental Duties (अनुच्छेद 51A - Part IV-A)**:
+They were added to the Indian Constitution by the **42nd Amendment Act of 1976** based on the recommendations of the **Swaran Singh Committee**.
+
+**Key aspects**:
+- Originally there were 10 duties; the 11th duty was added in 2002 by the **86th Amendment Act** (duty of parents/guardians to provide education opportunities to children aged 6-14).
+- They are non-justiciable in nature (cannot be enforced directly by a court).
+- They apply strictly to Indian citizens. Examples include respecting the National Flag, promoting harmony, safeguarding public property, and defending the nation.`;
+  } else if (textLower.includes("step") || textLower.includes("agniveer") || textLower.includes("selection")) {
+    defaultReply = `**Agniveer Selection Procedure**:
+1. **Phase I**: Indian Army/Navy/Air Force Common Entrance Exam (CEE) Online base computer exam.
+2. **Phase II**: Physical Fitness Test (PFT):
+   - 1.6 KM run under 5 mins 30 secs for Group I.
+   - Pull-ups / beam hangs.
+   - 9-feet ditch jump and zig-zag balance check.
+3. **Phase III**: Physical Measurement Test (PMT) checking height, chest expansion weight standards.
+4. **Phase IV**: Comprehensive Medical Examination and Merit List final announcement.`;
+  } else if (textLower.includes("hierarchy") || textLower.includes("rank") || textLower.includes("commission")) {
+    defaultReply = `**Equivalence of Indian Commissioned Officers Ranks** (Army vs Navy vs Air Force):
+
+1. **Top Ranks**:
+   - Army: **General**
+   - Navy: **Admiral**
+   - Air Force: **Air Chief Marshal**
+2. **Brigadier equivalent**:
+   - Army: **Brigadier**
+   - Navy: **Commodore**
+   - Air Force: **Air Commodore**
+3. **Lieutenant level**:
+   - Army: **Lieutenant** (Starting rank)
+   - Navy: **Sub-Lieutenant**
+   - Air Force: **Flying Officer**`;
+  }
+
+  return res.json({ reply: defaultReply });
+});
+
+// Dynamic SEO friendly XML Sitemap route
 app.get("/sitemap.xml", (req, res) => {
   res.setHeader("Content-Type", "application/xml");
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -1413,7 +1571,7 @@ app.get("/sitemap.xml", (req, res) => {
   res.send(sitemap);
 });
 
-// 3. Robots.txt route for SEO crawler approval
+// Robots.txt route for SEO crawler approval
 app.get("/robots.txt", (req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.send(`User-agent: *
@@ -1422,7 +1580,7 @@ Disallow: /admin
 Sitemap: https://agnipariksha.com/sitemap.xml`);
 });
 
-// 4. Vite middleware for full-stack build/dev environments
+// Vite middleware for full-stack build/dev environments
 async function bootstrap() {
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

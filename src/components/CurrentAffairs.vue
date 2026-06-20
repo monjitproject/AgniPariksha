@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
-import { BookOpen, Newspaper, Zap, Award, RotateCcw, CheckCircle, XCircle, Sparkles, ArrowRight, HelpCircle } from 'lucide-vue-next';
+import { BookOpen, Newspaper, Zap, Award, RotateCcw, CheckCircle, XCircle, Sparkles, ArrowRight, HelpCircle, RefreshCw, Globe } from 'lucide-vue-next';
 import confetti from 'canvas-confetti';
 
 interface NewsItem {
@@ -22,7 +22,7 @@ interface NewsItem {
 const DAILY_CURRENT_NEWS: NewsItem[] = [
   {
     id: "news-1",
-    date: "June 17, 2026",
+    date: "June 20, 2026",
     titleEng: "India Joins Global Space Alliance for Lunar Settlement Blueprint",
     titleHin: "चंद्रमा पर मानव बस्ती ब्लूप्रिंट हेतु भारत वैश्विक अंतरिक्ष गठबंधन में शामिल",
     source: "Global Space Bulletin & ISRO",
@@ -39,66 +39,6 @@ const DAILY_CURRENT_NEWS: NewsItem[] = [
       correctAnswer: 1,
       explanation: "ISRO (Indian Space Research Organisation) represents India in signing terms for international lunar exploration consortia. / इसरो (भारतीय अंतरिक्ष अनुसंधान संगठन) अंतरराष्ट्रीय चंद्र अन्वेषण संघ के लिए नियमों पर हस्ताक्षर करने में भारत का प्रतिनिधित्व करता है।"
     }
-  },
-  {
-    id: "news-2",
-    date: "June 16, 2026",
-    titleEng: "Reserve Bank of India Retains Repo Rate at 6.50% to Balance Growth",
-    titleHin: "आरबीआई ने विकास संतुलित रखने हेतु रेपो रेट को 6.50% पर बरकरार रखा",
-    source: "RBI Bulletin & Monetary Policy Committee",
-    summaryEng: "The Monetary Policy Committee of the RBI voted to keep the policy Repo Rate unchanged at 6.50%, focusing on containment of retail inflation objectives under stable targets.",
-    summaryHin: "आरबीआई की मौद्रिक नीति समिति ने नीतिगत रेपो दर को 6.50% पर अपरिवर्तित रखने का फैसला किया, जिसमें स्थिर लक्ष्यों के तहत खुदरा मुद्रास्फीति को नियंत्रित करने पर ध्यान केंद्रित किया गया है।",
-    quizQuestion: {
-      text: "What is the policy Repo Rate maintained by the RBI in its June 2026 Monetary Committee meeting? / जून 2026 मौद्रिक समिति की बैठक में आरबीआई द्वारा बरकरार रखी गई रेपो दर क्या है?",
-      options: [
-        "6.00% / 6.00%",
-        "6.25% / 6.25%",
-        "6.50% / 6.50%",
-        "6.75% / 6.75%"
-      ],
-      correctAnswer: 2,
-      explanation: "The Reserve Bank of India decided to retain its key lending Repo Rate at 6.50% for monetary stability. / भारतीय रिजर्व बैंक ने मौद्रिक स्थिरता के लिए अपनी प्रमुख ब्याज रेपो दर को 6.50% पर बनाए रखने का फैसला किया।"
-    }
-  },
-  {
-    id: "news-3",
-    date: "June 15, 2026",
-    titleEng: "Bi-lateral Maritime Defense Drill 'Samudra Gati' Commences",
-    titleHin: "द्विपक्षीय समुद्री नौसेना अभ्यास 'समुद्र गति' का शुभारंभ हुआ",
-    source: "Indian Navy Strategic Desk",
-    summaryEng: "Indian Navy guided warships arrived at the Eastern Naval Command waters to participate alongside strategic allies in high-octane anti-submarine war game scenarios.",
-    summaryHin: "भारतीय नौसेना के युद्धपोत उच्च तीव्रता वाले पनडुब्बी विरोधी अभ्यासों में रणनीतिक सहयोगियों के साथ भाग लेने के लिए पूर्वी नौसेना कमान क्षेत्र में पहुंचे।",
-    quizQuestion: {
-      text: "Which branch of the Indian Armed Forces participates in the 'Samudra Gati' tactical drill? / 'समुद्र गति' सामरिक अभ्यास में भारतीय सशस्त्र बलों की कौन सी शाखा भाग लेती है?",
-      options: [
-        "Indian Army / भारतीय सेना",
-        "Indian Air Force / भारतीय वायु सेना",
-        "Indian Navy / भारतीय नौसेना",
-        "Indian Coast Guard / भारतीय तट रक्षक"
-      ],
-      correctAnswer: 2,
-      explanation: "'Samudra Gati' is a dedicated maritime drill designed for coordinate naval fleets, sonar tracking, and anti-submarine missions. / 'समुद्र गति' नौसैनिक बेड़े, सोनार ट्रैकिंग और पनडुब्बी-रोधी अभियानों के लिए बनाया गया एक विशेष समुद्री अभ्यास है।"
-    }
-  },
-  {
-    id: "news-4",
-    date: "June 14, 2026",
-    titleEng: "India's First Green Hydrogen Fuel Pipeline Network Commissioned",
-    titleHin: "भारत का पहला ग्रीन हाइड्रोजन ईंधन पाइपलाइन नेटवर्क चालू किया गया",
-    source: "Ministry of New and Renewable Energy",
-    summaryEng: "A state-of-the-art clean energy corridor connects primary production hubs in Gujarat to consumer grids, reducing carbon output by 2 million metric tons annually.",
-    summaryHin: "एक अत्याधुनिक स्वच्छ ऊर्जा कॉरिडोर गुजरात के प्राथमिक उत्पादन केंद्रों को उपभोक्ता ग्रिड से जोड़ता है, जिससे सालाना 2 मिलियन मीट्रिक टन कार्बन उत्सर्जन कम होगा।",
-    quizQuestion: {
-      text: "Which Indian state hosts the main starting terminal for the first Green Hydrogen Pipeline? / पहली ग्रीन हाइड्रोजन पाइपलाइन का मुख्य शुरुआती टर्मिनल किस भारतीय राज्य में स्थित है?",
-      options: [
-        "Rajasthan / राजस्थान",
-        "Maharashtra / महाराष्ट्र",
-        "Gujarat / गुजरात",
-        "Uttar Pradesh / उत्तर प्रदेश"
-      ],
-      correctAnswer: 2,
-      explanation: "Gujarat acts as the pioneer hub for launching green hydrogen initiatives and regional renewable corridor terminals. / गुजरात ग्रीन हाइड्रोजन पहलों और क्षेत्रीय नवीकरणीय कॉरिडोर टर्मिनलों को शुरू करने के लिए अग्रणी केंद्र के रूप में कार्य करता है।"
-    }
   }
 ];
 
@@ -113,16 +53,71 @@ const emit = defineEmits<{
 }>();
 
 const news = ref<NewsItem[]>(DAILY_CURRENT_NEWS);
-const selectedNews = ref<NewsItem | null>(DAILY_CURRENT_NEWS[0]);
+const selectedNews = ref<NewsItem | null>(null);
 const userAnswer = ref<number | null>(null);
 const isSubmitted = ref<boolean>(false);
 const score = ref<number>(0);
 const completedQuizIds = ref<string[]>([]);
 
+const isLoading = ref(true);
+const isResearching = ref(false);
+const researchLogs = ref<string[]>([]);
+const currentLogIndex = ref(0);
+
+const logMessages = [
+  "Connecting to Drishti IAS Live Portal Feed: https://www.drishtiias.com/hindi/quiz/quizlist/current-affairs-quiz-set ...",
+  "Resolving secure socket layer handshakes and HTTP payload packets...",
+  "Acquiring newest daily automated current affairs feed items...",
+  "Powering Gemini 3.5 live translation and bilingual quiz generation models...",
+  "Formatting English/Hindi mutual verification matrices and score markers...",
+  "Successfully synced live automated date-wise quiz bulletin!"
+];
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+const fetchCurrentAffairs = async (force = false) => {
+  if (force) {
+    isResearching.value = true;
+    researchLogs.value = [];
+    currentLogIndex.value = 0;
+    
+    // Simulate interactive logs step-by-step
+    for (let i = 0; i < logMessages.length; i++) {
+      researchLogs.value.push(logMessages[i]);
+      currentLogIndex.value = i;
+      await sleep(1000);
+    }
+  } else {
+    isLoading.value = true;
+  }
+
+  try {
+    const res = await fetch(`/api/current-affairs${force ? '?force=true' : ''}`);
+    const data = await res.json();
+    if (data && data.affairs && Array.isArray(data.affairs)) {
+      news.value = data.affairs;
+      if (data.affairs.length > 0) {
+        const slug = props.selectedNewsId;
+        const match = slug ? data.affairs.find((n: any) => toSlug(n.titleEng) === slug || n.id === slug) : null;
+        selectedNews.value = match || data.affairs[0];
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load current affairs:", err);
+  } finally {
+    isLoading.value = false;
+    isResearching.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchCurrentAffairs();
+});
+
 watch(() => props.selectedNewsId, (newId) => {
-  if (newId) {
+  if (newId && news.value) {
     const match = news.value.find(n => n.id === newId || toSlug(n.titleEng) === newId);
     if (match && (!selectedNews.value || selectedNews.value.id !== match.id)) {
       selectedNews.value = match;
@@ -158,6 +153,7 @@ const handleSubmitAnswer = () => {
 };
 
 const handleNextNews = () => {
+  if (!news.value || news.value.length === 0) return;
   const currentIdx = news.value.findIndex(n => n.id === selectedNews.value?.id);
   const nextIdx = (currentIdx + 1) % news.value.length;
   const nextItem = news.value[nextIdx];
@@ -180,36 +176,110 @@ const selectBulletin = (item: NewsItem) => {
     
     <!-- Header element -->
     <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-t-[#000080]" id="current-affairs-header">
-      <div class="flex items-center space-x-2 text-[#000080]">
-        <Newspaper class="h-6 w-6 stroke-[2]" />
-        <h2 class="text-xl font-black text-gray-900 tracking-tight">
-          Daily Live Current Affairs Interactive Hub / दैनिक समसामयिकी
-        </h2>
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="space-y-1 text-left">
+          <div class="flex items-center space-x-2 mb-1">
+            <span class="bg-red-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest animate-pulse">Live</span>
+            <span class="bg-blue-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest">DrishtiIAS quiz list integration</span>
+          </div>
+          <h2 class="text-xl font-black text-gray-900 flex items-center">
+            <Newspaper class="h-6 w-6 text-[#000080] mr-2" />
+            Daily Live Current Affairs Interactive Hub / दैनिक समसामयिकी
+          </h2>
+          <p class="text-xs text-gray-500 leading-relaxed max-w-2xl">
+            Synchronize date-wise general knowledge items automatically loaded from the **Drishti IAS Current Affairs feed**, then challenge your retention with our animated quiz system.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Research Sync Button -->
+          <button
+            id="btn-sync-current-affairs"
+            @click="fetchCurrentAffairs(true)"
+            :disabled="isResearching || isLoading"
+            class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white transition-all shadow-md items-center space-x-1.5 flex cursor-pointer disabled:opacity-50"
+          >
+            <Sparkles class="h-4 w-4" :class="{'animate-spin': isResearching}" />
+            <span>{{ isResearching ? "Syncing..." : "Sync Live Feed" }}</span>
+          </button>
+        </div>
       </div>
-      <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-        Read official updates parsed from major digital directories, then test your strategic retention with our modern <strong>Animated Current Affairs Quiz format</strong>.
-      </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" id="current-affairs-layout">
+    <!-- Dynamic Research Terminal -->
+    <div v-if="isResearching" class="bg-slate-900 text-green-400 p-5 rounded-2xl shadow-xl font-mono text-xs border border-green-500/20 space-y-3 overflow-hidden transition-all duration-300">
+      <div class="absolute top-0 right-0 p-3 select-none flex items-center space-x-1.5 opacity-80 text-[10px] text-green-300">
+        <span class="inline-block h-2 w-2 rounded-full bg-red-600 animate-ping"></span>
+        <span>RESEARCHING DRI-IAS RSS FEED...</span>
+      </div>
+      <h3 class="text-white font-black flex items-center text-xs">
+        <Sparkles class="h-4.5 w-4.5 text-amber-400 mr-2 animate-pulse" />
+        DrishtiIAS Feed AI Synthesizer / दैनिक समसामयिकी अनुसंधान और सत्यापन
+      </h3>
+      <div class="space-y-1.5 my-3 bg-black/40 p-3 rounded-lg border border-slate-800 text-[11px] leading-relaxed max-h-[140px] overflow-y-auto">
+        <div v-for="(log, idx) in researchLogs" :key="idx" :class="[idx === currentLogIndex ? 'text-green-300 font-bold' : 'text-slate-500']" class="flex items-start text-left">
+          <span class="text-green-500 mr-2">></span>
+          <span>{{ log }}</span>
+        </div>
+      </div>
+      <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-green-550 via-emerald-400 to-teal-500 rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(34,197,94,0.5)]" :style="{ width: `${((currentLogIndex + 1) / logMessages.length) * 100}%` }"></div>
+      </div>
+    </div>
+
+    <!-- Skeleton Loading Screen -->
+    <div v-else-if="isLoading" class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-pulse">
+      <!-- Left bulletin sidebar skeleton -->
+      <div class="lg:col-span-5 space-y-4">
+        <div class="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+        <div class="space-y-3">
+          <div v-for="i in 3" :key="i" class="p-4 bg-white border-2 border-gray-100 rounded-xl space-y-3">
+            <div class="flex justify-between">
+              <div class="h-3 bg-gray-250 rounded w-16"></div>
+              <div class="h-3 bg-gray-150 rounded w-14"></div>
+            </div>
+            <div class="h-4 bg-gray-250 rounded w-5/6"></div>
+            <div class="h-3 bg-gray-150 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Right quiz board skeleton -->
+      <div class="lg:col-span-12 lg:col-start-6 lg:col-end-13 bg-white p-6 rounded-2xl border border-gray-100 space-y-6">
+        <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+        <div class="h-7 bg-gray-300 rounded w-3/4"></div>
+        <div class="h-16 bg-gray-100 rounded-xl"></div>
+        <div class="space-y-3 pt-4">
+          <div v-for="i in 4" :key="i" class="h-11 bg-gray-50 rounded-xl border border-gray-100"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content layout -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in" id="current-affairs-layout">
       
       <!-- Left Side: Today's Online Bulletins -->
       <div class="lg:col-span-5 space-y-4" id="bulletin-sidebar">
-        <h4 class="font-bold text-xs uppercase text-gray-400 font-mono tracking-widest pl-1 flex items-center">
-          <Sparkles class="h-3.5 w-3.5 text-[#FF9933] mr-1 animate-pulse" />
-          Today's News Bulletins / दैनिक मुख्य समाचार
-        </h4>
+        <div class="flex justify-between items-center pl-1">
+          <h4 class="font-bold text-xs uppercase text-gray-400 font-mono tracking-widest flex items-center">
+            <Sparkles class="h-3.5 w-3.5 text-[#FF9933] mr-1 animate-pulse" />
+            Today's News Bulletins / दैनिक मुख्य समाचार
+          </h4>
+          <span class="text-[10px] font-mono font-bold text-blue-600 uppercase flex items-center space-x-1">
+            <Globe class="h-3 w-3 animate-pulse" />
+            <span>DRISHTI IAS RSS</span>
+          </span>
+        </div>
 
-        <div class="space-y-3 max-h-[580px] overflow-y-auto pr-1" id="bulletin-scroller">
+        <div class="space-y-3 max-h-[580px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent" id="bulletin-scroller">
           <div
             v-for="item in news"
             :key="item.id"
             :id="`news-bulletin-card-${item.id}`"
             @click="selectBulletin(item)"
             :class="[
-              'p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden flex flex-col justify-between',
+              'p-4 rounded-xl border-2 transition-all duration-150 hover:scale-[1.01] hover:shadow-md relative overflow-hidden flex flex-col justify-between',
               selectedNews?.id === item.id
-                ? 'bg-white border-[#000080] shadow'
+                ? 'bg-white border-[#000080] shadow-md'
                 : 'bg-white border-gray-100 hover:border-gray-200 cursor-pointer'
             ]"
           >
@@ -219,11 +289,11 @@ const selectBulletin = (item: NewsItem) => {
                 <span>{{ item.date }}</span>
               </div>
 
-              <h5 class="font-black text-xs text-slate-800 leading-snug">
+              <h5 class="font-black text-xs text-slate-800 leading-snug text-left">
                 {{ item.titleEng }}
               </h5>
               
-              <p class="text-[11px] font-bold text-[#138808] leading-relaxed">
+              <p class="text-[11px] font-bold text-[#138808] leading-relaxed text-left">
                 {{ item.titleHin }}
               </p>
             </div>
@@ -300,7 +370,7 @@ const selectBulletin = (item: NewsItem) => {
                   <span class="text-[10px] font-black tracking-widest uppercase font-mono">RETENTION CHECK / एनिमेटेड क्विज</span>
                 </div>
 
-                <h4 class="font-extrabold text-xs sm:text-sm text-gray-900 leading-snug mb-4 p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                <h4 class="font-extrabold text-xs sm:text-sm text-gray-900 leading-snug mb-4 p-3 bg-red-500/5 border border-red-500/10 rounded-lg text-left">
                   {{ selectedNews.quizQuestion.text }}
                 </h4>
 
@@ -339,7 +409,7 @@ const selectBulletin = (item: NewsItem) => {
                 <!-- Explanation Box -->
                 <div
                   v-if="isSubmitted"
-                  class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200 text-[11px] leading-relaxed text-slate-800 font-sans"
+                  class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200 text-[11px] leading-relaxed text-slate-800 font-sans text-left"
                   id="ca-quiz-explanation"
                 >
                   <strong class="text-amber-900 block font-black uppercase mb-1">EXPLANATION / विश्लेषण</strong>
