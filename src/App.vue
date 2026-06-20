@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import confetti from "canvas-confetti";
 import { 
   Award, BookOpen, FileText, Briefcase, 
   LayoutDashboard, Bell, Clock, Flame, 
-  ChevronRight, HelpCircle
+  ChevronRight, HelpCircle, RefreshCw, Search, ExternalLink
 } from "lucide-vue-next";
 
 // Import modular child components
@@ -180,6 +180,7 @@ onMounted(() => {
   window.addEventListener("popstate", handlePopState);
   handlePopState();
   fetchDailyQuiz(); // Load dynamic live educational feed questions on compile/session launch
+  fetchNotifications(); // Fetch dynamic live job notifications and armed forces alerts
 });
 
 onUnmounted(() => {
@@ -279,11 +280,76 @@ const triggerCelebration = () => {
 
 // Notification alerts
 const notificationDrawerOpen = ref(false);
-const notifications = ref([
-  { id: 1, text: "Agniveer Army Rally 2026 written exam hall tickets are active.", type: "urgent" },
-  { id: 2, text: "Indian Navy Marine Commando CEE syllabus update released.", type: "new" },
-  { id: 3, text: "Weekly National General Knowledge test commences on Sunday.", type: "general" }
+const notifications = ref<any[]>([
+  {
+    id: 1,
+    text: "Indian Air Force (IAF) Agniveervayu intake 02/2026 registration dates scheduled. Registrations open from July 8, 2026.",
+    hindiText: "भारतीय वायु सेना (IAF) अग्निवीरवायु 02/2026 बैच के लिए पंजीकरण की तिथियां जारी। आवेदन 8 जुलाई 2026 से उपलब्ध।",
+    type: "urgent",
+    link: "https://agnipathvayu.cdac.in",
+    date: "June 19, 2026"
+  },
+  {
+    id: 2,
+    text: "UPSC CDS-II & NDA-II examination notice out. Written test Scheduled on August 30, 2026 nationwide.",
+    hindiText: "UPSC CDS-II और NDA-II परीक्षा सूचना जारी। लिखित परीक्षा 30 अगस्त 2026 को देश भर में होगी।",
+    type: "new",
+    link: "https://upsc.gov.in",
+    date: "June 18, 2026"
+  },
+  {
+    id: 3,
+    text: "Weekly National General Knowledge test commences on Sunday.",
+    hindiText: "साप्ताहिक राष्ट्रीय सामान्य ज्ञान परीक्षा रविवार को शुरू होगी।",
+    type: "general",
+    link: "#",
+    date: "June 17, 2026"
+  }
 ]);
+
+const isFetchingNotifications = ref(false);
+const notificationsFilter = ref("all");
+const notificationsSearch = ref("");
+
+const fetchNotifications = async (force = false) => {
+  isFetchingNotifications.value = true;
+  try {
+    const res = await fetch(`/api/latest-notifications${force ? "?force=true" : ""}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.notifications && data.notifications.length > 0) {
+        notifications.value = data.notifications;
+      }
+    }
+  } catch (err) {
+    console.error("Error fetching latest notifications:", err);
+  } finally {
+    isFetchingNotifications.value = false;
+  }
+};
+
+const filteredNotifications = computed(() => {
+  return notifications.value.filter(n => {
+    // Search keyword match
+    const textToMatch = `${n.text || ''} ${n.hindiText || ''} ${n.type || ''}`.toLowerCase();
+    const query = notificationsSearch.value.trim().toLowerCase();
+    if (query && !textToMatch.includes(query)) {
+      return false;
+    }
+    
+    // Type filter match
+    if (notificationsFilter.value !== "all") {
+      const normType = (n.type || '').toLowerCase();
+      // Handle slight variations like "results" vs "result"
+      if (notificationsFilter.value === "result") {
+        return normType.includes("result");
+      }
+      return normType === notificationsFilter.value.toLowerCase();
+    }
+    
+    return true;
+  });
+});
 
 const activeQuizzes = ref<Quiz[]>(MOCK_QUIZZES);
 const activeJobs = ref<JobPost[]>(MOCK_JOBS);
@@ -954,50 +1020,190 @@ const handleAdminAddJob = (newJob: JobPost) => {
 
     </main>
 
-    <!-- 4. Active Notification popup drawer -->
+    <!-- 4. Sarkari Jobs & Armed Forces Latest Notifications Dynamic Sidebar -->
     <div v-if="notificationDrawerOpen" class="fixed inset-0 z-50 overflow-hidden flex justify-end" id="activity-alert-drawer">
+      <!-- Dark backdrop -->
       <div 
-        class="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity cursor-pointer" 
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity cursor-pointer" 
         @click="notificationDrawerOpen = false"
       />
-
-      <div class="relative w-full max-w-sm bg-white h-full shadow-22 flex flex-col justify-between" id="activity-alert-sheet">
-        <div class="p-5 border-b border-gray-150 flex items-center justify-between bg-gray-50 shrink-0 text-left">
-          <div class="flex items-center space-x-2">
-            <Bell class="h-5 w-5 text-[#000080]" />
-            <span class="font-extrabold text-xs uppercase tracking-wider text-gray-800">Student Live Alerts</span>
+ 
+      <!-- Slide-in Sidebar Panel -->
+      <div class="relative w-full max-w-md sm:max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between animate-slide-in-right border-l border-slate-200" id="activity-alert-sheet">
+        
+        <!-- Sidebar Header (Navy / Flag style inspired) -->
+        <div class="p-5 border-b border-gray-200 bg-slate-900 text-white shrink-0">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+              <span class="font-mono text-[10px] font-bold text-emerald-400 tracking-wider uppercase">Live Grounding Active</span>
+            </div>
+            
+            <button 
+              @click="notificationDrawerOpen = false"
+              class="text-xs font-bold text-gray-400 hover:text-white border border-slate-700 hover:border-slate-500 px-3 py-1 rounded-xl cursor-pointer uppercase transition-colors"
+            >
+              Close ×
+            </button>
           </div>
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-1 text-left">
+            <div>
+              <h3 class="font-black text-base sm:text-lg tracking-tight text-white flex items-center gap-1.5 leading-none">
+                <Bell class="h-5 w-5 text-[#FF9933]" />
+                Latest Gov Job Alerts
+              </h3>
+              <p class="text-xs text-slate-300 font-sans mt-1">Indian Armed Forces & Recruitment Updates • 2026</p>
+            </div>
 
-          <button 
-            @click="notificationDrawerOpen = false"
-            class="text-[11px] font-black text-gray-500 hover:text-black border px-2 py-0.5 rounded cursor-pointer uppercase font-sans"
-          >
-            Close ×
-          </button>
+            <!-- Manual live fetch button using Search Grounding -->
+            <button 
+              @click="fetchNotifications(true)" 
+              class="flex items-center justify-center gap-1.5 bg-[#FF9933] hover:bg-amber-600 disabled:bg-slate-700 text-black disabled:text-slate-400 font-black text-[11px] uppercase px-3 py-2 rounded-xl transition-all cursor-pointer shadow-md select-none leading-none shrink-0"
+              :disabled="isFetchingNotifications"
+              title="Queries Gemini Search Grounding for live recruitment notifications in real-time"
+            >
+              <RefreshCw class="h-3.5 w-3.5" :class="{'animate-spin': isFetchingNotifications}" />
+              <span>Refresh Live</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Notification List -->
-        <div class="flex-1 p-5 overflow-y-auto space-y-3.5 text-left" id="notification-entries">
+        <!-- Sidebar Searching & Filters Controls -->
+        <div class="p-4 bg-slate-50 border-b border-gray-200 shrink-0 space-y-3">
+          <!-- Text search -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search class="h-4 w-4 text-slate-400" />
+            </span>
+            <input 
+              v-model="notificationsSearch"
+              type="text"
+              placeholder="Search notifications (e.g. Army, SSC, Navy)..."
+              class="w-full pl-9 pr-4 py-2 text-xs font-sans rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#000080]/20 focus:border-[#000080] placeholder-slate-400 text-slate-800"
+            />
+            <button 
+              v-if="notificationsSearch" 
+              @click="notificationsSearch = ''"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-[10px] text-gray-400 hover:text-black font-black font-sans cursor-pointer"
+            >
+              CLEAR
+            </button>
+          </div>
+
+          <!-- Quick category pills -->
+          <div class="flex flex-wrap gap-1.5 items-center">
+            <span class="text-[10px] font-black uppercase text-slate-500 mr-1.5 font-sans">Filter alerts:</span>
+            <button 
+              v-for="cat in ['all', 'urgent', 'new', 'result', 'general']"
+              :key="cat"
+              @click="notificationsFilter = cat"
+              :class="[
+                'text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-lg transition-all cursor-pointer',
+                notificationsFilter === cat 
+                  ? 'bg-[#000080] text-white shadow-xs' 
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+              ]"
+            >
+              {{ cat === 'new' ? 'New Alerts' : cat === 'all' ? 'All Updates' : cat }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Notification Cards Feed Container -->
+        <div class="flex-1 p-5 overflow-y-auto space-y-4 text-left bg-slate-100/50" id="notification-entries">
+          
+          <!-- Fetching updates overlay -->
+          <div v-if="isFetchingNotifications && filteredNotifications.length === 0" class="py-12 text-center text-slate-500 space-y-3">
+            <RefreshCw class="h-8 w-8 text-[#000080] animate-spin mx-auto" />
+            <p class="text-xs font-sans font-bold text-slate-700">Connecting to verified Indian recruitment portals...</p>
+            <p class="text-[10px] text-slate-400 max-w-xs mx-auto">Gemini is searching official sources like JoindIndianArmy and UPSC via live search grounding.</p>
+          </div>
+
+          <!-- Empty search results -->
+          <div v-else-if="filteredNotifications.length === 0" class="py-12 bg-white rounded-xl border border-dashed border-slate-200 text-center text-slate-400 p-6 space-y-2">
+            <Bell class="h-8 w-8 text-slate-300 mx-auto" />
+            <p class="text-xs font-black text-slate-700">No Job Alerts Found</p>
+            <p class="text-[11px] font-sans max-w-xs mx-auto">No matching feeds found for current keyword filters. Clear searching tags to reload fallback databases.</p>
+            <button 
+              @click="() => { notificationsFilter = 'all'; notificationsSearch = ''; }"
+              class="text-xs text-[#000080] font-bold border px-3 py-1 rounded-lg hover:bg-slate-50 cursor-pointer mt-1"
+            >
+              Reset Filters
+            </button>
+          </div>
+
+          <!-- Dynamic Cards Loop -->
           <div 
-            v-for="n in notifications" 
+            v-else
+            v-for="n in filteredNotifications" 
             :key="n.id" 
             :id="`notif-${n.id}`"
-            class="p-3.5 bg-gray-50 border border-gray-150 rounded-xl space-y-1.5"
+            class="p-4 bg-white border border-slate-200 rounded-xl space-y-2.5 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200 relative overflow-hidden"
           >
-            <span :class="[
-              'text-[8px] font-black uppercase px-2 py-0.5 rounded inline-block',
-              n.type === 'urgent' ? 'bg-red-50 text-red-700 border border-red-200' :
-              n.type === 'new' ? 'bg-green-50 text-green-700 border border-green-200' :
-              'bg-[#000080]/10 text-[#000080]'
-            ]">
-              {{ n.type }}
-            </span>
-            <p class="text-xs text-gray-800 leading-snug font-sans font-medium">{{ n.text }}</p>
+            <!-- Border badge accent depending on urgency -->
+            <div :class="[
+              'absolute top-0 left-0 bottom-0 w-1.5',
+              n.type === 'urgent' ? 'bg-rose-500' :
+              n.type === 'new' ? 'bg-emerald-500' :
+              n.type === 'result' ? 'bg-purple-500' :
+              'bg-blue-500'
+            ]" />
+            
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span :class="[
+                'text-[8px] font-black uppercase px-2 py-0.5 rounded-md border inline-block leading-none tracking-wide',
+                n.type === 'urgent' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                n.type === 'new' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                n.type === 'result' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                'bg-blue-50 text-blue-700 border-blue-200'
+              ]">
+                {{ n.type }}
+              </span>
+              
+              <span class="text-[9px] font-mono text-slate-400 font-bold bg-slate-50 border px-1.5 py-0.5 rounded">
+                {{ n.date }}
+              </span>
+            </div>
+
+            <!-- Bilingual description sentences -->
+            <div class="space-y-1.5">
+              <p class="text-xs text-slate-800 leading-snug font-sans font-bold flex gap-1.5 items-start">
+                <span class="text-slate-400 mt-0.5 font-mono">EN</span>
+                <span>{{ n.text }}</span>
+              </p>
+              
+              <div v-if="n.hindiText" class="border-t border-dashed border-slate-100 pt-1.5">
+                <p class="text-xs text-emerald-800 leading-relaxed font-sans font-semibold flex gap-1.5 items-start">
+                  <span class="text-emerald-400 mt-1 font-mono">🇮🇳 HI</span>
+                  <span>{{ n.hindiText }}</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Action Link anchor targeting official website -->
+            <div v-if="n.link && n.link !== '#'" class="pt-1.5 flex items-center justify-between border-t border-slate-100 flex-wrap gap-2 text-[11px]">
+              <a 
+                :href="n.link" 
+                target="_blank" 
+                rel="no-referrer"
+                class="inline-flex items-center gap-1 text-[#000080] hover:text-[#0000cc] font-black transition-all hover:underline"
+              >
+                <span>Apply & View Circular</span>
+                <ExternalLink class="h-3 w-3" />
+              </a>
+              <span class="text-[9px] text-slate-400 font-sans tracking-wide">Official Govt Portal</span>
+            </div>
           </div>
         </div>
 
-        <div class="p-4 bg-gray-50 border-t text-[10px] text-gray-400 font-mono text-center shrink-0">
-          Helpline support: +91 141 2450011
+        <!-- Helpline & Info Support Footer -->
+        <div class="p-4 bg-slate-50 border-t border-gray-200 shrink-0 text-center space-y-1">
+          <p class="text-[10px] text-slate-500 font-sans font-bold">Helpline Candidate Support: +91 141 2450011</p>
+          <p class="text-[8px] text-slate-400 font-mono">Updates sourced directly from Join Indian Army & official Sarkari announcements.</p>
         </div>
       </div>
     </div>
