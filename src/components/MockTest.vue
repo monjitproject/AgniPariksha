@@ -74,7 +74,12 @@ const fetchMockQuestions = async (forceBypass = false) => {
   isLoading.value = true;
   isError.value = false;
   try {
-    const response = await fetch(`/api/gk-mock-test${forceBypass ? '?force=true' : ''}`);
+    const url = `/api/gk-mock-test?_t=${Date.now()}${forceBypass ? '&force=true' : ''}`;
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
     if (!response.ok) {
       throw new Error(`Server returned HTTP ${response.status}`);
     }

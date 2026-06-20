@@ -44,7 +44,12 @@ const refreshAllNotes = () => {
 };
 
 onMounted(() => {
-  fetch("/api/get-automated-content")
+  const contentUrl = `/api/get-automated-content?_t=${Date.now()}`;
+  fetch(contentUrl, {
+    headers: {
+      'Accept': 'application/json'
+    }
+  })
     .then((res) => res.json())
     .then((data) => {
       if (data && data.studyNotes) {
@@ -121,7 +126,13 @@ const filteredNotes = () => {
 const handlePublishNotes = async () => {
   isGenerating.value = true;
   try {
-    const res = await fetch("/api/get-automated-content?force=true", { method: "POST" });
+    const url = `/api/get-automated-content?force=true&_t=${Date.now()}`;
+    const res = await fetch(url, { 
+      method: "POST",
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
     const data = await res.json();
     if (data && data.studyNotes) {
       dynamicNotes.value = data.studyNotes;

@@ -234,7 +234,12 @@ const isFetchingDaily = ref<boolean>(false);
 const fetchDailyQuiz = async (force = false) => {
   isFetchingDaily.value = true;
   try {
-    const res = await fetch(`/api/daily-quiz${force ? "?force=true" : ""}`);
+    const url = `/api/daily-quiz?_t=${Date.now()}${force ? "&force=true" : ""}`;
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
     if (res.ok) {
       const data = await res.json();
       if (data.questions && data.questions.length > 0) {
@@ -317,7 +322,12 @@ const notificationsSearch = ref("");
 const fetchNotifications = async (force = false) => {
   isFetchingNotifications.value = true;
   try {
-    const res = await fetch(`/api/latest-notifications${force ? "?force=true" : ""}`);
+    const url = `/api/latest-notifications?_t=${Date.now()}${force ? "&force=true" : ""}`;
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
     if (res.ok) {
       const data = await res.json();
       if (data.notifications && data.notifications.length > 0) {

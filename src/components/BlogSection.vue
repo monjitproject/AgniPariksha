@@ -32,7 +32,12 @@ onMounted(() => {
     console.error(e);
   }
 
-  fetch("/api/get-automated-content")
+  const contentUrl = `/api/get-automated-content?_t=${Date.now()}`;
+  fetch(contentUrl, {
+    headers: {
+      'Accept': 'application/json'
+    }
+  })
     .then((res) => res.json())
     .then((data) => {
       const automatedBlogs = data && data.blogs ? data.blogs : [];
