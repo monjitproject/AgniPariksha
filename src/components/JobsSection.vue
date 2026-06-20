@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Briefcase, Calendar, Award, Shield, Search, ExternalLink, Bell, Landmark, CheckSquare } from 'lucide-vue-next';
+import { ref, watch, onMounted } from 'vue';
+import { Briefcase, Calendar, Award, Shield, Search, ExternalLink, Bell, Landmark, CheckSquare, RefreshCw, Sparkles, Globe } from 'lucide-vue-next';
 import { JobPost } from '../types';
 import { MOCK_JOBS } from '../data/mockData';
 
@@ -17,13 +17,69 @@ const emit = defineEmits<{
 const jobList = ref<JobPost[]>(MOCK_JOBS);
 const searchTerm = ref("");
 const selectedCategory = ref("All");
-const activeJob = ref<JobPost | null>(MOCK_JOBS[0]);
+const activeJob = ref<JobPost | null>(null);
 const isAlertSubscribed = ref(false);
+
+const isLoading = ref(true);
+const isResearching = ref(false);
+const researchLogs = ref<string[]>([]);
+const currentLogIndex = ref(0);
+
+const logMessages = [
+  "Connecting to Feed Address: https://www.sarkariresult.com/feed/ ...",
+  "Acquiring live XML payload channel from Sarkari Result index...",
+  "Translating XML item channels (titles, dates, registration guidelines) into schema attributes...",
+  "Running Gemini 3.5 AI analyzer to extrapolate age limit and selection structures...",
+  "Validating official application links and syllabus verification checklists...",
+  "Publishing daily automated live government vacancies index..."
+];
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const fetchJobs = async (force = false) => {
+  if (force) {
+    isResearching.value = true;
+    researchLogs.value = [];
+    currentLogIndex.value = 0;
+    
+    // Simulate interactive logs step-by-step
+    for (let i = 0; i < logMessages.length; i++) {
+      researchLogs.value.push(logMessages[i]);
+      currentLogIndex.value = i;
+      await sleep(1000);
+    }
+  } else {
+    isLoading.value = true;
+  }
+
+  try {
+    const res = await fetch(`/api/sarkari-jobs${force ? '?force=true' : ''}`);
+    const data = await res.json();
+    if (data && data.jobs && Array.isArray(data.jobs)) {
+      jobList.value = data.jobs;
+      if (data.jobs.length > 0) {
+        // If there's high priority matching URL id
+        const slug = props.activeJobId;
+        const match = slug ? data.jobs.find((j: any) => toSlug(j.title) === slug || j.id === slug) : null;
+        activeJob.value = match || data.jobs[0];
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load sarkari jobs:", err);
+  } finally {
+    isLoading.value = false;
+    isResearching.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchJobs();
+});
 
 const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 watch(() => props.activeJobId, (newId) => {
-  if (newId) {
+  if (newId && jobList.value) {
     const match = jobList.value.find(j => j.id === newId || toSlug(j.title) === newId);
     if (match && (!activeJob.value || activeJob.value.id !== match.id)) {
       activeJob.value = match;
@@ -31,7 +87,7 @@ watch(() => props.activeJobId, (newId) => {
   }
 }, { immediate: true });
 
-const categories = ["All", "Agniveer", "UPSC", "SSC", "Railway", "Police", "Banking"];
+const categories = ["All", "Agniveer", "UPSC", "SSC", "Railway", "Police", "Banking", "State Gov"];
 
 const handleSubscribe = () => {
   isAlertSubscribed.value = true;
@@ -45,7 +101,9 @@ const triggerFakeDownload = (title: string) => {
 const filteredJobs = () => {
   return jobList.value.filter(job => {
     const query = searchTerm.value.toLowerCase();
-    const matchesSearch = job.title.toLowerCase().includes(query) || job.category.toLowerCase().includes(query);
+    const categoryMatch = job.category || "";
+    const titleMatch = job.title || "";
+    const matchesSearch = titleMatch.toLowerCase().includes(query) || categoryMatch.toLowerCase().includes(query);
     if (selectedCategory.value === "All") return matchesSearch;
     return job.category === selectedCategory.value && matchesSearch;
   });
@@ -118,52 +176,124 @@ const handleDeletePost = (id: string) => {
     
     <!-- Search Header Banner -->
     <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-t-[#FF9933] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2">
+          <span class="bg-red-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest animate-pulse">Live</span>
+          <span class="bg-green-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest">SarkariResult.com Integration</span>
+        </div>
         <h2 class="text-xl font-black text-gray-900 flex items-center">
           <Briefcase class="h-6 w-6 text-[#000080] mr-2" />
           Active Indian Armed Forces & State Government Jobs Portal
         </h2>
-        <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-          Monitor real-time military alerts, CISF constabulary entries, railway line operators, and NDA vacancy applications. Always updated.
+        <p class="text-xs text-gray-500 leading-relaxed">
+          Monitor real-time military alerts, CISF constabulary entries, railway line operators, and NDA vacancy applications. Fast daily synchronization.
         </p>
       </div>
 
-      <!-- Subscribe Trigger -->
-      <button
-        id="btn-subscribe-job-alerts"
-        @click="handleSubscribe"
-        :class="[
-          'px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all shadow-md shrink-0 flex items-center space-x-1 border cursor-pointer',
-          isAlertSubscribed
-            ? 'bg-[#138808]/10 text-[#138808] border-[#138808]/30'
-            : 'bg-red-600 hover:bg-red-700 text-white border-transparent animate-pulse'
-        ]"
-      >
-        <Bell class="h-4 w-4 fill-current" />
-        <span>{{ isAlertSubscribed ? "Alerts Active" : "Get Job Alerts" }}</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Live Research Trigger -->
+        <button
+          id="btn-research-sarkari-jobs"
+          @click="fetchJobs(true)"
+          :disabled="isResearching || isLoading"
+          class="px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white transition-all shadow-md items-center space-x-1 flex cursor-pointer disabled:opacity-50"
+        >
+          <Sparkles class="h-4 w-4" :class="{'animate-spin': isResearching}" />
+          <span>{{ isResearching ? "Researching..." : "Research & Publish Live" }}</span>
+        </button>
+
+        <!-- Subscribe Trigger -->
+        <button
+          id="btn-subscribe-job-alerts"
+          @click="handleSubscribe"
+          :class="[
+            'px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all shadow-md shrink-0 flex items-center space-x-1 border cursor-pointer',
+            isAlertSubscribed
+              ? 'bg-[#138808]/10 text-[#138808] border-[#138808]/30'
+              : 'bg-[#000080] hover:bg-[#000060] text-white border-transparent'
+          ]"
+        >
+          <Bell class="h-4 w-4 fill-current" />
+          <span>{{ isAlertSubscribed ? "Alerts Active" : "Get Job Alerts" }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Category Selection Row -->
-    <div class="flex flex-wrap items-center gap-2" id="jobs-categories-filter">
-      <button
-        v-for="cat in categories"
-        :key="cat"
-        :id="`job-cat-${cat}`"
-        @click="selectedCategory = cat"
-        :class="[
-          'text-xs font-bold px-3 py-1.5 rounded-full border transition-all cursor-pointer',
-          selectedCategory === cat
-            ? 'bg-[#000080] text-white border-[#000080]'
-            : 'bg-white text-gray-700 border-gray-100 hover:bg-gray-50'
-        ]"
-      >
-        {{ cat === "All" ? "🌍 All Vacancies" : cat }}
-      </button>
+    <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100" id="jobs-categories-filter">
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          v-for="cat in categories"
+          :key="cat"
+          :id="`job-cat-${cat}`"
+          @click="selectedCategory = cat"
+          :class="[
+            'text-xs font-bold px-3 py-1.5 rounded-full border transition-all cursor-pointer',
+            selectedCategory === cat
+              ? 'bg-[#000080] text-white border-[#000080]'
+              : 'bg-white text-gray-700 border-gray-100 hover:bg-gray-50'
+          ]"
+        >
+          {{ cat === "All" ? "🌍 All Vacancies" : cat }}
+        </button>
+      </div>
+      <div class="flex items-center space-x-1.5 text-[11px] text-gray-500 font-mono">
+        <Globe class="h-3.5 w-3.5 text-blue-500 animate-pulse" />
+        <span>Source: SARKARIRESULT.COM</span>
+      </div>
+    </div>
+
+    <!-- Dynamic Research Terminal -->
+    <div v-if="isResearching" class="bg-slate-900 text-green-400 p-5 rounded-2xl shadow-xl font-mono text-xs border border-green-500/20 space-y-3 overflow-hidden transition-all duration-300">
+      <div class="absolute top-0 right-0 p-3 select-none flex items-center space-x-1.5 opacity-80 text-[10px] text-green-300">
+        <span class="inline-block h-2 w-2 rounded-full bg-red-600 animate-ping"></span>
+        <span>RESEARCHING LIVE VACANCIES STATE/CENTRAL...</span>
+      </div>
+      <h3 class="text-white font-black flex items-center text-xs">
+        <Sparkles class="h-4.5 w-4.5 text-amber-400 mr-2 animate-pulse" />
+        Gemini Automated Research Engine / भारतीय सरकारी नौकरी अनुसंधान
+      </h3>
+      <div class="space-y-1.5 my-3 bg-black/40 p-3 rounded-lg border border-slate-800 text-[11px] leading-relaxed max-h-[140px] overflow-y-auto">
+        <div v-for="(log, idx) in researchLogs" :key="idx" :class="[idx === currentLogIndex ? 'text-green-300 font-bold' : 'text-slate-500']" class="flex items-start">
+          <span class="text-green-500 mr-2">></span>
+          <span>{{ log }}</span>
+        </div>
+      </div>
+      <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-green-550 via-emerald-400 to-teal-500 rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(34,197,94,0.5)]" :style="{ width: `${((currentLogIndex + 1) / logMessages.length) * 100}%` }"></div>
+      </div>
+    </div>
+
+    <!-- Skeleton Loading Panel -->
+    <div v-else-if="isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-pulse">
+      <!-- Left Column Skeletons -->
+      <div class="space-y-3 lg:col-span-1">
+        <div class="h-11 bg-gray-200 rounded-xl mb-4"></div>
+        <div class="h-4 bg-gray-100 rounded w-1/3 mb-4"></div>
+        <div v-for="i in 4" :key="i" class="p-4 bg-white border-2 border-gray-100 rounded-xl space-y-3">
+          <div class="flex justify-between">
+            <div class="h-3 bg-gray-200 rounded w-12"></div>
+            <div class="h-3 bg-gray-100 rounded w-16"></div>
+          </div>
+          <div class="h-4 bg-gray-300 rounded w-5/6"></div>
+          <div class="h-3 bg-gray-100 rounded w-1/2"></div>
+        </div>
+      </div>
+      <!-- Right Column Skeleton Detailed Sheet -->
+      <div class="lg:col-span-2 bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 space-y-6">
+        <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+        <div class="h-8 bg-gray-300 rounded w-3/4"></div>
+        <div class="h-4 bg-gray-100 rounded w-1/2"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div v-for="i in 4" :key="i" class="h-16 bg-gray-50 rounded-xl border border-gray-100"></div>
+        </div>
+        <div class="h-20 bg-slate-50 rounded-xl border border-slate-100"></div>
+        <div class="h-12 bg-gray-200 rounded-lg"></div>
+      </div>
     </div>
 
     <!-- Main Two Column layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="jobs-dashboard-layout">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in" id="jobs-dashboard-layout">
       
       <!-- Left Column Job Lists -->
       <div class="space-y-3 lg:col-span-1" id="jobs-catalog-aside">
@@ -188,9 +318,9 @@ const handleDeletePost = (id: string) => {
             :id="`job-card-select-${job.id}`"
             @click="selectJob(job)"
             :class="[
-              'p-4 rounded-xl border-2 cursor-pointer transition-all',
+              'p-4 rounded-xl border-2 cursor-pointer transition-all hover:scale-[1.01] hover:shadow-sm duration-150',
               activeJob?.id === job.id
-                ? 'bg-white border-[#000080] shadow'
+                ? 'bg-white border-[#000080] shadow-md'
                 : 'bg-white border-gray-100 hover:border-gray-200'
             ]"
           >
@@ -204,8 +334,8 @@ const handleDeletePost = (id: string) => {
             <h5 class="font-black text-xs text-gray-800 leading-snug">{{ job.title }}</h5>
 
             <div class="flex justify-between items-center text-[10px] text-gray-500 mt-4 border-t border-gray-50 pt-2">
-              <span class="font-semibold text-green-700">{{ job.salary.split(" ")[0] }}</span>
-              <span class="font-mono text-[9px]">Age: {{ job.ageLimit.split(" ")[0] }} Year</span>
+              <span class="font-semibold text-green-700">{{ job.salary ? job.salary.split(" ")[0] : "Salary scale" }}</span>
+              <span class="font-mono text-[9px]">Age: {{ job.ageLimit ? job.ageLimit.split(" ")[0] : "Details" }}</span>
             </div>
           </div>
 

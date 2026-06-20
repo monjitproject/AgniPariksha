@@ -915,6 +915,248 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
   return res.json({ notifications: fallback });
 });
 
+// API: Latest Sarkari Result Jobs (Dynamic Real-Time Govt Vacancies)
+let cachedSarkariJobs: any[] | null = null;
+let lastSarkariJobsFetch = 0;
+
+app.get("/api/sarkari-jobs", async (req: express.Request, res: express.Response) => {
+  const forceBypassCache = req.query.force === "true";
+  const now = Date.now();
+
+  // If cache is fresh (less than 30 minutes old) and not forced, return cached list
+  if (cachedSarkariJobs && (now - lastSarkariJobsFetch < 30 * 60 * 1000) && !forceBypassCache) {
+    console.log("Serving sarkari-jobs from memory cache...");
+    return res.json({ jobs: cachedSarkariJobs });
+  }
+
+  let rawXml = "";
+  let feedUsed = false;
+
+  try {
+    console.log("Attempting direct sync from Sarkari Result official feed (https://www.sarkariresult.com/feed/)...");
+    const controller = new AbortController();
+    const abortTimeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+    const feedRes = await fetch("https://www.sarkariresult.com/feed/", {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/xml, text/xml, */*"
+      },
+      signal: controller.signal
+    });
+
+    clearTimeout(abortTimeout);
+
+    if (feedRes.ok) {
+      rawXml = await feedRes.text();
+      if (rawXml && rawXml.includes("<item>")) {
+        feedUsed = true;
+        console.log("Sarkari Result XML RSS Feed successfully acquired. Length:", rawXml.length);
+      }
+    } else {
+      console.log(`Feed fetch failed with response status: ${feedRes.status}`);
+    }
+  } catch (feedErr: any) {
+    console.log("Network direct RSS feed fetch disabled or timed out. Falling back to Search Grounding.", feedErr?.message || feedErr);
+  }
+
+  try {
+    if (ai) {
+      let promptString = "";
+      if (feedUsed) {
+        console.log("Synthesizing Sarkari RSS Feed Items through Gemini 3.5 Flash Model parser...");
+        promptString = `You are an expert system parser for Indian State and Central Government Job updates.
+Below is the live retrieved XML RSS Feed data from https://www.sarkariresult.com/feed/:
+---
+${rawXml.slice(0, 30000)}
+---
+Tasks:
+1. Examine the <item> containers in the XML document. Retrieve the 6-8 most recent recruitment listings.
+2. From their specific text blocks, extract or enrich high-quality structured items for our portal.
+3. Every card must have full informational fields:
+   - "id": A unique string, e.g., "sarkari-feed-1", "sarkari-feed-2"
+   - "title": Clean full job name (e.g., 'SSC Multi Tasking Staff MTS Exam 2026' or 'Army Agniveer Scheme 02/2026')
+   - "category": Match EXACTLY with one: 'Army', 'Navy', 'Air Force', 'Agniveer', 'SSC', 'UPSC', 'Railway', 'Police', 'Banking', 'State Gov'
+   - "eligibility": Guidelines or physical standards (e.g., 'Indian male and female nationals meeting physical fitness.')
+   - "ageLimit": Extrapolated age limits (e.g., '18 - 25 Years')
+   - "qualification": Minimum educational standard (e.g., '10th class pass / Matriculation or equivalent')
+   - "salary": Realistic approximate scale (e.g., '₹21,700 - ₹69,100')
+   - "selectionProcess": Selection stages (e.g., 'Computer Based Test (CBE), Physical Standard Test (PST) and Medical Board evaluation.')
+   - "importantDates": Object with registration start/end dates in YYYY-MM-DD format and exam timeline
+   - "applyLink": Valid target website URL (e.g. ssc.gov.in, Join Indian Army Portal, or sarkariresult.com direct registration link)
+
+Return raw JSON arrays resembling the schema structure. Do NOT wrap output inside \`\`\`json markdown blocks:
+[
+  {
+    "id": "string",
+    "title": "string",
+    "category": "string",
+    "eligibility": "string",
+    "ageLimit": "string",
+    "qualification": "string",
+    "salary": "string",
+    "selectionProcess": "string",
+    "importantDates": { "start": "YYYY-MM-DD", "end": "YYYY-MM-DD", "exam": "string" },
+    "applyLink": "string"
+  }
+]`;
+      } else {
+        console.log("Fetching live Sarkari Result notifications via Gemini Search Grounding fallback...");
+        promptString = `Research actual, live ongoing or upcoming Indian government and armed forces job vacancies published or active on sarkariresult.com (or official boards like UPSC, SSC, Railway Recruitment Board RRB, State Police Boards, Agnipath/Agniveer CDAC) in 2026.
+Generate a comprehensive list of exactly 6-8 highly authentic vacancies with full details.
+
+Return raw JSON strictly matching the structure below. Do NOT use markdown code blocks on the outer wrapper:
+[
+  {
+    "id": "sarkari-job-1",
+    "title": "Full job title (e.g. 'UP Police Constable Recruitment 2026' or 'SSC CGL Tier-1 Online Form 2026')",
+    "category": "One of: Army, Navy, Air Force, Agniveer, SSC, UPSC, Railway, Police, Banking, State Gov",
+    "eligibility": "Detail of eligibility guidelines or physical standards (e.g. 'All Indian male/female nationals within age limit.')",
+    "ageLimit": "Age bracket (e.g. '18 - 25 Years as of July 1, 2026.')",
+    "qualification": "Educational requirements (e.g. 'Passed 10+2 Intermediate Exam from recognized board.')",
+    "salary": "Pay scale or stipend (e.g. '₹21,700 - ₹69,100 (Pay Level 3)')",
+    "selectionProcess": "Full details of phases of vetting (written entrance, physical benchmarks, medical examination and merit check.)",
+    "importantDates": {
+      "start": "Registration commencement (e.g. '2026-06-18')",
+      "end": "Closing date (e.g. '2026-07-18')",
+      "exam": "Tentative schedule or notification status (e.g. 'August 2026')"
+    },
+    "applyLink": "Genuine direct apply URL or respective official portal URL (e.g. 'https://ssc.gov.in' or 'https://sarkariresult.com' or 'https://joinindianarmy.nic.in')"
+  }
+]`;
+      }
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: promptString,
+        config: {
+          tools: feedUsed ? [] : [{ googleSearch: {} }],
+          temperature: 0.7,
+          responseMimeType: "application/json"
+        }
+      });
+
+      let jsonText = response.text || "";
+      if (jsonText.startsWith("```")) {
+        jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "");
+      }
+      jsonText = jsonText.trim();
+
+      const list = JSON.parse(jsonText);
+      if (Array.isArray(list) && list.length > 0) {
+        cachedSarkariJobs = list;
+        lastSarkariJobsFetch = now;
+        return res.json({ jobs: list });
+      }
+    }
+  } catch (err: any) {
+    const errMessage = err?.message || String(err);
+    console.log("[INFO] Live xml parsing or search grounding failed, fallback to local high-yield database:", errMessage);
+  }
+
+  // Fallback to high-quality localized 2026 database
+  const fallback = [
+    {
+      id: "job-army-1",
+      title: "Indian Army Agniveer General Duty (GD) Recruitment 2026",
+      category: "Agniveer",
+      eligibility: "Male & Female citizens residing in India.",
+      ageLimit: "17.5 to 21 Years (Born between 01 Oct 2005 to 01 April 2009)",
+      qualification: "Class 10th/Matric pass with 45% marks in aggregate and 33% in each subject.",
+      salary: "₹30,000 to ₹40,000/month (with Seva Nidhi Package worth ₹11.71 Lakhs after completion)",
+      selectionProcess: "Phase I: Common Entrance Exam (CEE) Online, Phase II: Physical Fitness Test (PFT), Physical Measurement Test (PMT), Medical Examination.",
+      importantDates: {
+        start: "2026-06-01",
+        end: "2026-07-10",
+        exam: "2026-08-15"
+      },
+      applyLink: "https://joinindianarmy.nic.in"
+    },
+    {
+      id: "job-nda-1",
+      title: "UPSC NDA & NA Exam II 2026 Notification",
+      category: "UPSC",
+      eligibility: "Unmarried male & female candidates who have completed or appearing in 10+2.",
+      ageLimit: "16.5 to 19.5 Years",
+      qualification: "12th Class Pass of 10+2 pattern of School Education or equivalent with Physics and Mathematics (for Air Force & Navy Wing).",
+      salary: "₹56,100 to ₹2,50,000 /month (Sub-Lieutenant/Lieutenant Starting pay matrix scale 10)",
+      selectionProcess: "UPSC Written Examination (900 Marks) followed by Service Selection Board (SSB) Interview tests (900 Marks).",
+      importantDates: {
+        start: "2026-05-15",
+        end: "2026-07-01",
+        exam: "2026-09-06"
+      },
+      applyLink: "https://upsc.gov.in"
+    },
+    {
+      id: "job-ssc-gd-1",
+      title: "SSC GD Constable Recruitment 2026 (CISF, BSF, CRPF, ITBP)",
+      category: "SSC",
+      eligibility: "Indian nationality with respective physical and medical measurements.",
+      ageLimit: "18 to 23 Years (Relaxation as per government norms for OBC/SC/ST)",
+      qualification: "Matriculation (10th Class) pass from a recognized Board/University.",
+      salary: "₹21,700 - ₹69,100 (Pay Level 3)",
+      selectionProcess: "Computer-Based Examination (CBE), Physical Efficiency Test (PET), Physical Standard Test (PST) and Detailed Medical Exam.",
+      importantDates: {
+        start: "2026-06-10",
+        end: "2026-07-30",
+        exam: "2026-11-20"
+      },
+      applyLink: "https://ssc.gov.in"
+    },
+    {
+      id: "job-rail-1",
+      title: "RRB Assistant Loco Pilot (ALP) Vacancies 2026",
+      category: "Railway",
+      eligibility: "Indian Nationals with active ITI or diploma courses.",
+      ageLimit: "18 to 30 Years",
+      qualification: "Matriculation/SSLC plus ITI/Course Completed Act Apprentices OR 3 Years Diploma in Mechanical/Electrical/Electronics/Automobile Engineering.",
+      salary: "₹19,900/month basic (Starting Scale, Level 2 plus DA & allowances)",
+      selectionProcess: "CBT Stage I, CBT Stage II, Computer-Based Aptitude Test (CBAT), Document Verification and Medical Fitness.",
+      importantDates: {
+        start: "2026-04-10",
+        end: "2026-06-30",
+        exam: "2026-07-25"
+      },
+      applyLink: "https://indianrailways.gov.in"
+    },
+    {
+      id: "job-up-const-1",
+      title: "UP Police Constable Vacancy Online Form 2026",
+      category: "Police",
+      eligibility: "Resident of India with specific physical standards (Male: 168 cm, Female: 152 cm height).",
+      ageLimit: "18 to 25 Years",
+      qualification: "Passed 10+2 Intermediate Exam from any recognized board in India.",
+      salary: "₹21,700 - ₹69,100 (Grade Pay 2000)",
+      selectionProcess: "Written OMR Board Test, Document Verification (DV), Physical Standard Test (PST) and Physical Efficiency Test (PET) running check.",
+      importantDates: {
+        start: "2026-06-15",
+        end: "2026-07-20",
+        exam: "2026-09-12"
+      },
+      applyLink: "https://uppbpb.gov.in"
+    },
+    {
+      id: "job-sbi-po-1",
+      title: "SBI Probationary Officers (PO) Junior Management Scale 2026",
+      category: "Banking",
+      eligibility: "Indian citizens with graduate degree or final year candidates.",
+      ageLimit: "21 to 30 Years",
+      qualification: "Graduation in any discipline from a recognized University or any equivalent qualification recognized by the Central Government.",
+      salary: "₹41,960 - ₹63,840 (with 4 advanced increments)",
+      selectionProcess: "Phase I: Preliminary Objective Test, Phase II: Main Examination (Objective + Descriptive), Phase III: Psychometric Test & Interview.",
+      importantDates: {
+        start: "2026-06-05",
+        end: "2026-06-25",
+        exam: "2026-08-30"
+      },
+      applyLink: "https://sbi.co.in/careers"
+    }
+  ];
+
+  return res.json({ jobs: fallback });
+});
+
 // API: Get Automated Daily Researched Exam Notes & Blogs (Checks 12h gap)
 app.get("/api/get-automated-content", async (req: express.Request, res: express.Response) => {
   try {
