@@ -714,6 +714,96 @@ Key Fundamental Duties encompass:
 
 export const MOCK_PDFS: PdfDoc[] = [
   {
+    id: "pdf-re-ssc-gd-mock",
+    title: "SSC GD Constable 2026 - Full Syllabus Practice Mock Test Paper",
+    category: "SSC Exam Notes",
+    type: "Previous Paper",
+    publishDate: "2026-06-18",
+    downloadCount: 5120,
+    size: "2.1 MB",
+    contentSnippet: "Complete mock practice dataset for SSC GD 2026 exam. Designed as per latest notification, covers: General Intelligence & Reasoning (20 Qs), GK & General Awareness (20 Qs), Elementary Mathematics (20 Qs), Hindi/English (20 Qs)."
+  },
+  {
+    id: "pdf-re-up-police-m-paper",
+    title: "UP Police Constable Exam 2026 - High Yield Model Practice Paper",
+    category: "UP Police Notes",
+    type: "Previous Paper",
+    publishDate: "2026-06-16",
+    downloadCount: 6245,
+    size: "1.9 MB",
+    contentSnippet: "Specially curated practice set matching the official UP Police recruitment board standards. Features 150 questions in Hindi and English with full explanations for Samanya Gyan, Hindi, Quantitative, and Mental Ability sections."
+  },
+  {
+    id: "pdf-re-rrb-ntpc-bulletin",
+    title: "RRB NTPC 2026 recruitment bulletin - 22,000+ Non-Technical Vacancies Notification",
+    category: "Railway Exam Notes",
+    type: "Job Alert",
+    publishDate: "2026-06-10",
+    downloadCount: 9542,
+    size: "1.5 MB",
+    contentSnippet: "Official Railway Recruitment Board advertisement notification for NTPC 2026. Details age limitations, category-wise vacancies breakdown, educational eligibility certificates, and Stage 1 & Stage 2 CBT syllabus patterns."
+  },
+  {
+    id: "pdf-re-ssc-cgl-alert",
+    title: "SSC CGL 2026 official recruitment advertisement & calendar notice",
+    category: "SSC Exam Notes",
+    type: "Job Alert",
+    publishDate: "2026-06-11",
+    downloadCount: 8431,
+    size: "1.2 MB",
+    contentSnippet: "Official notification document from Staff Selection Commission (SSC) regarding CGL Tier-1 and Tier-2 examination stages. Lists state-wise vacancy charts, reservation patterns, physical eligibility standards, and application dates."
+  },
+  {
+    id: "pdf-re-up-constable-solved",
+    title: "UP Police Constable Recruitment 2024 - Official Solved Previous Year Paper",
+    category: "UP Police Notes",
+    type: "Previous Paper",
+    publishDate: "2026-05-15",
+    downloadCount: 11050,
+    size: "2.4 MB",
+    contentSnippet: "Complete set of original questions asked in UP Police Constable Bharti 2024 exam. Includes official keys, sectional analytical breakdowns, cut-off records, and step-by-step math workouts."
+  },
+  {
+    id: "pdf-re-quick-history-cheat",
+    title: "Sarkari Core Notes: Indian History Important Battles & Dynasties Formula Sheet",
+    category: "Agniveer Notes",
+    type: "Notes",
+    publishDate: "2026-06-03",
+    downloadCount: 3125,
+    size: "0.9 MB",
+    contentSnippet: "Excellent high-yield printable cheat sheet listing ancient and medieval battles - Battle of Tarain, Panipat, Haldighati, Buxar, Plassey along with relevant dates, rulers, and empires established."
+  },
+  {
+    id: "pdf-re-aptitude-formulas",
+    title: "Math Shortcut Tricks & Quick Formulas Study Cheat Sheet PDF",
+    category: "Railway Exam Notes",
+    type: "Notes",
+    publishDate: "2026-06-13",
+    downloadCount: 7421,
+    size: "1.1 MB",
+    contentSnippet: "A highly concise print-friendly handbook containing essential formula tricks for competitive examinations. Speed-Mathematics, fractions, LCM/HCF properties, work-and-time, and compound interest shortcuts."
+  },
+  {
+    id: "pdf-re-tributaries-visual",
+    title: "Visual Mnemonic Guide: Map of Indian River Systems & Tributaries",
+    category: "UPSC Civil Services",
+    type: "Notes",
+    publishDate: "2025-12-10",
+    downloadCount: 4235,
+    size: "3.5 MB",
+    contentSnippet: "High definition printable flow diagram illustrating the drainage divisions of India. Visual representation of Himalayan (Indus, Ganga, Brahmaputra) and Peninsular (Godavari, Krishna, Narmada, Tapi) basins with local names."
+  },
+  {
+    id: "pdf-re-constitution-infographic",
+    title: "Visual flow chart of Indian Constitution Articles & Schedules",
+    category: "UPSC Civil Services",
+    type: "Notes",
+    publishDate: "2026-01-20",
+    downloadCount: 3890,
+    size: "2.8 MB",
+    contentSnippet: "Beautifully structured visual flowchart mapping the 22 parts, 12 schedules, and 395 main articles of the Constitution of India. Ideal for competitive memory retention and quick revision."
+  },
+  {
     id: "pdf-army-gd-paper",
     title: "Indian Army Agniveer GD 2026 - Official Model Mock Paper",
     category: "Agniveer Notes",
