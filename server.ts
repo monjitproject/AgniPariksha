@@ -950,6 +950,211 @@ app.post("/api/get-automated-content", async (req: express.Request, res: express
   }
 });
 
+// API: Robust Mock Test Questions (Dynamic generation via Gemini with high-quality localized 10-question fallback)
+let cachedMockTest: any[] | null = null;
+let lastMockTestFetch = 0;
+
+app.get("/api/gk-mock-test", async (req: express.Request, res: express.Response) => {
+  const forceBypassCache = req.query.force === "true";
+  const now = Date.now();
+
+  // Fresh for 10 minutes cache
+  if (cachedMockTest && (now - lastMockTestFetch < 10 * 60 * 1000) && !forceBypassCache) {
+    console.log("Serving gk-mock-test from memory cache...");
+    return res.json({ questions: cachedMockTest });
+  }
+
+  try {
+    if (ai) {
+      console.log("Generating fresh GK Mock Test questions via Gemini...");
+      const promptString = `Generate a set of exactly 10 high-quality, professional, bilingual (English and Hindi) multiple-choice General Knowledge, Defence forces, general science, and history questions for a competitive exam mock series.
+Each question must be challenging, authentic, and styled like real Agniveer Navy, Army, SSC GD, Railway, and State civil service papers.
+
+Return raw JSON strictly matching the structure below. Do NOT use markdown code blocks (\`\`\`json on the outer wrapper):
+[
+  {
+    "id": "dynamic-mock-1",
+    "text": "English question text here (e.g. 'Which is the oldest paramilitary force in India?')",
+    "hindiText": "हिन्दी में प्रश्न (जैसे 'भारत का सबसे पुराना अर्धसैनिक बल कौन सा है?')",
+    "options": [
+      "Assam Rifles / असम राइफल्स",
+      "Border Security Force / सीमा सुरक्षा बल",
+      "Central Reserve Police Force / केन्द्रीय रिजर्व पुलिस बल",
+      "Indo-Tibetan Border Police / भारत-तिब्बत सीमा पुलिस"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Assam Rifles was established in 1835 and is the oldest paramilitary force. / असम राइफल्स की स्थापना 1835 में हुई थी और यह भारत का सबसे पुराना अर्धसैनिक बल है।"
+  }
+]`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: promptString,
+        config: {
+          temperature: 0.85,
+          responseMimeType: "application/json"
+        }
+      });
+
+      let jsonText = response.text || "[]";
+      if (jsonText.startsWith("```")) {
+        jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "");
+      }
+      jsonText = jsonText.trim();
+
+      const questions = JSON.parse(jsonText);
+      if (Array.isArray(questions) && questions.length > 0) {
+        cachedMockTest = questions;
+        lastMockTestFetch = now;
+        return res.json({ questions });
+      }
+    }
+  } catch (err: any) {
+    const errMessage = err?.message || String(err);
+    if (errMessage.includes("429") || errMessage.includes("quota") || errMessage.includes("RESOURCE_EXHAUSTED")) {
+      console.log("[INFO] Gemini API limit reached for gk-mock-test. Serving offline high-yield 10-question mockup pool.");
+    } else {
+      console.warn("GK mock test generation encountered error, serving robust local fallback:", errMessage);
+    }
+  }
+
+  // Curated premium backup pool of 10 real bilingual questions
+  const backupPool = [
+    {
+      "id": "backup-mock-1",
+      "text": "What is the highest peacetime gallantry award in India?",
+      "hindiText": "भारत में शांति काल का सर्वोच्च वीरता पुरस्कार कौन सा है?",
+      "options": [
+        "Param Vir Chakra / परमवीर चक्र",
+        "Ashoka Chakra / अशोक चक्र",
+        "Kirti Chakra / कीर्ति चक्र",
+        "Vir Chakra / वीर चक्र"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The Ashoka Chakra is India's highest peacetime military decoration awarded for valor, courageous action or self-sacrifice away from the battlefield. / अशोक चक्र शौर्य, साहसी कार्रवाई या युद्ध के मैदान से दूर आत्म-बलिदान के लिए दिया जाने वाला भारत का शांति काल का सर्वोच्च सैन्य सम्मान है।"
+    },
+    {
+      "id": "backup-mock-2",
+      "text": "Which Article of the Indian Constitution outlines the process for constitutional amendments?",
+      "hindiText": "भारतीय संविधान का कौन सा अनुच्छेद संवैधानिक संशोधन की प्रक्रिया को रेखांकित करता है?",
+      "options": [
+        "Article 356 / अनुच्छेद 356",
+        "Article 360 / अनुच्छेद 360",
+        "Article 368 / अनुच्छेद 368",
+        "Article 370 / अनुच्छेद 370"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Article 368 of the Constitution of India grants Parliament the power to amend the constitution in accordance with specified procedures. / भारतीय संविधान का अनुच्छेद 368 संसद को निर्दिष्ट प्रक्रियाओं के अनुसार संविधान में संशोधन करने की शक्ति प्रदान करता है।"
+    },
+    {
+      "id": "backup-mock-3",
+      "text": "Which is the highest mountain peak located entirely within India's borders?",
+      "hindiText": "पूरी तरह से भारतीय सीमाओं के भीतर स्थित सबसे ऊंची पर्वत चोटी कौन सी है?",
+      "options": [
+        "Mount Everest / माउंट एवरेस्ट",
+        "K2 (Godwin-Austen) / के2",
+        "Kangchenjunga / कंचनजंगा",
+        "Nanda Devi / नंदा देवी"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Kangchenjunga is the third highest mountain in the world and the highest located in India (Sikkim). Mount Everest is in Nepal, and K2 lies in Pok/Karakoram. / कंचनजंगा दुनिया का तीसरा सबसे ऊंचा और भारत (सिक्किम) में स्थित सबसे ऊंचा पर्वत है। एवरेस्ट नेपाल में है और के2 पीओके में स्थित है।"
+    },
+    {
+      "id": "backup-mock-4",
+      "text": "Which of the following is the oldest paramilitary force in India?",
+      "hindiText": "निम्नलिखित में से भारत का सबसे पुराना अर्धसैनिक बल कौन सा है?",
+      "options": [
+        "Border Security Force (BSF) / सीमा सुरक्षा बल",
+        "Central Reserve Police Force (CRPF) / केन्द्रीय रिजर्व पुलिस बल",
+        "Assam Rifles / असम राइफल्स",
+        "Central Industrial Security Force (CISF) / केन्द्रीय औद्योगिक सुरक्षा बल"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Assam Rifles is the oldest paramilitary force in India, established in 1835 under the name 'Cachar Levy'. / असम राइफल्स भारत का सबसे पुराना अर्धसैनिक बल है, जिसकी स्थापना 1835 में 'कछार लेवी' के नाम से की गई थी।"
+    },
+    {
+      "id": "backup-mock-5",
+      "text": "Which part of the computer acts as its primary logic and control center, or 'brain'?",
+      "hindiText": "कंप्यूटर का कौन सा हिस्सा इसके प्राथमिक तर्क और नियंत्रण केंद्र अर्थात 'मस्तिष्क' के रूप में कार्य करता है?",
+      "options": [
+        "Random Access Memory (RAM) / रैम",
+        "Hard Disk Drive (HDD) / हार्ड डिस्क",
+        "Central Processing Unit (CPU) / सीपीयू",
+        "Graphics Processing Unit (GPU) / जीपीयू"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The CPU (Central Processing Unit) performs all basic arithmetic, logical, and control operations, making it the computer's brain. / सीपीयू (सेंट्रल प्रोसेसिंग यूनिट) सभी बुनियादी अंकगणितीय, तार्किक और नियंत्रण कार्यों को निष्पादित करता है, जो इसे कंप्यूटर का मस्तिष्क बनाता है।"
+    },
+    {
+      "id": "backup-mock-6",
+      "text": "The First Battle of Panipat was fought in 1526 between Babur and whom?",
+      "hindiText": "पानीपत की पहली लड़ाई 1526 में बाबर और किसके बीच लड़ी गई थी?",
+      "options": [
+        "Ibrahim Lodi / इब्राहिम लोदी",
+        "Sher Shah Suri / शेर शाह सूरी",
+        "Hem Chandra Vikramaditya / हेमू",
+        "Rana Sanga / राणा सांगा"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The First Battle of Panipat (21 April 1526) was fought between Babur's invading Mughal forces and the Lodi Empire, marking the foundation of the Mughal era. / पानीपत की पहली लड़ाई (21 अप्रैल 1526) बाबर की हमलावर मुगल सेना और लोदी साम्राज्य के बीच लड़ी गई थी, जो मुगल काल की नींव थी।"
+    },
+    {
+      "id": "backup-mock-7",
+      "text": "Who governs and regulates the supply of paper currency coins and reserves in India?",
+      "hindiText": "भारत में कागजी मुद्रा, सिक्कों और भंडार की आपूर्ति का संचालन और नियमन कौन करता है?",
+      "options": [
+        "State Bank of India (SBI) / भारतीय स्टेट बैंक",
+        "Reserve Bank of India (RBI) / भारतीय रिजर्व बैंक",
+        "Securities and Exchange Board of India (SEBI) / सेबी",
+        "Ministry of Commerce / वाणिज्य मंत्रालय"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The Reserve Bank of India (RBI) is India's central bank and regulatory authority for monetary policies and currency management. / भारतीय रिजर्व बैंक (RBI) भारत का केंद्रीय बैंक है जो मौद्रिक नीतियों और मुद्रा प्रबंधन के लिए प्रमुख नियामक प्राधिकरण है।"
+    },
+    {
+      "id": "backup-mock-8",
+      "text": "Which is the deepest oceanic trench on Earth?",
+      "hindiText": "पृथ्वी पर सबसे गहरी महासागरीय गर्त कौन सी है?",
+      "options": [
+        "Puerto Rico Trench / प्यूर्टो रिको गर्त",
+        "Mariana Trench / मारियाना गर्त",
+        "Sundas Trench / सुंडा गर्त",
+        "Java Trench / जावा गर्त"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The Challenger Deep inside the Mariana Trench in the western Pacific Ocean is the deepest point in the world's oceans. / पश्चिमी प्रशांत महासागर में मारियाना गर्त के भीतर स्थित चैलेंजर डीप दुनिया के महासागरों का सबसे गहरा स्थान है।"
+    },
+    {
+      "id": "backup-mock-9",
+      "text": "In which medium does sound travel with the highest speed at a given temperature?",
+      "hindiText": "दिए गए तापमान पर ध्वनि किस माध्यम में सबसे अधिक गति से यात्रा करती है?",
+      "options": [
+        "Vacuum / निर्वात",
+        "Air (Gas) / वायु (गैस)",
+        "Water (Liquid) / पानी (द्रव)",
+        "Steel (Solid) / स्टील (ठोस)"
+      ],
+      "correctAnswer": 3,
+      "explanation": "Sound is a mechanical wave and travels fastest in solids (like steel) due to the dense arrangement and high elasticity of particles. / ध्वनि एक यांत्रिक तरंग है जो कणों की सघन संरचना और उच्च लोच के कारण ठोस (जैसे स्टील) में सबसे तेज गति करती है।"
+    },
+    {
+      "id": "backup-mock-10",
+      "text": "Which two air polluting gases are primarily responsible for the formation of acid rain?",
+      "hindiText": "अम्लीय वर्षा के निर्माण के लिए मुख्य रूप से कौन सी दो वायु प्रदूषक गैसें जिम्मेदार हैं?",
+      "options": [
+        "Carbon Monoxide & Hydrogen / कार्बन मोनोऑक्साइड और हाइड्रोजन",
+        "Oxygen & Carbon Dioxide / ऑक्सीजन और कार्बन डाइऑक्साइड",
+        "Sulfur Dioxide & Nitrogen Oxides / सल्फर डाइऑक्साइड और नाइट्रोजन ऑक्साइड",
+        "Methane & Helium / मीथेन और हीलियम"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Sulfur dioxide (SO2) and Nitrogen oxides (NOx) react with water vapor, oxygen, and other chemicals in the atmosphere to form sulfuric and nitric acids. / सल्फर डाइऑक्साइड (SO2) और नाइट्रोजन ऑक्साइड (NOx) वायुमंडल में जल वाष्प, ऑक्सीजन और अन्य रसायनों के साथ प्रतिक्रिया करके सल्फ्यूरिक और नाइट्रिक अम्ल बनाते हैं।"
+    }
+  ];
+
+  return res.json({ questions: backupPool });
+});
+
 // 2. Dynamic SEO friendly XML Sitemap route
 app.get("/sitemap.xml", (req, res) => {
   res.setHeader("Content-Type", "application/xml");

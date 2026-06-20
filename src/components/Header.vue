@@ -37,7 +37,7 @@ const handleNav = (tabId: string) => {
   if (tabId === 'current') {
     emit('setCurrentTab', 'current');
   } else if (tabId === 'mock-tests') {
-    emit('setCurrentTab', 'quizzes');
+    emit('setCurrentTab', 'mock-tests');
   } else {
     emit('setCurrentTab', tabId);
   }

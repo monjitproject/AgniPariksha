@@ -21,6 +21,7 @@ import AiAssistant from "./components/AiAssistant.vue";
 import Dashboard from "./components/Dashboard.vue";
 import AdminPanel from "./components/AdminPanel.vue";
 import SeoPages from "./components/SeoPages.vue";
+import MockTest from "./components/MockTest.vue";
 
 import { 
   UserProfile, Quiz, JobPost, QuizHistoryItem, UserCertificate 
@@ -72,7 +73,8 @@ const parseLocation = () => {
       "blog": "blog",
       "dashboard": "dashboard",
       "chat": "chat",
-      "admin": "admin"
+      "admin": "admin",
+      "mock-tests": "mock-tests"
     };
     
     if (tabMap[singleSegment]) {
@@ -126,7 +128,8 @@ const navigateTo = (tab: string, subId?: string | null, policyId?: string | null
       "blog": "blog",
       "dashboard": "dashboard",
       "chat": "chat",
-      "admin": "admin"
+      "admin": "admin",
+      "mock-tests": "mock-tests"
     };
     const catPath = catMap[tab] || tab;
     if (subId) {
@@ -948,6 +951,11 @@ const handleAdminAddJob = (newJob: JobPost) => {
         <div class="lg:col-span-1">
           <AdSenseSidebar />
         </div>
+      </div>
+
+      <!-- INTERACTIVE MOCK TEST BLOCK -->
+      <div v-if="currentTab === 'mock-tests'" class="animate-fade-in text-left" id="mock-tests-viewport">
+        <MockTest />
       </div>
 
       <!-- DETAILED SYLLABUS STUDY TRACKER -->
