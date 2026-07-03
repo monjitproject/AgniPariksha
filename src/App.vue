@@ -121,6 +121,9 @@ const parseLocation = () => {
     if (category === "pdfs") {
       return { tab: "pdfs", subId: subItem };
     }
+    if (category === "category") {
+      return { tab: "home" };
+    }
     
     return { tab: "404" };
   }

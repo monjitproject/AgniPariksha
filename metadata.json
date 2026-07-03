@@ -1,6 +1,6 @@
 {
-  "name": "AgniPariksha",
-  "description": "Indian Armed Forces & Government Jobs Preparation Portal: features GK mock tests, study notes, pdf library, job notifications, and Google AdSense compliance pages.",
+  "name": "MAIC India",
+  "description": "Enterprise-grade Indian Armed Forces & Government Jobs Preparation Portal featuring bilingually optimized GK mock tests, syllabus-aligned study notes, solved previous year paper PDFs, and verified job notification alerts.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

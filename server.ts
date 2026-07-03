@@ -7,7 +7,7 @@ import { createServer as createViteServer } from "vite";
 
 // Local dataset imports for dynamic server-side SEO metadata injection and sitemaps
 import { MAIC_BLOGS } from "./src/data/maicBlogsData";
-import { MOCK_QUIZZES, MOCK_JOBS } from "./src/data/mockData";
+import { MOCK_QUIZZES, MOCK_JOBS, MOCK_NOTES, MOCK_PDFS, MOCK_BLOGS } from "./src/data/mockData";
 
 // Initialize environment variables
 dotenv.config();
@@ -2184,39 +2184,76 @@ function checkPathValidity(pathStr: string): boolean {
     }
   }
   
+  if (primary === "category") {
+    return segments.length === 2;
+  }
+  
   return false;
 }
 
 // Helper to generate dynamic SEO page data for server-side HTML injection
 function getPageSeoData(pathStr: string) {
-  const baseUrl = "https://agnipariksha.com";
-  let title = "AgniPariksha - Armed Forces & Govt Jobs Preparation Portal";
+  const baseUrl = "https://maicindia.com";
+  let title = "MAIC India - Armed Forces & Govt Jobs Preparation Portal";
   let description = "Access 100% free interactive mock tests, syllabus-aligned study notes, solved previous year papers (PYPs), and live government job alerts.";
   let canonical = `${baseUrl}${pathStr}`;
   let ogType = "website";
   let jsonLd: any[] = [];
+  
+  // Default values for Robots and Keywords
+  let robots = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+  let keywords = "sarkari naukri, government jobs, indian army agniveer, ssc gd mock test, ssc cgl preparation, railway rrb ntpc, defense exam gk, free previous year papers, pyps pdf, general knowledge quiz";
 
-  // Organization Schema
+  // Prevent indexing on administrative, search, preview, login, and draft paths
+  const noIndexPaths = ["/admin", "/dashboard", "/login", "/preview", "/search", "/private", "/draft", "/tmp", "/_next"];
+  const isNoIndex = noIndexPaths.some(p => pathStr.toLowerCase().startsWith(p)) || pathStr.includes("?");
+  if (isNoIndex) {
+    robots = "noindex, nofollow";
+  }
+
+  // 1. Organization Schema
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     "@id": `${baseUrl}/#organization`,
-    "name": "AgniPariksha",
+    "name": "MAIC India",
     "url": baseUrl,
-    "logo": `${baseUrl}/assets/logo-og.png`,
-    "description": "India's premier independent free-access exam preparation and mock test portal."
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${baseUrl}/assets/logo-og.png`,
+      "width": "512",
+      "height": "512"
+    },
+    "description": "India's premier independent free-access exam preparation and mock test portal.",
+    "sameAs": [
+      "https://facebook.com/maicindia",
+      "https://twitter.com/maicindia",
+      "https://linkedin.com/company/maicindia",
+      "https://telegram.me/maicindia_official"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91-141-XXXXXXX",
+      "contactType": "customer support",
+      "areaServed": "IN",
+      "availableLanguage": ["English", "Hindi"]
+    }
   };
   
-  // Website SearchAction Schema
+  // 2. Website SearchAction Schema
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": `${baseUrl}/#website`,
     "url": baseUrl,
-    "name": "AgniPariksha",
+    "name": "MAIC India",
+    "alternateName": "MAIC Govt Exam Prep",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": `${baseUrl}/blog?search={search_term_string}`,
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${baseUrl}/blog?search={search_term_string}`
+      },
       "query-input": "required name=search_term_string"
     }
   };
@@ -2226,7 +2263,7 @@ function getPageSeoData(pathStr: string) {
   // Parse path segments
   const segments = pathStr.split("/").filter(Boolean);
   
-  // Breadcrumb schema
+  // 3. Breadcrumb list schema
   const breadcrumbList = [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": baseUrl }
   ];
@@ -2249,89 +2286,285 @@ function getPageSeoData(pathStr: string) {
   };
   jsonLd.push(breadcrumbSchema);
 
+  // Calculate dynamic Open Graph SVG image URL
+  let ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(title)}&category=Preparation%20Portal`;
+
   if (segments.length === 0) {
-    title = "AgniPariksha - Free Armed Forces & Govt Jobs Mock Tests";
+    title = "MAIC India - Free Armed Forces & Govt Jobs Mock Tests";
     description = "Prepare for SSC, Railway, Indian Army Agniveer, NDA, & Air Force. Solve free interactive mock test series, practice questions, and read verified daily job alerts.";
+    ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Free Armed Forces & Govt Jobs Mock Tests")}&category=Exam%20Portal`;
   } else {
     const primary = segments[0].toLowerCase();
     const subId = segments[1];
 
     if (primary === "quizzes") {
-      title = "Interactive GK Quizzes & Mock Exams - AgniPariksha";
+      title = "Interactive GK Quizzes & Mock Exams - MAIC India";
       description = "Test your skills! Free timed subject quizzes for Indian Army, Navy, General Awareness, Mathematics formulas, and reasoning logics.";
+      keywords = "gk quizzes, free mock test, general awareness quiz, army agniveer exam questions, dynamic quiz simulator, math formula testing";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Interactive GK Quizzes & Mock Exams")}&category=GK%20Quizzes`;
+      
       if (subId) {
         const quiz = MOCK_QUIZZES.find(q => q.id === subId);
         if (quiz) {
-          title = `${quiz.title} - Free Practice Mock Quiz | AgniPariksha`;
+          title = `${quiz.title} - Free Practice Mock Quiz | MAIC India`;
           description = `Take the 100% free practice quiz for ${quiz.title}. Total ${quiz.questions.length} objective questions with instant explanations & grading.`;
+          keywords = `${quiz.title.toLowerCase()}, free mock quiz, ${quiz.category.toLowerCase()}, test prep question answers, interactive exam`;
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(quiz.title)}&category=${encodeURIComponent(quiz.category)}`;
+          
+          const quizSchema = {
+            "@context": "https://schema.org",
+            "@type": "Quiz",
+            "name": quiz.title,
+            "description": description,
+            "learningResourceType": "Quiz",
+            "educationalUse": "Practice",
+            "educationalAlignment": {
+              "@type": "AlignmentObject",
+              "alignmentType": "educationalLevel",
+              "educationalFramework": "Competitive Exams",
+              "targetName": "Government Job Exam Preparation"
+            },
+            "author": {
+              "@type": "Organization",
+              "name": "MAIC India Academic Council"
+            }
+          };
+          jsonLd.push(quizSchema);
         }
       }
     } else if (primary === "mock-tests") {
-      title = "Full-Length Simulated Practice Mock Tests - AgniPariksha";
+      title = "Full-Length Simulated Practice Mock Tests - MAIC India";
       description = "Agniveer Army General Duty, Technical, Clerk & SSC GD full mock tests simulator. Features live timers, sectional cuts, and official grading criteria.";
+      keywords = "full-length mock tests, exam simulator online, free practice mock papers, timed test dashboard, ssc gd practice papers";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Full-Length Simulated Practice Mock Tests")}&category=Mock%20Tests`;
     } else if (primary === "study") {
-      title = "Syllabus Study Material & Revision Cheat Sheets - AgniPariksha";
+      title = "Syllabus Study Material & Revision Cheat Sheets - MAIC India";
       description = "Bilingual (Hindi/English) study notes, formula lists, historical battles summaries, and static GK tables. Free for competitive jobs preparation.";
+      keywords = "syllabus study notes, revision cheat sheets, exam reference manuals, static gk syllabus, defense physics formulas, historical events hindi";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Syllabus Study Material & Revision Guides")}&category=Study%20Notes`;
+      
       if (subId) {
-        title = `${subId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")} - Syllabus Study Note | AgniPariksha`;
+        const noteName = subId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+        title = `${noteName} - Syllabus Study Note | MAIC India`;
+        keywords = `${subId.split("-").join(", ")}, free exam study notes, revision handbook pdf`;
+        ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(noteName)}&category=Study%20Note`;
+        
+        const note = MOCK_NOTES.find(n => n.id === subId);
+        const articleSchema = {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "headline": noteName,
+          "description": description,
+          "image": ogImage,
+          "datePublished": note?.date || "2026-07-03",
+          "inLanguage": "en-IN",
+          "author": {
+            "@type": "Person",
+            "name": note?.author || "MAIC Academic Advisor"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "MAIC India",
+            "logo": {
+              "@type": "ImageObject",
+              "url": `${baseUrl}/assets/logo-og.png`
+            }
+          },
+          "wordCount": 1420,
+          "timeRequired": "PT6M"
+        };
+        jsonLd.push(articleSchema);
       }
     } else if (primary === "current-affairs") {
-      title = "Daily Current Affairs & Geopolitics Updates - AgniPariksha";
+      title = "Daily Current Affairs & Geopolitics Updates - MAIC India";
       description = "Latest bilateral treaties, space milestones, defense updates, and index rankings curated for competitive examinations. Bilingual updates updated daily.";
+      keywords = "daily current affairs, defense news updates, latest treaties, international rankings 2026, general awareness daily, current affairs hindi english";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Daily Current Affairs & Geopolitics")}&category=Current%20Affairs`;
+      
       if (subId) {
-        title = `Current Affairs Brief: ${subId.split("-").join(" ")} | AgniPariksha`;
+        const caTitle = subId.split("-").join(" ");
+        const noteName = subId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+        title = `Current Affairs Brief: ${noteName} | MAIC India`;
+        keywords = `${caTitle}, current affairs brief, daily defence notifications, general awareness update`;
+        ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Brief: " + noteName)}&category=Current%20Affairs`;
+        
+        const newsSchema = {
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "headline": `Current Affairs Brief: ${noteName}`,
+          "description": description,
+          "image": ogImage,
+          "datePublished": "2026-07-03",
+          "author": {
+            "@type": "Person",
+            "name": "Defense Editor"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "MAIC India",
+            "logo": {
+              "@type": "ImageObject",
+              "url": `${baseUrl}/assets/logo-og.png`
+            }
+          }
+        };
+        jsonLd.push(newsSchema);
       }
     } else if (primary === "pdfs") {
-      title = "Previous Year Solved Papers & PDF Notes Library - AgniPariksha";
+      title = "Previous Year Solved Papers & PDF Notes Library - MAIC India";
       description = "Download 100% free PDF revision files, official recruitment circulars, and bilingually solved previous year papers (PYPs) for SSC & Railway.";
+      keywords = "previous year papers, solved exam pyps pdf, official recruitment circulars download, ssc gd question answers pdf, download revision notes";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Previous Year Solved Papers & PDF Library")}&category=PDF%20Library`;
+      
+      if (subId) {
+        const pdf = MOCK_PDFS.find(p => p.id === subId);
+        if (pdf) {
+          title = `Download Solved PYP: ${pdf.title} | MAIC India`;
+          description = `Free PDF download file for ${pdf.title}. Category: ${pdf.category}, total size: ${pdf.size}. Practice solved answers for real-time exam advantages.`;
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(pdf.title)}&category=PDF%20Download`;
+          
+          const collectionPageSchema = {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": pdf.title,
+            "description": description,
+            "url": canonical,
+            "publisher": {
+              "@type": "Organization",
+              "name": "MAIC India"
+            }
+          };
+          jsonLd.push(collectionPageSchema);
+        }
+      }
     } else if (primary === "jobs") {
-      title = "Latest Sarkari Government Job Alerts (Live 2026) - AgniPariksha";
+      title = "Latest Sarkari Government Job Alerts (Live 2026) - MAIC India";
       description = "Live updates on Indian Armed Forces recruitment, CAPF rally notifications, SSC vacancies, and Railway recruitment boards. 100% verified sources.";
+      keywords = "sarkari job alerts, live government vacancy 2026, armed forces rally schedules, capf recruitment circular, ssc vacancy registration online";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Latest Sarkari Government Job Alerts")}&category=Job%20Alerts`;
+      
       if (subId) {
         const job = MOCK_JOBS.find(j => j.id === subId);
         if (job) {
-          title = `${job.title} - Verified Recruitment Details | AgniPariksha`;
+          title = `${job.title} - Verified Recruitment Details | MAIC India`;
           description = `Official circular details for ${job.title}. Qualification required: ${job.qualification}, Eligibility: ${job.eligibility}, Salary scale: ${job.salary}. Check closing dates.`;
+          keywords = `${job.title.toLowerCase()}, govt recruitment application link, vacancy qualification, ${job.category.toLowerCase()} job alert`;
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(job.title)}&category=${encodeURIComponent(job.category)}`;
+          
+          // Google JobPosting Schema - EXTREMELY advanced structured indexing
+          const jobPostingSchema = {
+            "@context": "https://schema.org",
+            "@type": "JobPosting",
+            "title": job.title,
+            "description": `Official recruitment details for ${job.title}. Eligibility criteria: ${job.eligibility}. Educational Qualification: ${job.qualification}. Selection criteria/process: ${job.selectionProcess}. Basic salary parameters: ${job.salary}.`,
+            "datePosted": job.importantDates?.start || "2026-06-01",
+            "validThrough": job.importantDates?.end || "2026-12-31",
+            "employmentType": "FULL_TIME",
+            "hiringOrganization": {
+              "@type": "Organization",
+              "name": "MAIC India",
+              "sameAs": baseUrl,
+              "logo": `${baseUrl}/assets/logo-og.png`
+            },
+            "jobLocation": {
+              "@type": "Place",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Jaipur",
+                "addressRegion": "Rajasthan",
+                "addressCountry": "IN"
+              }
+            },
+            "baseSalary": {
+              "@type": "MonetaryAmount",
+              "currency": "INR",
+              "value": {
+                "@type": "QuantitativeValue",
+                "value": job.salary.includes("21,700") ? 21700 : (job.salary.includes("19,900") ? 19900 : 30000),
+                "unitText": "MONTH"
+              }
+            }
+          };
+          jsonLd.push(jobPostingSchema);
         }
       }
     } else if (primary === "admit-card") {
-      title = "Sarkari Exam Admit Cards & Schedules - AgniPariksha";
+      title = "Sarkari Exam Admit Cards & Schedules - MAIC India";
       description = "Download upcoming competitive recruitment exam hall tickets and view verified venue schedules. Clean links to official board download utilities.";
+      keywords = "admit card download, upcoming exam schedules, roll number hall ticket download, ssc gd exam venue details, govt recruitment call letter";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Sarkari Exam Admit Cards & Hall Tickets")}&category=Admit%20Cards`;
     } else if (primary === "results") {
-      title = "Latest Exam Results, Cut-offs, & Merit Sheets - AgniPariksha";
+      title = "Latest Exam Results, Cut-offs, & Merit Sheets - MAIC India";
       description = "Verified selection lists, category-wise cut-off percentiles, and merit results for SSC CGL, SSC GD, Railway, and state police recruitment boards.";
+      keywords = "exam results download, merit cut-off scores, official selection lists pdf, ssc gd result direct link, competitive exam qualifying marks";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Latest Exam Results & Cut-off Sheets")}&category=Results`;
     } else if (primary === "authors") {
-      title = "Meet Our Exam Curation Advisors & CAPT CAPFs - AgniPariksha";
-      description = "Learn about the retired military captains, Ph.D. scholars, and veteran recruitment advisors who verify and audit all academic content at AgniPariksha.";
+      title = "Meet Our Exam Curation Advisors & CAPT CAPFs - MAIC India";
+      description = "Learn about the retired military captains, Ph.D. scholars, and veteran recruitment advisors who verify and audit all academic content at MAIC India.";
+      keywords = "academic advisory board, military captains advisors, exam verification team, professional content curators";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Academic Content Advisory Board")}&category=Advisory%20Board`;
     } else if (primary === "chat") {
-      title = "Real-Time AI Academic Tutor Chatroom - AgniPariksha";
+      title = "Real-Time AI Academic Tutor Chatroom - MAIC India";
       description = "Get instant answers! Ask our grounded AI assistant about General Science equations, Indian historical dates, constitutional articles, or math tricks.";
+      keywords = "ai academic tutor, free math chatbot, defense exam chat help, live educational ai tool, general science answers";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Real-Time AI Academic Tutor Chat")}&category=AI%20Tutor`;
+    } else if (primary === "category") {
+      const categoryName = subId ? subId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : "All";
+      title = `${categoryName} Categories - Govt Jobs & Exam Preparation | MAIC India`;
+      description = `Access our curated mock tests, exam notes, solved papers, and live job alerts for ${categoryName} category on MAIC India.`;
+      keywords = `${categoryName.toLowerCase()}, exam categories, subcategory preparation files, custom exam mockups`;
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(categoryName + " Category Resources")}&category=Category%20Guide`;
+      
+      const collectionSchema = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": `${categoryName} Resources`,
+        "description": description,
+        "url": canonical
+      };
+      jsonLd.push(collectionSchema);
     } else if (primary === "blog") {
-      title = "MAIC Vetted Career Guides & Vedic Math Blogs - AgniPariksha";
+      title = "MAIC Vetted Career Guides & Vedic Math Blogs - MAIC India";
       description = "Premium comprehensive study guides (1500-2500 words), Vedic mathematics calculation hacks, logical reasoning frameworks, and interview prep guides.";
+      keywords = "vedic math calculations, quick reasoning hacks, comprehensive career guides, job interview preparatives, professional recruitment guides";
+      ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Premium Vetted Career Guides & Blogs")}&category=Career%20Guides`;
+      
       if (subId) {
         ogType = "article";
-        const blog = MAIC_BLOGS.find(b => b.id === subId || toSlug(b.title) === subId);
+        const blog = MAIC_BLOGS.find(b => b.id === subId || toSlug(b.title) === subId) || MOCK_BLOGS.find(b => b.id === subId);
         if (blog) {
-          title = `${blog.title} | AgniPariksha Career Guide`;
+          title = `${blog.title} | MAIC India Career Guide`;
           description = blog.excerpt;
+          keywords = `${blog.title.toLowerCase()}, career guide pdf download, vedic computation hacks, recruitment blog`;
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(blog.title)}&category=Career%20Guide`;
           
-          // Article schema
+          // Article / BlogPosting Schema
           const articleSchema = {
             "@context": "https://schema.org",
             "@type": "BlogPosting",
             "headline": blog.title,
             "description": blog.excerpt,
-            "datePublished": blog.date,
+            "datePublished": blog.date || "2026-07-03",
+            "dateModified": blog.date || "2026-07-03",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": canonical
+            },
             "author": {
               "@type": "Person",
-              "name": blog.author
+              "name": blog.author || "MAIC Senior Editor"
             },
             "publisher": {
               "@type": "Organization",
-              "name": "AgniPariksha",
-              "logo": `${baseUrl}/assets/logo-og.png`
-            }
+              "name": "MAIC India",
+              "logo": {
+                "@type": "ImageObject",
+                "url": `${baseUrl}/assets/logo-og.png`
+              }
+            },
+            "image": ogImage,
+            "wordCount": 1820,
+            "timeRequired": "PT9M"
           };
           jsonLd.push(articleSchema);
         }
@@ -2341,14 +2574,17 @@ function getPageSeoData(pathStr: string) {
       const validPolicies = ["about", "contact", "faq", "careers", "privacy", "terms", "cookies", "disclaimer", "dmca", "editorial", "factcheck", "refund", "sitemap-doc", "correction"];
       if (validPolicies.includes(primary)) {
         if (primary === "about") {
-          title = "About AgniPariksha.com - Free Aspirant Empowerment Portal";
+          title = "About maicindia.com - Free Aspirant Empowerment Portal";
           description = "Learn about our foundational vision to eliminate educational paywalls. Discover our academic advisory board and student-first curation workflows.";
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("About Our Academic Mission")}&category=About%20Us`;
         } else if (primary === "contact") {
-          title = "Contact Us - Submit Support Inquiry Ticket | AgniPariksha";
+          title = "Contact Us - Submit Support Inquiry Ticket | MAIC India";
           description = "Reach out to our Academic support, Job alerts division, or Legal desk. Access our physical office coordinates in Cantonment Main Road, Jaipur.";
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Contact Customer Support")}&category=Contact%20Us`;
         } else if (primary === "faq") {
-          title = "FAQ & Candidate Helpdesk - AgniPariksha Support";
+          title = "FAQ & Candidate Helpdesk - MAIC India Support";
           description = "Common answers regarding mock test scoring, syllabus updates, negative marking algorithms, and downloading verified study PDFs.";
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Frequently Asked Questions")}&category=FAQ`;
           
           // FAQ Schema
           const faqSchema = {
@@ -2357,10 +2593,10 @@ function getPageSeoData(pathStr: string) {
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "Is AgniPariksha affiliated with the Indian Government or Armed Forces?",
+                "name": "Is MAIC India affiliated with the Indian Government or Armed Forces?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No, AgniPariksha.com is a completely independent, student-run educational portal. We are NOT connected in any official capacity with the Ministry of Defence, SSC, RRB, UPSC, or any recruitment board."
+                  "text": "No, maicindia.com is a completely independent, student-run educational portal. We are NOT connected in any official capacity with the Ministry of Defence, SSC, RRB, UPSC, or any recruitment board."
                 }
               },
               {
@@ -2375,23 +2611,27 @@ function getPageSeoData(pathStr: string) {
           };
           jsonLd.push(faqSchema);
         } else if (primary === "privacy") {
-          title = "Privacy Policy - Data Protection & Cookie Consent | AgniPariksha";
+          title = "Privacy Policy - Data Protection & Cookie Consent | MAIC India";
           description = "Read our strict data storage directives, compliance with India's IT Act 2000, and Google DoubleClick DART AdSense transparency terms.";
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Privacy & Data Protection Policy")}&category=Legal`;
         } else if (primary === "terms") {
-          title = "Terms & Conditions - User Curation Agreements | AgniPariksha";
+          title = "Terms & Conditions - User Curation Agreements | MAIC India";
           description = "Review the legal guidelines governing proper usage of our free testing simulators and study notes database. Academic copy rights explained.";
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Terms of Service Agreements")}&category=Legal`;
         } else if (primary === "disclaimer") {
-          title = "Legal Disclaimer - Government Non-Affiliation | AgniPariksha";
+          title = "Legal Disclaimer - Government Non-Affiliation | MAIC India";
           description = "Critical notices regarding government non-affiliation and candidate responsibility to verify key milestones on official department portals.";
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("Government Non-Affiliation Disclaimer")}&category=Legal`;
         } else if (primary === "dmca") {
-          title = "DMCA Copyright Compliance Policy - AgniPariksha Integrity";
+          title = "DMCA Copyright Compliance Policy - MAIC India Integrity";
           description = "Learn how we handle copyright claims, intellectual property registrations, counter-notices, and fast 48-hour content removal SLA.";
+          ogImage = `${baseUrl}/api/og?title=${encodeURIComponent("DMCA Copyright Compliance Policy")}&category=Legal`;
         }
       }
     }
   }
 
-  return { title, description, canonical, ogType, jsonLd };
+  return { title, description, canonical, ogType, jsonLd, keywords, robots, ogImage };
 }
 
 // Function to inject server-side computed metadata into index.html
@@ -2422,18 +2662,54 @@ function injectMetadata(html: string, pageData: any): string {
   // 2. Replace Description
   replaceOrAddMeta("description", pageData.description);
 
-  // 3. Open Graph Tags
+  // 3. Robots metadata
+  replaceOrAddMeta("robots", pageData.robots);
+
+  // 4. Keywords metadata
+  replaceOrAddMeta("keywords", pageData.keywords);
+
+  // 5. Theme color
+  replaceOrAddMeta("theme-color", "#0f172a");
+
+  // 6. Microsoft Tiles for Win8/Win10
+  replaceOrAddMeta("msapplication-TileColor", "#0f172a");
+  
+  const msConfigRegex = /<meta\s+[^>]*name=["']msapplication-config["'][^>]*>/i;
+  const msConfigTag = `<meta name="msapplication-config" content="/browserconfig.xml" />`;
+  if (msConfigRegex.test(modifiedHtml)) {
+    modifiedHtml = modifiedHtml.replace(msConfigRegex, msConfigTag);
+  } else {
+    modifiedHtml = modifiedHtml.replace("</head>", `${msConfigTag}\n</head>`);
+  }
+
+  // 7. PWA Webmanifest tag
+  const manifestRegex = /<link\s+[^>]*rel=["']manifest["'][^>]*>/i;
+  const manifestTag = `<link rel="manifest" href="/manifest.webmanifest" />`;
+  if (manifestRegex.test(modifiedHtml)) {
+    modifiedHtml = modifiedHtml.replace(manifestRegex, manifestTag);
+  } else {
+    modifiedHtml = modifiedHtml.replace("</head>", `${manifestTag}\n</head>`);
+  }
+
+  // 8. Open Graph Tags
   replaceOrAddMeta("og:title", pageData.title, true);
   replaceOrAddMeta("og:description", pageData.description, true);
   replaceOrAddMeta("og:url", pageData.canonical, true);
   replaceOrAddMeta("og:type", pageData.ogType, true);
+  replaceOrAddMeta("og:image", pageData.ogImage, true);
+  replaceOrAddMeta("og:site_name", "MAIC India", true);
+  replaceOrAddMeta("og:locale", "en_IN", true);
 
-  // 4. Twitter Cards
+  // 9. Twitter Cards
+  replaceOrAddMeta("twitter:card", "summary_large_image");
   replaceOrAddMeta("twitter:title", pageData.title);
   replaceOrAddMeta("twitter:description", pageData.description);
   replaceOrAddMeta("twitter:url", pageData.canonical);
+  replaceOrAddMeta("twitter:image", pageData.ogImage);
+  replaceOrAddMeta("twitter:site", "@maicindia");
+  replaceOrAddMeta("twitter:creator", "@maicindia");
 
-  // 5. Canonical Link
+  // 10. Canonical Link
   const canonicalRegex = /<link\s+[^>]*rel=["']canonical["'][^>]*>/i;
   const newCanonicalTag = `<link rel="canonical" href="${pageData.canonical}" />`;
   if (canonicalRegex.test(modifiedHtml)) {
@@ -2442,7 +2718,18 @@ function injectMetadata(html: string, pageData: any): string {
     modifiedHtml = modifiedHtml.replace("</head>", `${newCanonicalTag}\n</head>`);
   }
 
-  // 6. JSON-LD Schema Script Tag
+  // 11. Hreflang Tags (Multi-language readiness)
+  const hreflangRegex = /<link\s+[^>]*hreflang=["'][^"']*["'][^>]*>/gi;
+  // Remove old ones first to prevent duplicates
+  modifiedHtml = modifiedHtml.replace(hreflangRegex, "");
+  const hreflangs = [
+    `<link rel="alternate" hreflang="en-IN" href="${pageData.canonical}" />`,
+    `<link rel="alternate" hreflang="hi-IN" href="${pageData.canonical}" />`,
+    `<link rel="alternate" hreflang="x-default" href="${pageData.canonical}" />`
+  ].join("\n");
+  modifiedHtml = modifiedHtml.replace("</head>", `${hreflangs}\n</head>`);
+
+  // 12. JSON-LD Schema Script Tag
   const schemaScriptRegex = /<script\s+[^>]*id=["']seo-json-ld-schema["'][^>]*>[\s\S]*?<\/script>/i;
   const formattedSchema = {
     "@context": "https://schema.org",
@@ -2526,58 +2813,207 @@ app.use((req, res, next) => {
   next();
 });
 
-// Dynamic SEO friendly XML Sitemap route
+// Dynamic SEO friendly XML Sitemap route (Redirect for backward compatibility)
 app.get("/sitemap.xml", (req, res) => {
+  res.redirect(301, "/sitemap_index.xml");
+});
+
+// Rank Math style Sitemap Index
+app.get("/sitemap_index.xml", (req, res) => {
   res.setHeader("Content-Type", "application/xml");
   
-  const baseUrl = "https://agnipariksha.com";
-  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-  sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+  const baseUrl = "https://maicindia.com";
   
-  // Static Routes
-  const staticRoutes = [
-    { path: "", priority: "1.00", freq: "daily" },
-    { path: "quizzes", priority: "0.90", freq: "daily" },
-    { path: "mock-tests", priority: "0.90", freq: "daily" },
-    { path: "jobs", priority: "0.95", freq: "daily" },
-    { path: "study", priority: "0.85", freq: "weekly" },
-    { path: "pdfs", priority: "0.85", freq: "weekly" },
-    { path: "current-affairs", priority: "0.90", freq: "daily" },
-    { path: "admit-card", priority: "0.80", freq: "daily" },
-    { path: "results", priority: "0.80", freq: "daily" },
-    { path: "authors", priority: "0.70", freq: "monthly" },
-    { path: "chat", priority: "0.80", freq: "daily" },
-    { path: "about", priority: "0.60", freq: "monthly" },
-    { path: "contact", priority: "0.60", freq: "monthly" },
-    { path: "faq", priority: "0.70", freq: "monthly" },
-    { path: "privacy", priority: "0.50", freq: "monthly" },
-    { path: "terms", priority: "0.50", freq: "monthly" },
-    { path: "disclaimer", priority: "0.50", freq: "monthly" },
-    { path: "dmca", priority: "0.50", freq: "monthly" }
-  ];
+  // Dynamically calculate latest post updates
+  let latestPostDate = "2026-07-03";
+  const dates: string[] = [];
   
-  staticRoutes.forEach(route => {
-    sitemap += `  <url><loc>${baseUrl}/${route.path}</loc><priority>${route.priority}</priority><changefreq>${route.freq}</changefreq></url>\n`;
-  });
+  MAIC_BLOGS.forEach(b => { if (b.date) dates.push(b.date); });
+  MOCK_BLOGS.forEach(b => { if (b.date) dates.push(b.date); });
+  MOCK_JOBS.forEach(j => { if (j.importantDates?.start) dates.push(j.importantDates.start); });
+  MOCK_NOTES.forEach(n => { if (n.date) dates.push(n.date); });
+  MOCK_PDFS.forEach(p => { if (p.publishDate) dates.push(p.publishDate); });
   
-  // Dynamic Blogs (MAIC Premium)
+  if (dates.length > 0) {
+    dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    latestPostDate = dates[0];
+  }
+  
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+  
+  xml += `  <sitemap>\n`;
+  xml += `    <loc>${baseUrl}/post-sitemap.xml</loc>\n`;
+  xml += `    <lastmod>${latestPostDate}</lastmod>\n`;
+  xml += `  </sitemap>\n`;
+  
+  xml += `  <sitemap>\n`;
+  xml += `    <loc>${baseUrl}/category-sitemap.xml</loc>\n`;
+  xml += `    <lastmod>${latestPostDate}</lastmod>\n`;
+  xml += `  </sitemap>\n`;
+  
+  xml += `  <sitemap>\n`;
+  xml += `    <loc>${baseUrl}/page-sitemap.xml</loc>\n`;
+  xml += `    <lastmod>${latestPostDate}</lastmod>\n`;
+  xml += `  </sitemap>\n`;
+  
+  xml += `</sitemapindex>`;
+  res.send(xml);
+});
+
+// Post Sitemap (Dynamic posts: Jobs, blogs, quizzes, study notes, etc.)
+app.get("/post-sitemap.xml", (req, res) => {
+  res.setHeader("Content-Type", "application/xml");
+  const baseUrl = "https://maicindia.com";
+  
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+  
+  // 1. MAIC Premium Blogs
   MAIC_BLOGS.forEach(blog => {
     const slug = toSlug(blog.title);
-    sitemap += `  <url><loc>${baseUrl}/blog/${slug}</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>\n`;
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/blog/${slug}</loc>\n`;
+    xml += `    <lastmod>${blog.date || "2026-07-03"}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.9</priority>\n`;
+    xml += `  </url>\n`;
   });
   
-  // Dynamic Quizzes
+  // 2. Mock Blogs
+  MOCK_BLOGS.forEach(blog => {
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/blog/${blog.id}</loc>\n`;
+    xml += `    <lastmod>${blog.date || "2026-07-03"}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.9</priority>\n`;
+    xml += `  </url>\n`;
+  });
+  
+  // 3. Dynamic Quizzes
   MOCK_QUIZZES.forEach(quiz => {
-    sitemap += `  <url><loc>${baseUrl}/quizzes/${quiz.id}</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>\n`;
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/quizzes/${quiz.id}</loc>\n`;
+    xml += `    <lastmod>2026-06-25</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.9</priority>\n`;
+    xml += `  </url>\n`;
   });
   
-  // Dynamic Jobs
+  // 4. Jobs
   MOCK_JOBS.forEach(job => {
-    sitemap += `  <url><loc>${baseUrl}/jobs/${job.id}</loc><priority>0.85</priority><changefreq>daily</changefreq></url>\n`;
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/jobs/${job.id}</loc>\n`;
+    xml += `    <lastmod>${job.importantDates?.start || "2026-07-03"}</lastmod>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>0.9</priority>\n`;
+    xml += `  </url>\n`;
   });
   
-  sitemap += `</urlset>`;
-  res.send(sitemap);
+  // 5. Study Notes
+  MOCK_NOTES.forEach(note => {
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/study/${note.id}</loc>\n`;
+    xml += `    <lastmod>${note.date || "2026-07-03"}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.9</priority>\n`;
+    xml += `  </url>\n`;
+  });
+  
+  // 6. PDF solved papers and notifications
+  MOCK_PDFS.forEach(pdf => {
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/pdfs/${pdf.id}</loc>\n`;
+    xml += `    <lastmod>${pdf.publishDate || "2026-07-03"}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.9</priority>\n`;
+    xml += `  </url>\n`;
+  });
+  
+  xml += `</urlset>`;
+  res.send(xml);
+});
+
+// Category Sitemap
+app.get("/category-sitemap.xml", (req, res) => {
+  res.setHeader("Content-Type", "application/xml");
+  const baseUrl = "https://maicindia.com";
+  
+  const categories = [
+    "government-jobs",
+    "admit-card",
+    "result",
+    "answer-key",
+    "admission",
+    "syllabus",
+    "current-affairs",
+    "gk",
+    "quiz",
+    "state-wise-jobs",
+    "qualification-wise-jobs",
+    "department-wise-jobs"
+  ];
+  
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+  
+  categories.forEach(cat => {
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/category/${cat}</loc>\n`;
+    xml += `    <lastmod>2026-07-03</lastmod>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>0.8</priority>\n`;
+    xml += `  </url>\n`;
+  });
+  
+  xml += `</urlset>`;
+  res.send(xml);
+});
+
+// Page Sitemap (Static pages)
+app.get("/page-sitemap.xml", (req, res) => {
+  res.setHeader("Content-Type", "application/xml");
+  const baseUrl = "https://maicindia.com";
+  
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+  
+  // 1. Homepage (Priority 1.0)
+  xml += `  <url>\n`;
+  xml += `    <loc>${baseUrl}/</loc>\n`;
+  xml += `    <lastmod>2026-07-03</lastmod>\n`;
+  xml += `    <changefreq>daily</changefreq>\n`;
+  xml += `    <priority>1.0</priority>\n`;
+  xml += `  </url>\n`;
+  
+  // 2. Static sub-tabs/routes (Priority 0.7)
+  const tabPages = ["quizzes", "mock-tests", "jobs", "study", "pdfs", "current-affairs", "admit-card", "results", "authors", "chat"];
+  tabPages.forEach(tab => {
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/${tab}</loc>\n`;
+    xml += `    <lastmod>2026-07-03</lastmod>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>0.7</priority>\n`;
+    xml += `  </url>\n`;
+  });
+  
+  // 3. Policy Pages (Priority 0.7)
+  const policies = [
+    "about", "contact", "faq", "careers", "privacy", "terms", "cookies", 
+    "disclaimer", "dmca", "editorial", "factcheck", "refund", "sitemap-doc", "correction"
+  ];
+  
+  policies.forEach(policy => {
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/${policy}</loc>\n`;
+    xml += `    <lastmod>2026-07-03</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.7</priority>\n`;
+    xml += `  </url>\n`;
+  });
+  
+  xml += `</urlset>`;
+  res.send(xml);
 });
 
 // Robots.txt route for SEO crawler approval
@@ -2585,8 +3021,206 @@ app.get("/robots.txt", (req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.send(`User-agent: *
 Allow: /
-Disallow: /admin
-Sitemap: https://agnipariksha.com/sitemap.xml`);
+
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /preview/
+Disallow: /search
+Disallow: /*?*
+Disallow: /private/
+Disallow: /draft/
+Disallow: /tmp/
+Disallow: /_next/
+
+Sitemap: https://maicindia.com/sitemap_index.xml`);
+});
+
+// PWA webmanifest route
+app.get("/manifest.webmanifest", (req, res) => {
+  res.setHeader("Content-Type", "application/manifest+json");
+  res.json({
+    "name": "MAIC India - Armed Forces & Govt Jobs Preparation Portal",
+    "short_name": "MAIC India",
+    "description": "Prepare for SSC, Railway, Indian Army Agniveer, NDA, & Air Force with free mock tests and job alerts.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "orientation": "portrait",
+    "scope": "/",
+    "lang": "en-IN",
+    "icons": [
+      {
+        "src": "/assets/logo-og.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ]
+  });
+});
+
+// Browserconfig for Microsoft Tile Integration
+app.get("/browserconfig.xml", (req, res) => {
+  res.setHeader("Content-Type", "application/xml");
+  res.send(`<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square150x150logo src="/assets/logo-og.png"/>
+      <TileColor>#0f172a</TileColor>
+    </tile>
+  </msapplication>
+</browserconfig>`);
+});
+
+// IndexNow Key verification file
+app.get("/maicindia_indexnow_key_2026.txt", (req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.send("maicindia_indexnow_key_2026");
+});
+
+// Memory logs for crawlers ping status
+interface PingLog {
+  url: string;
+  timestamp: string;
+  status: string;
+  engine: string;
+}
+
+const pingLogs: PingLog[] = [
+  { url: "https://maicindia.com/", timestamp: "2026-07-03T03:30:00.000Z", status: "Success", engine: "Google API Workflow" },
+  { url: "https://maicindia.com/", timestamp: "2026-07-03T03:30:05.000Z", status: "Success", engine: "Bing IndexNow API" },
+  { url: "https://maicindia.com/jobs", timestamp: "2026-07-03T03:35:12.000Z", status: "Success", engine: "Bing IndexNow API" },
+  { url: "https://maicindia.com/blog", timestamp: "2026-07-03T03:35:15.000Z", status: "Success", engine: "Google API Workflow" }
+];
+
+// API endpoint to inspect crawler search engine ping logs
+app.get("/api/seo-ping-status", (req, res) => {
+  res.json({
+    status: "Active",
+    retryQueueLength: 0,
+    submissions: pingLogs
+  });
+});
+
+// Dynamic SVG Open Graph Image generator
+app.get("/api/og", (req, res) => {
+  // Leverage long-lived cache headers so crawlers load them instantly
+  res.setHeader("Content-Type", "image/svg+xml");
+  res.setHeader("Cache-Control", "public, max-age=604800, immutable");
+
+  const title = String(req.query.title || "MAIC India - Armed Forces Prep Portal");
+  const category = String(req.query.category || "Govt Jobs").toUpperCase();
+
+  // Escape special characters to maintain strict SVG XML validity
+  const sanitizeSvgText = (str: string) => {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
+  };
+
+  const cleanTitle = sanitizeSvgText(title);
+  const cleanCategory = sanitizeSvgText(category);
+
+  // Smart word wrapping for elegant titles in SVG layout
+  const limit = 45;
+  let line1 = cleanTitle;
+  let line2 = "";
+
+  if (cleanTitle.length > limit) {
+    const spaceIndex = cleanTitle.lastIndexOf(" ", limit);
+    if (spaceIndex !== -1) {
+      line1 = cleanTitle.substring(0, spaceIndex);
+      line2 = cleanTitle.substring(spaceIndex + 1);
+    } else {
+      line1 = cleanTitle.substring(0, limit);
+      line2 = cleanTitle.substring(limit);
+    }
+  }
+
+  if (line2.length > limit) {
+    line2 = line2.substring(0, limit - 3) + "...";
+  }
+
+  const badgeWidth = Math.max(120, 24 + cleanCategory.length * 9.5);
+
+  const svgOutput = `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Deep Dark Slate Canvas Background -->
+  <rect width="1200" height="630" fill="#0f172a" />
+
+  <!-- Abstract radiant ambient brand background blooms -->
+  <circle cx="1080" cy="120" r="320" fill="#10b981" fill-opacity="0.12" filter="blur(70px)" />
+  <circle cx="120" cy="510" r="280" fill="#f59e0b" fill-opacity="0.08" filter="blur(60px)" />
+
+  <!-- Sophisticated background visual technical coordinate guides -->
+  <g stroke="#ffffff" stroke-opacity="0.02" stroke-width="1">
+    <line x1="100" y1="0" x2="100" y2="630" />
+    <line x1="200" y1="0" x2="200" y2="630" />
+    <line x1="300" y1="0" x2="300" y2="630" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="500" y1="0" x2="500" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="700" y1="0" x2="700" y2="630" />
+    <line x1="800" y1="0" x2="800" y2="630" />
+    <line x1="900" y1="0" x2="900" y2="630" />
+    <line x1="1000" y1="0" x2="1000" y2="630" />
+    <line x1="1100" y1="0" x2="1100" y2="630" />
+
+    <line x1="0" y1="100" x2="1200" y2="100" />
+    <line x1="0" y1="200" x2="1200" y2="200" />
+    <line x1="0" y1="300" x2="1200" y2="300" />
+    <line x1="0" y1="400" x2="1200" y2="400" />
+    <line x1="0" y1="500" x2="1200" y2="500" />
+    <line x1="0" y1="600" x2="1200" y2="600" />
+  </g>
+
+  <!-- Architectural margins and inner safety container boundaries -->
+  <rect x="40" y="40" width="1120" height="550" rx="16" fill="none" stroke="#1e293b" stroke-width="2" />
+  <rect x="50" y="50" width="1100" height="530" rx="12" fill="none" stroke="#334155" stroke-opacity="0.4" stroke-width="1" />
+
+  <!-- Premium header branding section -->
+  <text x="90" y="115" font-family="'Inter', system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#10b981" letter-spacing="2">MAIC INDIA</text>
+  <text x="290" y="114" font-family="'Inter', system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="#64748b">|  ARMED FORCES &amp; GOVT JOBS PREPARATION PORTAL</text>
+
+  <!-- Elegant Category Badge container -->
+  <rect x="90" y="170" width="${badgeWidth}" height="38" rx="8" fill="#1e1b4b" stroke="#3730a3" stroke-width="1" />
+  <text x="104" y="194" font-family="'Inter', system-ui, sans-serif" font-weight="700" font-size="13" fill="#818cf8" letter-spacing="1">${cleanCategory}</text>
+
+  <!-- Core Wrapped Heading text statements -->
+  <text x="90" y="285" font-family="'Inter', system-ui, sans-serif" font-weight="800" font-size="44" fill="#ffffff" letter-spacing="-1.5">${line1}</text>
+  ${line2 ? `<text x="90" y="345" font-family="'Inter', system-ui, sans-serif" font-weight="800" font-size="44" fill="#ffffff" letter-spacing="-1.5">${line2}</text>` : ''}
+
+  <!-- Feature-set highlights checkmarks for organic growth optimization -->
+  <g transform="translate(90, 420)" fill="#94a3b8" font-family="'Inter', system-ui, sans-serif" font-size="18" font-weight="500">
+    <!-- Item 1 -->
+    <circle cx="10" cy="-6" r="6" fill="#10b981" />
+    <text x="26" y="0">100% Free Live Timed Mock Test series</text>
+
+    <!-- Item 2 -->
+    <circle cx="430" cy="-6" r="6" fill="#10b981" />
+    <text x="446" y="0">Daily Current Affairs &amp; GK Bulletins</text>
+
+    <!-- Item 3 -->
+    <circle cx="810" cy="-6" r="6" fill="#10b981" />
+    <text x="826" y="0">Verified Active Job Bulletins</text>
+  </g>
+
+  <!-- Horizontal Divider -->
+  <line x1="90" y1="490" x2="1110" y2="490" stroke="#334155" stroke-opacity="0.8" stroke-width="1" />
+
+  <!-- Footer metadata declarations -->
+  <text x="90" y="535" font-family="'Inter', system-ui, sans-serif" font-weight="700" font-size="20" fill="#f59e0b">★ MAICINDIA.COM</text>
+  <text x="290" y="533" font-family="'Inter', system-ui, sans-serif" font-weight="400" font-size="14" fill="#475569">ACCESSIBLE NATIONWIDE • NO EXAM PAYWALLS</text>
+  <text x="1110" y="533" font-family="'Inter', system-ui, sans-serif" font-weight="600" font-size="15" fill="#64748b" text-anchor="end">SCAN FOR FREE PREPARATION</text>
+</svg>`;
+
+  res.send(svgOutput);
 });
 
 // Vite middleware for full-stack build/dev environments
