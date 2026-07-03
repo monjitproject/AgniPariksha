@@ -5,6 +5,10 @@ import fs from "fs";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 
+// Local dataset imports for dynamic server-side SEO metadata injection and sitemaps
+import { MAIC_BLOGS } from "./src/data/maicBlogsData";
+import { MOCK_QUIZZES, MOCK_JOBS } from "./src/data/mockData";
+
 // Initialize environment variables
 dotenv.config();
 
@@ -2144,41 +2148,435 @@ Do NOT write markdown block wrappers or explanations. Just return the raw JSON a
   return res.json({ papers: fallbackPapers });
 });
 
+// Helper to convert text to slug (same as client-side)
+const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+// Check if a given requested URL path is theoretically valid
+function checkPathValidity(pathStr: string): boolean {
+  if (pathStr === "/" || pathStr === "") return true;
+  const segments = pathStr.split("/").filter(Boolean);
+  if (segments.length === 0) return true;
+  
+  const primary = segments[0].toLowerCase();
+  const subId = segments[1];
+  
+  const validPolicies = ["about", "contact", "faq", "careers", "privacy", "terms", "cookies", "disclaimer", "dmca", "editorial", "factcheck", "refund", "sitemap-doc", "correction"];
+  if (validPolicies.includes(primary)) {
+    return segments.length === 1;
+  }
+  
+  const validSingleRoutes = [
+    "quizzes", "study", "current-affairs", "jobs", "admit-card", "results", "pdfs", "blog", "authors", "dashboard", "chat", "admin", "mock-tests"
+  ];
+  if (validSingleRoutes.includes(primary)) {
+    if (segments.length === 1) return true;
+    if (segments.length === 2) {
+      if (primary === "blog") {
+        return MAIC_BLOGS.some(b => b.id === subId || toSlug(b.title) === subId);
+      }
+      if (primary === "quizzes") {
+        return MOCK_QUIZZES.some(q => q.id === subId);
+      }
+      if (primary === "jobs") {
+        return MOCK_JOBS.some(j => j.id === subId);
+      }
+      return true; // Other subIDs (like study note slugs, current affairs, etc.) are allowed dynamically
+    }
+  }
+  
+  return false;
+}
+
+// Helper to generate dynamic SEO page data for server-side HTML injection
+function getPageSeoData(pathStr: string) {
+  const baseUrl = "https://agnipariksha.com";
+  let title = "AgniPariksha - Armed Forces & Govt Jobs Preparation Portal";
+  let description = "Access 100% free interactive mock tests, syllabus-aligned study notes, solved previous year papers (PYPs), and live government job alerts.";
+  let canonical = `${baseUrl}${pathStr}`;
+  let ogType = "website";
+  let jsonLd: any[] = [];
+
+  // Organization Schema
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "@id": `${baseUrl}/#organization`,
+    "name": "AgniPariksha",
+    "url": baseUrl,
+    "logo": `${baseUrl}/assets/logo-og.png`,
+    "description": "India's premier independent free-access exam preparation and mock test portal."
+  };
+  
+  // Website SearchAction Schema
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${baseUrl}/#website`,
+    "url": baseUrl,
+    "name": "AgniPariksha",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${baseUrl}/blog?search={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  jsonLd.push(organizationSchema, websiteSchema);
+
+  // Parse path segments
+  const segments = pathStr.split("/").filter(Boolean);
+  
+  // Breadcrumb schema
+  const breadcrumbList = [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": baseUrl }
+  ];
+  let currentAccumulated = baseUrl;
+  segments.forEach((seg, index) => {
+    currentAccumulated += `/${seg}`;
+    const readableName = seg.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    breadcrumbList.push({
+      "@type": "ListItem",
+      "position": index + 2,
+      "name": readableName,
+      "item": currentAccumulated
+    });
+  });
+  
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbList
+  };
+  jsonLd.push(breadcrumbSchema);
+
+  if (segments.length === 0) {
+    title = "AgniPariksha - Free Armed Forces & Govt Jobs Mock Tests";
+    description = "Prepare for SSC, Railway, Indian Army Agniveer, NDA, & Air Force. Solve free interactive mock test series, practice questions, and read verified daily job alerts.";
+  } else {
+    const primary = segments[0].toLowerCase();
+    const subId = segments[1];
+
+    if (primary === "quizzes") {
+      title = "Interactive GK Quizzes & Mock Exams - AgniPariksha";
+      description = "Test your skills! Free timed subject quizzes for Indian Army, Navy, General Awareness, Mathematics formulas, and reasoning logics.";
+      if (subId) {
+        const quiz = MOCK_QUIZZES.find(q => q.id === subId);
+        if (quiz) {
+          title = `${quiz.title} - Free Practice Mock Quiz | AgniPariksha`;
+          description = `Take the 100% free practice quiz for ${quiz.title}. Total ${quiz.questions.length} objective questions with instant explanations & grading.`;
+        }
+      }
+    } else if (primary === "mock-tests") {
+      title = "Full-Length Simulated Practice Mock Tests - AgniPariksha";
+      description = "Agniveer Army General Duty, Technical, Clerk & SSC GD full mock tests simulator. Features live timers, sectional cuts, and official grading criteria.";
+    } else if (primary === "study") {
+      title = "Syllabus Study Material & Revision Cheat Sheets - AgniPariksha";
+      description = "Bilingual (Hindi/English) study notes, formula lists, historical battles summaries, and static GK tables. Free for competitive jobs preparation.";
+      if (subId) {
+        title = `${subId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")} - Syllabus Study Note | AgniPariksha`;
+      }
+    } else if (primary === "current-affairs") {
+      title = "Daily Current Affairs & Geopolitics Updates - AgniPariksha";
+      description = "Latest bilateral treaties, space milestones, defense updates, and index rankings curated for competitive examinations. Bilingual updates updated daily.";
+      if (subId) {
+        title = `Current Affairs Brief: ${subId.split("-").join(" ")} | AgniPariksha`;
+      }
+    } else if (primary === "pdfs") {
+      title = "Previous Year Solved Papers & PDF Notes Library - AgniPariksha";
+      description = "Download 100% free PDF revision files, official recruitment circulars, and bilingually solved previous year papers (PYPs) for SSC & Railway.";
+    } else if (primary === "jobs") {
+      title = "Latest Sarkari Government Job Alerts (Live 2026) - AgniPariksha";
+      description = "Live updates on Indian Armed Forces recruitment, CAPF rally notifications, SSC vacancies, and Railway recruitment boards. 100% verified sources.";
+      if (subId) {
+        const job = MOCK_JOBS.find(j => j.id === subId);
+        if (job) {
+          title = `${job.title} - Verified Recruitment Details | AgniPariksha`;
+          description = `Official circular details for ${job.title}. Qualification required: ${job.qualification}, Eligibility: ${job.eligibility}, Salary scale: ${job.salary}. Check closing dates.`;
+        }
+      }
+    } else if (primary === "admit-card") {
+      title = "Sarkari Exam Admit Cards & Schedules - AgniPariksha";
+      description = "Download upcoming competitive recruitment exam hall tickets and view verified venue schedules. Clean links to official board download utilities.";
+    } else if (primary === "results") {
+      title = "Latest Exam Results, Cut-offs, & Merit Sheets - AgniPariksha";
+      description = "Verified selection lists, category-wise cut-off percentiles, and merit results for SSC CGL, SSC GD, Railway, and state police recruitment boards.";
+    } else if (primary === "authors") {
+      title = "Meet Our Exam Curation Advisors & CAPT CAPFs - AgniPariksha";
+      description = "Learn about the retired military captains, Ph.D. scholars, and veteran recruitment advisors who verify and audit all academic content at AgniPariksha.";
+    } else if (primary === "chat") {
+      title = "Real-Time AI Academic Tutor Chatroom - AgniPariksha";
+      description = "Get instant answers! Ask our grounded AI assistant about General Science equations, Indian historical dates, constitutional articles, or math tricks.";
+    } else if (primary === "blog") {
+      title = "MAIC Vetted Career Guides & Vedic Math Blogs - AgniPariksha";
+      description = "Premium comprehensive study guides (1500-2500 words), Vedic mathematics calculation hacks, logical reasoning frameworks, and interview prep guides.";
+      if (subId) {
+        ogType = "article";
+        const blog = MAIC_BLOGS.find(b => b.id === subId || toSlug(b.title) === subId);
+        if (blog) {
+          title = `${blog.title} | AgniPariksha Career Guide`;
+          description = blog.excerpt;
+          
+          // Article schema
+          const articleSchema = {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": blog.title,
+            "description": blog.excerpt,
+            "datePublished": blog.date,
+            "author": {
+              "@type": "Person",
+              "name": blog.author
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "AgniPariksha",
+              "logo": `${baseUrl}/assets/logo-og.png`
+            }
+          };
+          jsonLd.push(articleSchema);
+        }
+      }
+    } else {
+      // Policies
+      const validPolicies = ["about", "contact", "faq", "careers", "privacy", "terms", "cookies", "disclaimer", "dmca", "editorial", "factcheck", "refund", "sitemap-doc", "correction"];
+      if (validPolicies.includes(primary)) {
+        if (primary === "about") {
+          title = "About AgniPariksha.com - Free Aspirant Empowerment Portal";
+          description = "Learn about our foundational vision to eliminate educational paywalls. Discover our academic advisory board and student-first curation workflows.";
+        } else if (primary === "contact") {
+          title = "Contact Us - Submit Support Inquiry Ticket | AgniPariksha";
+          description = "Reach out to our Academic support, Job alerts division, or Legal desk. Access our physical office coordinates in Cantonment Main Road, Jaipur.";
+        } else if (primary === "faq") {
+          title = "FAQ & Candidate Helpdesk - AgniPariksha Support";
+          description = "Common answers regarding mock test scoring, syllabus updates, negative marking algorithms, and downloading verified study PDFs.";
+          
+          // FAQ Schema
+          const faqSchema = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is AgniPariksha affiliated with the Indian Government or Armed Forces?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No, AgniPariksha.com is a completely independent, student-run educational portal. We are NOT connected in any official capacity with the Ministry of Defence, SSC, RRB, UPSC, or any recruitment board."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Are the mock test series, study PDFs, and certificates entirely free?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, 100% of our educational content, including simulated mock tests, custom explanation keys, PDF notes, and milestone badges, is completely free of charge. No premium paywalls exist."
+                }
+              }
+            ]
+          };
+          jsonLd.push(faqSchema);
+        } else if (primary === "privacy") {
+          title = "Privacy Policy - Data Protection & Cookie Consent | AgniPariksha";
+          description = "Read our strict data storage directives, compliance with India's IT Act 2000, and Google DoubleClick DART AdSense transparency terms.";
+        } else if (primary === "terms") {
+          title = "Terms & Conditions - User Curation Agreements | AgniPariksha";
+          description = "Review the legal guidelines governing proper usage of our free testing simulators and study notes database. Academic copy rights explained.";
+        } else if (primary === "disclaimer") {
+          title = "Legal Disclaimer - Government Non-Affiliation | AgniPariksha";
+          description = "Critical notices regarding government non-affiliation and candidate responsibility to verify key milestones on official department portals.";
+        } else if (primary === "dmca") {
+          title = "DMCA Copyright Compliance Policy - AgniPariksha Integrity";
+          description = "Learn how we handle copyright claims, intellectual property registrations, counter-notices, and fast 48-hour content removal SLA.";
+        }
+      }
+    }
+  }
+
+  return { title, description, canonical, ogType, jsonLd };
+}
+
+// Function to inject server-side computed metadata into index.html
+function injectMetadata(html: string, pageData: any): string {
+  let modifiedHtml = html;
+
+  // 1. Replace Title
+  const titleRegex = /<title>[^<]*<\/title>/i;
+  const newTitleTag = `<title>${pageData.title}</title>`;
+  if (titleRegex.test(modifiedHtml)) {
+    modifiedHtml = modifiedHtml.replace(titleRegex, newTitleTag);
+  } else {
+    modifiedHtml = modifiedHtml.replace("</head>", `${newTitleTag}\n</head>`);
+  }
+
+  // Helper to replace or add meta/link tags safely
+  const replaceOrAddMeta = (nameAttr: string, value: string, isProperty = false) => {
+    const attr = isProperty ? "property" : "name";
+    const regex = new RegExp(`<meta\\s+[^>]*${attr}=["']${nameAttr}["'][^>]*>`, 'i');
+    const newTag = `<meta ${attr}="${nameAttr}" content="${value}" />`;
+    if (regex.test(modifiedHtml)) {
+      modifiedHtml = modifiedHtml.replace(regex, newTag);
+    } else {
+      modifiedHtml = modifiedHtml.replace("</head>", `${newTag}\n</head>`);
+    }
+  };
+
+  // 2. Replace Description
+  replaceOrAddMeta("description", pageData.description);
+
+  // 3. Open Graph Tags
+  replaceOrAddMeta("og:title", pageData.title, true);
+  replaceOrAddMeta("og:description", pageData.description, true);
+  replaceOrAddMeta("og:url", pageData.canonical, true);
+  replaceOrAddMeta("og:type", pageData.ogType, true);
+
+  // 4. Twitter Cards
+  replaceOrAddMeta("twitter:title", pageData.title);
+  replaceOrAddMeta("twitter:description", pageData.description);
+  replaceOrAddMeta("twitter:url", pageData.canonical);
+
+  // 5. Canonical Link
+  const canonicalRegex = /<link\s+[^>]*rel=["']canonical["'][^>]*>/i;
+  const newCanonicalTag = `<link rel="canonical" href="${pageData.canonical}" />`;
+  if (canonicalRegex.test(modifiedHtml)) {
+    modifiedHtml = modifiedHtml.replace(canonicalRegex, newCanonicalTag);
+  } else {
+    modifiedHtml = modifiedHtml.replace("</head>", `${newCanonicalTag}\n</head>`);
+  }
+
+  // 6. JSON-LD Schema Script Tag
+  const schemaScriptRegex = /<script\s+[^>]*id=["']seo-json-ld-schema["'][^>]*>[\s\S]*?<\/script>/i;
+  const formattedSchema = {
+    "@context": "https://schema.org",
+    "@graph": pageData.jsonLd
+  };
+  const newSchemaScript = `<script type="application/ld+json" id="seo-json-ld-schema">\n${JSON.stringify(formattedSchema, null, 2)}\n</script>`;
+  if (schemaScriptRegex.test(modifiedHtml)) {
+    modifiedHtml = modifiedHtml.replace(schemaScriptRegex, newSchemaScript);
+  } else {
+    modifiedHtml = modifiedHtml.replace("</head>", `${newSchemaScript}\n</head>`);
+  }
+
+  return modifiedHtml;
+}
+
+// 301 Redirects and SEO Canonicalizing middleware
+app.use((req, res, next) => {
+  const host = req.headers.host || "";
+  const url = req.url;
+  
+  // 1. Redirect www to non-www
+  if (host.startsWith("www.")) {
+    const cleanHost = host.replace("www.", "");
+    return res.redirect(301, `https://${cleanHost}${url}`);
+  }
+  
+  // 2. Redirect trailing slashes for clean URLs (except root and files with dots)
+  if (req.path !== "/" && req.path.endsWith("/") && !req.path.includes(".")) {
+    const cleanPath = req.path.slice(0, -1);
+    const query = req.url.slice(req.path.length);
+    return res.redirect(301, `${cleanPath}${query}`);
+  }
+  
+  // 3. Redirect legacy query tab parameters to clean SEO URLs
+  if (req.path === "/" && req.query.tab) {
+    const tab = String(req.query.tab);
+    const id = req.query.id || req.query.subId;
+    
+    const tabMap: Record<string, string> = {
+      "quizzes": "quizzes",
+      "quiz": "quizzes",
+      "study": "study",
+      "current": "current-affairs",
+      "current-affairs": "current-affairs",
+      "jobs": "jobs",
+      "admit-card": "admit-card",
+      "results": "results",
+      "pdfs": "pdfs",
+      "blog": "blog",
+      "authors": "authors",
+      "dashboard": "dashboard",
+      "chat": "chat",
+      "mock-tests": "mock-tests"
+    };
+    
+    const cleanTab = tabMap[tab] || tab;
+    let redirectPath = `/${cleanTab}`;
+    if (id) {
+      redirectPath += `/${id}`;
+    }
+    return res.redirect(301, redirectPath);
+  }
+  
+  // 4. Redirect legacy paths to their canonical counterparts
+  const legacyRedirects: Record<string, string> = {
+    "/current": "/current-affairs",
+    "/current/": "/current-affairs",
+    "/admit-cards": "/admit-card",
+    "/admit-cards/": "/admit-card",
+    "/result": "/results",
+    "/result/": "/results",
+    "/quiz": "/quizzes",
+    "/quiz/": "/quizzes"
+  };
+  
+  if (legacyRedirects[req.path]) {
+    const query = req.url.slice(req.path.length);
+    return res.redirect(301, `${legacyRedirects[req.path]}${query}`);
+  }
+  
+  next();
+});
+
 // Dynamic SEO friendly XML Sitemap route
 app.get("/sitemap.xml", (req, res) => {
   res.setHeader("Content-Type", "application/xml");
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core Static/SPA Routes -->
-  <url><loc>https://agnipariksha.com/</loc><priority>1.00</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/quizzes</loc><priority>0.90</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/mock-tests</loc><priority>0.90</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/latest-jobs</loc><priority>0.95</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/study-material</loc><priority>0.85</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/pdf-library</loc><priority>0.85</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/current-affairs</loc><priority>0.90</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/admit-card</loc><priority>0.80</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/results</loc><priority>0.80</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/authors</loc><priority>0.70</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://agnipariksha.com/about</loc><priority>0.60</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://agnipariksha.com/contact</loc><priority>0.60</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://agnipariksha.com/faq</loc><priority>0.70</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog</loc><priority>0.85</priority><changefreq>daily</changefreq></url>
-
-  <!-- 12 Premium MAICINDIA.COM Articles / Guides -->
-  <url><loc>https://agnipariksha.com/blog/ultimate-monthly-current-affairs-blueprint-2026-india-s-geopolitical-shifts-defense-treaties-economy-keys</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/complete-indian-constitution-polity-study-notes-fundamental-rights-schedules-landmark-amendments</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/सम्पूर्ण-सामान्य-ज्ञान-गाइड-2026-भारतीय-इतिहास-भूगोल-और-महत्वपूर्ण-राष्ट्रीय-तथ्य-hindi-gk-study-notes</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/comprehensive-guide-to-logical-reasoning-syllogism-blood-relations-analytical-coding-hacks</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/superfast-vedic-math-tricks-speed-calculation-hacks-for-competitive-exams</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/high-yield-english-grammar-guide-active-passive-voice-tense-mechanics-spotting-errors</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/ssb-government-job-interview-mastery-body-language-psychological-vetting-question-banks</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/ssc-cgl-gd-2026-preparation-masterclass-tier-wise-strategy-cutoff-analysis-time-management</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/rrb-ntpc-alp-group-d-blueprint-comprehensive-syllabus-technical-subjects-score-optimization</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/ibps-sbi-po-clerk-vetting-quantitative-aptitude-banking-awareness-speed-drilling-framework</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/upsc-cse-civil-services-strategy-answer-writing-dynamics-optional-vetting-prelims-filtering</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/blog/comprehensive-nda-cds-and-capf-preparation-manual-physical-drills-written-syllabus-officer-qualities</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-</urlset>`;
+  
+  const baseUrl = "https://agnipariksha.com";
+  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+  
+  // Static Routes
+  const staticRoutes = [
+    { path: "", priority: "1.00", freq: "daily" },
+    { path: "quizzes", priority: "0.90", freq: "daily" },
+    { path: "mock-tests", priority: "0.90", freq: "daily" },
+    { path: "jobs", priority: "0.95", freq: "daily" },
+    { path: "study", priority: "0.85", freq: "weekly" },
+    { path: "pdfs", priority: "0.85", freq: "weekly" },
+    { path: "current-affairs", priority: "0.90", freq: "daily" },
+    { path: "admit-card", priority: "0.80", freq: "daily" },
+    { path: "results", priority: "0.80", freq: "daily" },
+    { path: "authors", priority: "0.70", freq: "monthly" },
+    { path: "chat", priority: "0.80", freq: "daily" },
+    { path: "about", priority: "0.60", freq: "monthly" },
+    { path: "contact", priority: "0.60", freq: "monthly" },
+    { path: "faq", priority: "0.70", freq: "monthly" },
+    { path: "privacy", priority: "0.50", freq: "monthly" },
+    { path: "terms", priority: "0.50", freq: "monthly" },
+    { path: "disclaimer", priority: "0.50", freq: "monthly" },
+    { path: "dmca", priority: "0.50", freq: "monthly" }
+  ];
+  
+  staticRoutes.forEach(route => {
+    sitemap += `  <url><loc>${baseUrl}/${route.path}</loc><priority>${route.priority}</priority><changefreq>${route.freq}</changefreq></url>\n`;
+  });
+  
+  // Dynamic Blogs (MAIC Premium)
+  MAIC_BLOGS.forEach(blog => {
+    const slug = toSlug(blog.title);
+    sitemap += `  <url><loc>${baseUrl}/blog/${slug}</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>\n`;
+  });
+  
+  // Dynamic Quizzes
+  MOCK_QUIZZES.forEach(quiz => {
+    sitemap += `  <url><loc>${baseUrl}/quizzes/${quiz.id}</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>\n`;
+  });
+  
+  // Dynamic Jobs
+  MOCK_JOBS.forEach(job => {
+    sitemap += `  <url><loc>${baseUrl}/jobs/${job.id}</loc><priority>0.85</priority><changefreq>daily</changefreq></url>\n`;
+  });
+  
+  sitemap += `</urlset>`;
   res.send(sitemap);
 });
 
@@ -2198,15 +2596,64 @@ async function bootstrap() {
       server: { middlewareMode: true },
       appType: "spa",
     });
+    
     app.use(vite.middlewares);
     console.log("Vite dev middleware mounted.");
+    
+    // Intercept html requests in development mode to perform server-side injection
+    app.get("*", async (req, res, next) => {
+      if (req.path === "/" || (!req.path.includes(".") && !req.path.startsWith("/api"))) {
+        try {
+          let html = fs.readFileSync(path.join(process.cwd(), "index.html"), "utf-8");
+          html = await vite.transformIndexHtml(req.url, html);
+          
+          const isPathValid = checkPathValidity(req.path);
+          const pageData = getPageSeoData(req.path);
+          let modifiedHtml = injectMetadata(html, pageData);
+          
+          if (!isPathValid) {
+            modifiedHtml = modifiedHtml.replace("<body>", "<body>\n<script>window.__INITIAL_STATE__ = { is404: true };</script>");
+            return res.status(404).send(modifiedHtml);
+          } else {
+            modifiedHtml = modifiedHtml.replace("<body>", "<body>\n<script>window.__INITIAL_STATE__ = { is404: false };</script>");
+            return res.status(200).send(modifiedHtml);
+          }
+        } catch (e) {
+          next(e);
+        }
+      } else {
+        next();
+      }
+    });
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+    
+    // Disable default index serving so our routing wildcard can inject metadata first
+    app.use(express.static(distPath, { index: false }));
+    
+    app.get("*", (req, res, next) => {
+      if (req.path === "/" || (!req.path.includes(".") && !req.path.startsWith("/api"))) {
+        try {
+          let html = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+          const isPathValid = checkPathValidity(req.path);
+          const pageData = getPageSeoData(req.path);
+          let modifiedHtml = injectMetadata(html, pageData);
+          
+          if (!isPathValid) {
+            modifiedHtml = modifiedHtml.replace("<body>", "<body>\n<script>window.__INITIAL_STATE__ = { is404: true };</script>");
+            return res.status(404).send(modifiedHtml);
+          } else {
+            modifiedHtml = modifiedHtml.replace("<body>", "<body>\n<script>window.__INITIAL_STATE__ = { is404: false };</script>");
+            return res.status(200).send(modifiedHtml);
+          }
+        } catch (e) {
+          next(e);
+        }
+      } else {
+        next();
+      }
     });
-    console.log("Serving static production assets from dist.");
+    console.log("Serving static production assets from dist with SSMI.");
   }
 
   app.listen(PORT, "0.0.0.0", () => {

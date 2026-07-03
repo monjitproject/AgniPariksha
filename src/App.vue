@@ -93,7 +93,7 @@ const parseLocation = () => {
       return { tab: tabMap[singleSegment] };
     }
     
-    return { tab: "home" };
+    return { tab: "404" };
   }
   
   if (segments.length === 2) {
@@ -121,9 +121,11 @@ const parseLocation = () => {
     if (category === "pdfs") {
       return { tab: "pdfs", subId: subItem };
     }
+    
+    return { tab: "404" };
   }
   
-  return { tab: "home" };
+  return { tab: "404" };
 };
 
 // PushState navigation helper
@@ -131,6 +133,8 @@ const navigateTo = (tab: string, subId?: string | null, policyId?: string | null
   let path = "/";
   if (tab === "home") {
     path = "/";
+  } else if (tab === "404") {
+    path = window.location.pathname; // Keep the original invalid URL path unchanged for canonical search crawler reporting
   } else if (tab === "policies" && policyId) {
     path = `/${policyId}`;
   } else {
@@ -200,7 +204,15 @@ const handlePopState = () => {
 
 onMounted(() => {
   window.addEventListener("popstate", handlePopState);
-  handlePopState();
+  
+  // Check if server-side metadata injector flagged this page as 404
+  const initialState = (window as any).__INITIAL_STATE__;
+  if (initialState && initialState.is404) {
+    currentTab.value = "404";
+  } else {
+    handlePopState();
+  }
+  
   fetchDailyQuiz(); // Load dynamic live educational feed questions on compile/session launch
   fetchNotifications(); // Fetch dynamic live job notifications and armed forces alerts
 });
@@ -598,6 +610,73 @@ const handleAdminAddJob = (newJob: JobPost) => {
       <!-- REAL-TIME AI TUTOR CHAT ROOM -->
       <div v-if="currentTab === 'chat'" class="max-w-4xl mx-auto animate-fade-in" id="chat-tab-viewport">
         <AiAssistant />
+      </div>
+
+      <!-- HIGH-FIDELITY CUSTOM 404 ERROR PAGE -->
+      <div v-if="currentTab === '404'" class="max-w-2xl mx-auto py-12 px-4 text-center space-y-8 animate-fade-in" id="custom-404-viewport">
+        <!-- Visual Identity graphic representing the flame/examination metaphor -->
+        <div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+          <div class="absolute inset-0 bg-radial from-[#000080]/10 to-transparent animate-pulse rounded-full" />
+          <div class="absolute inset-4 bg-radial from-[#FF9933]/15 to-transparent animate-spin rounded-full [animation-duration:8s]" />
+          <!-- Big 404 text with patriotic colors -->
+          <span class="text-7xl font-black tracking-tighter text-slate-900 select-none flex items-center justify-center gap-1">
+            <span class="text-[#FF9933]">4</span>
+            <span class="text-slate-300">0</span>
+            <span class="text-[#138808]">4</span>
+          </span>
+        </div>
+
+        <div class="space-y-3">
+          <span class="bg-[#000080]/10 text-[#000080] border border-[#000080]/15 text-[10px] font-mono font-black tracking-widest uppercase px-3 py-1 rounded-full">
+            ERROR CODE: ROUTE_NOT_FOUND
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+            Oops! This Exam Directive is Missing
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed font-sans">
+            The path you followed does not correspond to an active syllabus, recruitment alert, or mock test in our vetted database. Let's redirect your focus back to the target material.
+          </p>
+        </div>
+
+        <!-- Quick navigation portal cards to direct candidates back safely -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-lg mx-auto">
+          <button 
+            @click="handleNavigation('home')"
+            class="p-4 bg-white hover:bg-slate-50 border border-slate-200 hover:border-[#000080]/30 rounded-2xl transition-all flex items-start gap-3 shadow-3xs cursor-pointer group"
+          >
+            <div class="p-2 bg-[#000080]/5 rounded-xl text-[#000080] shrink-0 group-hover:scale-105 transition-transform">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 font-sans">Main Portal Dashboard</h4>
+              <p class="text-[10px] text-slate-500 leading-normal mt-0.5 font-sans">Return to mock series catalog & study trackers.</p>
+            </div>
+          </button>
+
+          <button 
+            @click="handleNavigation('blog')"
+            class="p-4 bg-white hover:bg-slate-50 border border-slate-200 hover:border-[#138808]/30 rounded-2xl transition-all flex items-start gap-3 shadow-3xs cursor-pointer group"
+          >
+            <div class="p-2 bg-[#138808]/5 rounded-xl text-[#138808] shrink-0 group-hover:scale-105 transition-transform">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 font-sans">Syllabus Study Guides</h4>
+              <p class="text-[10px] text-slate-500 leading-normal mt-0.5 font-sans">Explore 12 dynamic career blueprints & Vedic math tricks.</p>
+            </div>
+          </button>
+        </div>
+
+        <!-- humble support indicator -->
+        <div class="text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1.5 pt-4">
+          <span>Target Destination Invalid</span>
+          <span>•</span>
+          <button @click="handleNavigation('policies', null, 'contact')" class="text-blue-700 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer text-[10px]">Report Broken Link</button>
+        </div>
       </div>
 
     </main>

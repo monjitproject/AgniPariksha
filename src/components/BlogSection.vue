@@ -29,6 +29,10 @@ const activeCategory = ref("All");
 const searchQuery = ref("");
 const showShareNotification = ref(false);
 
+// Pagination SEO State
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+
 const toSlug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 // Load blogs and register categories
@@ -54,10 +58,24 @@ onMounted(() => {
       const automatedBlogs = data && data.blogs ? data.blogs : [];
       // Combine MAIC Premium blogs as primary high-value content, then add rest
       blogs.value = [...MAIC_BLOGS, ...localPublished, ...automatedBlogs, ...MOCK_BLOGS];
+      
+      // Parse query param page on mount
+      const params = new URLSearchParams(window.location.search);
+      const p = parseInt(params.get('page') || '1');
+      if (p > 1) {
+        currentPage.value = p;
+      }
     })
     .catch((err) => {
       console.error("Error loading server-based blogs:", err);
       blogs.value = [...MAIC_BLOGS, ...localPublished, ...MOCK_BLOGS];
+      
+      // Parse query param page on mount
+      const params = new URLSearchParams(window.location.search);
+      const p = parseInt(params.get('page') || '1');
+      if (p > 1) {
+        currentPage.value = p;
+      }
     });
 });
 
@@ -84,6 +102,49 @@ const filteredBlogs = computed(() => {
   }
 
   return list;
+});
+
+// Computed values for Pagination SEO
+const totalPages = computed(() => Math.ceil(filteredBlogs.value.length / itemsPerPage.value));
+
+const paginatedBlogs = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredBlogs.value.slice(start, end);
+});
+
+// Watch filtering to reset back to Page 1
+watch([activeCategory, searchQuery], () => {
+  currentPage.value = 1;
+});
+
+const setPage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return;
+  currentPage.value = page;
+  
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', page.toString());
+    window.history.pushState({}, '', url.pathname + url.search);
+  } catch (e) {
+    console.warn("Could not modify search query parameter:", e);
+  }
+  
+  window.scrollTo({ top: 300, behavior: "smooth" });
+};
+
+// Related Content Engine
+const relatedBlogs = computed(() => {
+  if (!activeBlog.value) return [];
+  const currentId = activeBlog.value.id;
+  const list = blogs.value.filter(b => b.id !== currentId);
+  const sameCategory = list.filter(b => b.category.toLowerCase() === activeBlog.value!.category.toLowerCase());
+  
+  if (sameCategory.length >= 3) {
+    return sameCategory.slice(0, 3);
+  }
+  const others = list.filter(b => b.category.toLowerCase() !== activeBlog.value!.category.toLowerCase());
+  return [...sameCategory, ...others].slice(0, 3);
 });
 
 // Watch activeBlogId prop from app routing to load correct post
@@ -390,54 +451,107 @@ const handleArticleClick = (e: MouseEvent) => {
       </div>
 
       <!-- Blogs Staggered Feed Listings -->
-      <div v-if="filteredBlogs.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6" id="blogs-grid">
-        <div
-          v-for="blog in filteredBlogs"
-          :key="blog.id"
-          :id="`blog-card-${blog.id}`"
-          class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 hover:border-slate-300 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group"
-          @click="selectBlog(blog)"
-        >
-          <div class="space-y-4">
-            <div class="flex justify-between items-center text-[10px] font-mono">
-              <span class="text-[#000080] uppercase bg-blue-50 px-2.5 py-0.8 rounded-md border border-blue-100 font-black">
-                {{ blog.category }}
-              </span>
-              <span class="text-slate-400 font-semibold">{{ blog.date }}</span>
+      <div v-if="filteredBlogs.length > 0" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="blogs-grid">
+          <div
+            v-for="blog in paginatedBlogs"
+            :key="blog.id"
+            :id="`blog-card-${blog.id}`"
+            class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 hover:border-slate-300 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group"
+            @click="selectBlog(blog)"
+          >
+            <div class="space-y-4">
+              <div class="flex justify-between items-center text-[10px] font-mono">
+                <span class="text-[#000080] uppercase bg-blue-50 px-2.5 py-0.8 rounded-md border border-blue-100 font-black">
+                  {{ blog.category }}
+                </span>
+                <span class="text-slate-400 font-semibold">{{ blog.date }}</span>
+              </div>
+
+              <h3 class="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#000080] transition-colors leading-snug">
+                {{ blog.title }}
+              </h3>
+
+              <p class="text-xs text-slate-500 leading-relaxed font-sans line-clamp-3 font-medium">
+                {{ blog.excerpt }}
+              </p>
+
+              <!-- SEO keywords badges -->
+              <div v-if="'seoKeywords' in blog && (blog as any).seoKeywords" class="flex flex-wrap gap-1 pt-1">
+                <span 
+                  v-for="kw in (blog as any).seoKeywords.slice(0, 3)" 
+                  :key="kw"
+                  class="bg-slate-50 text-slate-450 text-[9px] font-mono px-2 py-0.5 rounded border border-slate-150"
+                >
+                  #{{ kw }}
+                </span>
+              </div>
             </div>
 
-            <h3 class="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#000080] transition-colors leading-snug">
-              {{ blog.title }}
-            </h3>
+            <!-- Card Specs footer -->
+            <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-[10.5px] font-mono text-slate-400">
+              <div class="flex items-center gap-1.5 text-slate-500 font-semibold">
+                <User class="h-3.5 w-3.5 text-[#000080]" />
+                <span class="font-sans text-[11px] font-bold text-slate-700">{{ blog.author }}</span>
+              </div>
+              
+              <span class="flex items-center text-[#138808] font-black uppercase tracking-wider gap-0.5 group-hover:translate-x-1 transition-transform">
+                <span>Read Guide</span>
+                <ChevronRight class="h-4 w-4" />
+              </span>
+            </div>
+          </div>
+        </div>
 
-            <p class="text-xs text-slate-500 leading-relaxed font-sans line-clamp-3 font-medium">
-              {{ blog.excerpt }}
-            </p>
+        <!-- Pagination Controls with SEO crawlable anchors -->
+        <div v-if="totalPages > 1" class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200" id="blog-pagination-container">
+          <span class="text-xs text-slate-500 font-medium font-sans">
+            Showing Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong> (Total {{ filteredBlogs.length }} Guides)
+          </span>
+          <nav class="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-3xs animate-fade-in" aria-label="Pagination SEO Navigation">
+            <a
+              :href="`?page=${currentPage - 1}`"
+              @click.prevent="setPage(currentPage - 1)"
+              :class="[
+                'flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-[#000080] hover:bg-slate-50 transition-colors cursor-pointer',
+                currentPage === 1 ? 'pointer-events-none opacity-40' : ''
+              ]"
+              aria-label="Go to previous page"
+            >
+              <ArrowLeft class="h-4 w-4" />
+            </a>
 
-            <!-- SEO keywords badges -->
-            <div v-if="'seoKeywords' in blog && (blog as any).seoKeywords" class="flex flex-wrap gap-1 pt-1">
-              <span 
-                v-for="kw in (blog as any).seoKeywords.slice(0, 3)" 
-                :key="kw"
-                class="bg-slate-50 text-slate-450 text-[9px] font-mono px-2 py-0.5 rounded border border-slate-150"
+            <div class="flex items-center gap-1 px-1">
+              <a
+                v-for="page in totalPages"
+                :key="page"
+                :href="`?page=${page}`"
+                @click.prevent="setPage(page)"
+                :class="[
+                  'w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-colors cursor-pointer',
+                  currentPage === page
+                    ? 'bg-[#000080] text-white'
+                    : 'text-slate-650 hover:bg-slate-50 hover:text-[#000080]'
+                ]"
+                :aria-current="currentPage === page ? 'page' : undefined"
+                :aria-label="`Go to page ${page}`"
               >
-                #{{ kw }}
-              </span>
+                {{ page }}
+              </a>
             </div>
-          </div>
 
-          <!-- Card Specs footer -->
-          <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-[10.5px] font-mono text-slate-400">
-            <div class="flex items-center gap-1.5 text-slate-500 font-semibold">
-              <User class="h-3.5 w-3.5 text-[#000080]" />
-              <span class="font-sans text-[11px] font-bold text-slate-700">{{ blog.author }}</span>
-            </div>
-            
-            <span class="flex items-center text-[#138808] font-black uppercase tracking-wider gap-0.5 group-hover:translate-x-1 transition-transform">
-              <span>Read Guide</span>
-              <ChevronRight class="h-4 w-4" />
-            </span>
-          </div>
+            <a
+              :href="`?page=${currentPage + 1}`"
+              @click.prevent="setPage(currentPage + 1)"
+              :class="[
+                'flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-[#000080] hover:bg-slate-50 transition-colors cursor-pointer',
+                currentPage === totalPages ? 'pointer-events-none opacity-40' : ''
+              ]"
+              aria-label="Go to next page"
+            >
+              <ArrowRight class="h-4 w-4" />
+            </a>
+          </nav>
         </div>
       </div>
 
@@ -664,6 +778,44 @@ const handleArticleClick = (e: MouseEvent) => {
               <RefreshCw class="h-3.5 w-3.5" />
               <span>Retry Quiz Exercises</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Related Content Engine Recommendation Grid -->
+        <div v-if="relatedBlogs.length > 0" class="border-t border-slate-200 pt-8 mt-8 space-y-4" id="related-articles-engine">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5 font-sans">
+              <Newspaper class="h-4 w-4 text-[#000080]" />
+              <span>Related High-Yield Syllabus Study Guides</span>
+            </h4>
+            <span class="text-[9px] font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-150 font-bold">
+              Contextual Recommendations
+            </span>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div 
+              v-for="relBlog in relatedBlogs" 
+              :key="relBlog.id"
+              @click="selectBlog(relBlog)"
+              class="bg-white hover:bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-[#000080]/35 hover:shadow-xs transition-all duration-200 text-left flex flex-col justify-between cursor-pointer group"
+            >
+              <div class="space-y-2">
+                <span class="text-[8px] font-mono text-[#000080] uppercase font-black bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                  {{ relBlog.category }}
+                </span>
+                <h5 class="text-[11px] font-black text-slate-800 group-hover:text-[#000080] transition-colors line-clamp-2 leading-tight font-sans">
+                  {{ relBlog.title }}
+                </h5>
+                <p class="text-[10px] text-slate-500 font-sans line-clamp-2 leading-relaxed">
+                  {{ relBlog.excerpt }}
+                </p>
+              </div>
+              <div class="pt-2.5 border-t border-slate-100 mt-2 flex items-center justify-between text-[9px] text-[#138808] font-black uppercase">
+                <span>Read Guide</span>
+                <ChevronRight class="h-3.5 w-3.5 transform group-hover:translate-x-0.5 transition-transform text-[#138808]" />
+              </div>
+            </div>
           </div>
         </div>
 
