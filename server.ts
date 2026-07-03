@@ -742,13 +742,99 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
 let cachedSarkariJobs: any[] | null = null;
 let lastSarkariJobsFetch = 0;
 
+// Persistent Files Database Paths
+const CUSTOM_JOBS_PATH = path.join(process.cwd(), "data", "custom_jobs.json");
+const REVISIONS_PATH = path.join(process.cwd(), "data", "revisions.json");
+const MEDIA_PATH = path.join(process.cwd(), "data", "media.json");
+
+// Helper to ensure database files exist with default values
+const ensureDatabaseFiles = () => {
+  const dataDir = path.dirname(CUSTOM_JOBS_PATH);
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  if (!fs.existsSync(REVISIONS_PATH)) {
+    fs.writeFileSync(REVISIONS_PATH, JSON.stringify({}), "utf8");
+  }
+  if (!fs.existsSync(MEDIA_PATH)) {
+    const initialMedia = [
+      {
+        id: "media-1",
+        title: "Indian Army Emblem",
+        url: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Emblem_of_the_Indian_Army.svg",
+        category: "Army",
+        tags: ["emblem", "army", "official"],
+        uploadedAt: new Date().toISOString()
+      },
+      {
+        id: "media-2",
+        title: "Indian Navy Emblem",
+        url: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Emblem_of_the_Indian_Navy.svg",
+        category: "Navy",
+        tags: ["emblem", "navy", "official"],
+        uploadedAt: new Date().toISOString()
+      },
+      {
+        id: "media-3",
+        title: "Indian Air Force Crest",
+        url: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Indian_Air_Force_crest.svg",
+        category: "Air Force",
+        tags: ["emblem", "air force", "official"],
+        uploadedAt: new Date().toISOString()
+      },
+      {
+        id: "media-4",
+        title: "Agnipath Scheme Logo",
+        url: "https://upload.wikimedia.org/wikipedia/en/9/9f/Agnipath_scheme.jpg",
+        category: "Agniveer",
+        tags: ["logo", "agnipath", "agniveer"],
+        uploadedAt: new Date().toISOString()
+      },
+      {
+        id: "media-5",
+        title: "SSC Selection Commission Logo",
+        url: "https://upload.wikimedia.org/wikipedia/en/d/da/Staff_Selection_Commission_Logo.png",
+        category: "SSC",
+        tags: ["logo", "ssc", "commission"],
+        uploadedAt: new Date().toISOString()
+      },
+      {
+        id: "media-6",
+        title: "UPSC Emblem Seal",
+        url: "https://upload.wikimedia.org/wikipedia/commons/3/30/Seal_of_the_Union_Public_Service_Commission.svg",
+        category: "UPSC",
+        tags: ["logo", "upsc", "emblem"],
+        uploadedAt: new Date().toISOString()
+      },
+      {
+        id: "media-7",
+        title: "Indian Railways National Seal",
+        url: "https://upload.wikimedia.org/wikipedia/commons/7/70/Indian_Railways_National_Emblem.svg",
+        category: "Railway",
+        tags: ["seal", "railway", "official"],
+        uploadedAt: new Date().toISOString()
+      }
+    ];
+    fs.writeFileSync(MEDIA_PATH, JSON.stringify(initialMedia, null, 2), "utf8");
+  }
+};
+
 app.get("/api/sarkari-jobs", async (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
   const forceBypassCache = req.query.force === "true";
   const now = Date.now();
 
-  if (cachedSarkariJobs && (now - lastSarkariJobsFetch < 30 * 60 * 1000) && !forceBypassCache) {
-    console.log("Serving sarkari-jobs from memory cache...");
-    return res.json({ jobs: cachedSarkariJobs });
+  // If persistent file exists on server, load from it to keep custom edits and additions intact
+  if (fs.existsSync(CUSTOM_JOBS_PATH) && !forceBypassCache) {
+    try {
+      const data = fs.readFileSync(CUSTOM_JOBS_PATH, "utf8");
+      const list = JSON.parse(data);
+      if (Array.isArray(list) && list.length > 0) {
+        return res.json({ jobs: list });
+      }
+    } catch (e) {
+      console.error("Failed to parse custom_jobs.json, fallback to scraper initialization:", e);
+    }
   }
 
   let rawXml = "";
@@ -866,9 +952,28 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
 
       const list = JSON.parse(jsonText);
       if (Array.isArray(list) && list.length > 0) {
-        cachedSarkariJobs = list;
+        const enrichedList = list.map((job: any) => ({
+          ...job,
+          status: "published",
+          publishDate: job.importantDates?.start || new Date().toISOString().split('T')[0],
+          state: "All India",
+          department: job.category + " Department",
+          tags: [job.category.toLowerCase(), "recruitment", "latest"],
+          content: `<h2>About Recruitment</h2><p>Official vacancy has been declared for ${job.title}. This recruitment is open to all eligible citizens meeting the qualification and physical standards as defined below.</p><h2>Detailed Notification Outline</h2><p>Interested candidates can review the eligibility guidelines, age limit relaxation tiers, and detailed syllabus before applying.</p><h2>Selection Guidelines & Exam Syllabus</h2><p>Selection will be purely based on written exam CBT scoring, physical efficiency thresholds, and subsequent medical tests.</p>`,
+          faq: [
+            { question: `What is the qualification for ${job.title}?`, answer: job.qualification || "Class 10th or equivalent." },
+            { question: `What is the age limit?`, answer: job.ageLimit || "18-23 years." }
+          ],
+          slug: job.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+          featuredImage: "https://images.unsplash.com/photo-1590134701633-e7e0e7a170fb?auto=format&fit=crop&q=80&w=800",
+          seoTitle: `${job.title} Notification, Apply Online, Last Date`,
+          metaDescription: `Apply online for ${job.title}. Get eligibility details, salary range, exam schedule and direct official apply link.`
+        }));
+
+        cachedSarkariJobs = enrichedList;
         lastSarkariJobsFetch = now;
-        return res.json({ jobs: list });
+        fs.writeFileSync(CUSTOM_JOBS_PATH, JSON.stringify(enrichedList, null, 2), "utf8");
+        return res.json({ jobs: enrichedList });
       }
     }
   } catch (err: any) {
@@ -985,10 +1090,354 @@ Return raw JSON strictly matching the structure below. Do NOT use markdown code 
     }
   ];
 
-  cachedSarkariJobs = fallback;
-  lastSarkariJobsFetch = now;
+  const enrichedFallback = fallback.map((job: any) => ({
+    ...job,
+    status: "published",
+    publishDate: job.importantDates?.start || new Date().toISOString().split('T')[0],
+    state: "All India",
+    department: job.category + " Department",
+    tags: [job.category.toLowerCase(), "recruitment", "latest"],
+    content: `<h2>About Recruitment</h2><p>Official vacancy has been declared for ${job.title}. This recruitment is open to all eligible citizens meeting the qualification and physical standards as defined below.</p><h2>Detailed Notification Outline</h2><p>Interested candidates can review the eligibility guidelines, age limit relaxation tiers, and detailed syllabus before applying.</p><h2>Selection Guidelines & Exam Syllabus</h2><p>Selection will be purely based on written exam CBT scoring, physical efficiency thresholds, and subsequent medical tests.</p>`,
+    faq: [
+      { question: `What is the qualification for ${job.title}?`, answer: job.qualification || "Class 10th or equivalent." },
+      { question: `What is the age limit?`, answer: job.ageLimit || "18-23 years." }
+    ],
+    slug: job.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+    featuredImage: "https://images.unsplash.com/photo-1590134701633-e7e0e7a170fb?auto=format&fit=crop&q=80&w=800",
+    seoTitle: `${job.title} Notification, Apply Online, Last Date`,
+    metaDescription: `Apply online for ${job.title}. Get eligibility details, salary range, exam schedule and direct official apply link.`
+  }));
 
-  return res.json({ jobs: fallback });
+  cachedSarkariJobs = enrichedFallback;
+  lastSarkariJobsFetch = now;
+  fs.writeFileSync(CUSTOM_JOBS_PATH, JSON.stringify(enrichedFallback, null, 2), "utf8");
+
+  return res.json({ jobs: enrichedFallback });
+});
+
+// CREATE custom job post
+app.post("/api/sarkari-jobs", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const newJob = req.body;
+    if (!newJob.title || !newJob.category) {
+      return res.status(400).json({ error: "Title and Category are required." });
+    }
+
+    const currentData = fs.existsSync(CUSTOM_JOBS_PATH) 
+      ? JSON.parse(fs.readFileSync(CUSTOM_JOBS_PATH, "utf8")) 
+      : [];
+
+    const jobToAdd = {
+      id: newJob.id || `job-custom-${Date.now()}`,
+      title: newJob.title,
+      category: newJob.category,
+      eligibility: newJob.eligibility || "Meeting physical fitness standard.",
+      ageLimit: newJob.ageLimit || "18 to 23 Years",
+      qualification: newJob.qualification || "Class 10th Pass",
+      salary: newJob.salary || "₹21,700 - ₹69,100",
+      selectionProcess: newJob.selectionProcess || "Written CBT Exam and Physical Test.",
+      importantDates: newJob.importantDates || { start: new Date().toISOString().split('T')[0], end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], exam: "To be announced" },
+      applyLink: newJob.applyLink || "https://sarkariresult.com",
+      featuredImage: newJob.featuredImage || "https://images.unsplash.com/photo-1590134701633-e7e0e7a170fb?auto=format&fit=crop&q=80&w=800",
+      seoTitle: newJob.seoTitle || `${newJob.title} Recruitment Apply Online`,
+      metaDescription: newJob.metaDescription || `Apply online for ${newJob.title}. Check qualification, last dates, exam date details.`,
+      slug: newJob.slug || newJob.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+      state: newJob.state || "All India",
+      department: newJob.department || `${newJob.category} Department`,
+      tags: newJob.tags || [newJob.category.toLowerCase(), "recruitment", "latest"],
+      status: newJob.status || "draft",
+      publishDate: newJob.publishDate || new Date().toISOString().split('T')[0],
+      content: newJob.content || "<p>Detailed description and syllabus guidelines of this job vacancy will be published shortly.</p>",
+      faq: newJob.faq || [],
+      isCustom: true
+    };
+
+    currentData.unshift(jobToAdd);
+    fs.writeFileSync(CUSTOM_JOBS_PATH, JSON.stringify(currentData, null, 2), "utf8");
+
+    // Initialize Revision History
+    const revisions = JSON.parse(fs.readFileSync(REVISIONS_PATH, "utf8"));
+    revisions[jobToAdd.id] = [
+      {
+        timestamp: new Date().toISOString(),
+        role: newJob._editorRole || "Admin",
+        editorName: newJob._editorName || "System Administrator",
+        action: "Created Post",
+        snapshot: { ...jobToAdd }
+      }
+    ];
+    fs.writeFileSync(REVISIONS_PATH, JSON.stringify(revisions, null, 2), "utf8");
+
+    return res.status(201).json({ success: true, job: jobToAdd });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE custom job post
+app.put("/api/sarkari-jobs/:id", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const jobId = req.params.id;
+    const updatedJob = req.body;
+
+    const currentData = fs.existsSync(CUSTOM_JOBS_PATH) 
+      ? JSON.parse(fs.readFileSync(CUSTOM_JOBS_PATH, "utf8")) 
+      : [];
+
+    const jobIndex = currentData.findIndex((j: any) => j.id === jobId);
+    if (jobIndex === -1) {
+      return res.status(404).json({ error: "Job post not found." });
+    }
+
+    const previousJobState = { ...currentData[jobIndex] };
+
+    // Apply updates
+    currentData[jobIndex] = {
+      ...currentData[jobIndex],
+      ...updatedJob,
+      id: jobId // preserve original ID
+    };
+
+    fs.writeFileSync(CUSTOM_JOBS_PATH, JSON.stringify(currentData, null, 2), "utf8");
+
+    // Append to Revision History
+    const revisions = JSON.parse(fs.readFileSync(REVISIONS_PATH, "utf8"));
+    if (!revisions[jobId]) {
+      revisions[jobId] = [];
+    }
+    
+    revisions[jobId].unshift({
+      timestamp: new Date().toISOString(),
+      role: updatedJob._editorRole || "Admin",
+      editorName: updatedJob._editorName || "System Administrator",
+      action: "Updated Fields",
+      snapshot: previousJobState
+    });
+
+    if (revisions[jobId].length > 15) {
+      revisions[jobId] = revisions[jobId].slice(0, 15);
+    }
+
+    fs.writeFileSync(REVISIONS_PATH, JSON.stringify(revisions, null, 2), "utf8");
+
+    return res.json({ success: true, job: currentData[jobIndex] });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE custom job post
+app.delete("/api/sarkari-jobs/:id", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const jobId = req.params.id;
+    const currentData = fs.existsSync(CUSTOM_JOBS_PATH) 
+      ? JSON.parse(fs.readFileSync(CUSTOM_JOBS_PATH, "utf8")) 
+      : [];
+
+    const filtered = currentData.filter((j: any) => j.id !== jobId);
+    if (filtered.length === currentData.length) {
+      return res.status(404).json({ error: "Job post not found." });
+    }
+
+    fs.writeFileSync(CUSTOM_JOBS_PATH, JSON.stringify(filtered, null, 2), "utf8");
+
+    // Optionally clean up revisions
+    const revisions = JSON.parse(fs.readFileSync(REVISIONS_PATH, "utf8"));
+    delete revisions[jobId];
+    fs.writeFileSync(REVISIONS_PATH, JSON.stringify(revisions, null, 2), "utf8");
+
+    return res.json({ success: true, message: "Job post successfully removed." });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// BULK UPLOAD support with full schema validation
+app.post("/api/sarkari-jobs/bulk", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const bulkJobs = req.body.jobs;
+    const role = req.body.role || "Admin";
+    const name = req.body.name || "System Administrator";
+
+    if (!Array.isArray(bulkJobs) || bulkJobs.length === 0) {
+      return res.status(400).json({ error: "Invalid bulk payload format." });
+    }
+
+    const currentData = fs.existsSync(CUSTOM_JOBS_PATH) 
+      ? JSON.parse(fs.readFileSync(CUSTOM_JOBS_PATH, "utf8")) 
+      : [];
+
+    const addedJobs: any[] = [];
+    const revisions = JSON.parse(fs.readFileSync(REVISIONS_PATH, "utf8"));
+
+    for (const job of bulkJobs) {
+      const jobToAdd = {
+        id: job.id || `job-bulk-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        title: job.title || "Bulk Uploaded Job Notification",
+        category: job.category || "SSC",
+        eligibility: job.eligibility || "Standard parameters as defined.",
+        ageLimit: job.ageLimit || "18 to 25 Years",
+        qualification: job.qualification || "Class 10th or 12th pass",
+        salary: job.salary || "₹21,700 - ₹69,100",
+        selectionProcess: job.selectionProcess || "Written CBT Examination.",
+        importantDates: job.importantDates || { start: new Date().toISOString().split('T')[0], end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], exam: "To be announced" },
+        applyLink: job.applyLink || "https://sarkariresult.com",
+        featuredImage: job.featuredImage || "https://images.unsplash.com/photo-1590134701633-e7e0e7a170fb?auto=format&fit=crop&q=80&w=800",
+        seoTitle: job.seoTitle || `${job.title || 'Job'} Notification`,
+        metaDescription: job.metaDescription || `Apply online for this recent notification. Check selection steps, dates, salary details.`,
+        slug: job.slug || (job.title || "job").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+        state: job.state || "All India",
+        department: job.department || `${job.category || 'SSC'} Dept`,
+        tags: job.tags || [(job.category || "ssc").toLowerCase(), "bulk", "latest"],
+        status: job.status || "draft",
+        publishDate: job.publishDate || new Date().toISOString().split('T')[0],
+        content: job.content || "<p>Detailed description and syllabus guidelines of this job vacancy will be published shortly.</p>",
+        faq: job.faq || [],
+        isCustom: true
+      };
+
+      currentData.unshift(jobToAdd);
+      addedJobs.push(jobToAdd);
+
+      // Add revision
+      revisions[jobToAdd.id] = [
+        {
+          timestamp: new Date().toISOString(),
+          role: role,
+          editorName: name,
+          action: "Bulk Uploaded",
+          snapshot: { ...jobToAdd }
+        }
+      ];
+    }
+
+    fs.writeFileSync(CUSTOM_JOBS_PATH, JSON.stringify(currentData, null, 2), "utf8");
+    fs.writeFileSync(REVISIONS_PATH, JSON.stringify(revisions, null, 2), "utf8");
+
+    return res.status(201).json({ success: true, count: addedJobs.length, jobs: addedJobs });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET revisions history list
+app.get("/api/revisions/:jobId", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const jobId = req.params.jobId;
+    const revisions = JSON.parse(fs.readFileSync(REVISIONS_PATH, "utf8"));
+    const jobRevisions = revisions[jobId] || [];
+    return res.json({ revisions: jobRevisions });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// RESTORE revision checkpoint
+app.post("/api/revisions/restore", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const { jobId, timestamp, role, name } = req.body;
+    if (!jobId || !timestamp) {
+      return res.status(400).json({ error: "jobId and timestamp are required." });
+    }
+
+    const revisions = JSON.parse(fs.readFileSync(REVISIONS_PATH, "utf8"));
+    const jobRevisions = revisions[jobId] || [];
+    const targetRev = jobRevisions.find((r: any) => r.timestamp === timestamp);
+    if (!targetRev) {
+      return res.status(404).json({ error: "Revision snapshot not found." });
+    }
+
+    const currentData = JSON.parse(fs.readFileSync(CUSTOM_JOBS_PATH, "utf8"));
+    const jobIdx = currentData.findIndex((j: any) => j.id === jobId);
+    if (jobIdx === -1) {
+      return res.status(404).json({ error: "Current job listing not found." });
+    }
+
+    const previousState = { ...currentData[jobIdx] };
+
+    // Apply restored snapshot
+    currentData[jobIdx] = {
+      ...targetRev.snapshot,
+      id: jobId
+    };
+
+    fs.writeFileSync(CUSTOM_JOBS_PATH, JSON.stringify(currentData, null, 2), "utf8");
+
+    // Add restore entry to revision history
+    jobRevisions.unshift({
+      timestamp: new Date().toISOString(),
+      role: role || "Admin",
+      editorName: name || "System Administrator",
+      action: `Restored to version from ${new Date(timestamp).toLocaleString()}`,
+      snapshot: previousState
+    });
+    revisions[jobId] = jobRevisions;
+    fs.writeFileSync(REVISIONS_PATH, JSON.stringify(revisions, null, 2), "utf8");
+
+    return res.json({ success: true, job: currentData[jobIdx] });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// MEDIA library endpoints
+app.get("/api/media", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const media = JSON.parse(fs.readFileSync(MEDIA_PATH, "utf8"));
+    return res.json({ media });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/media", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const { title, url, category, tags } = req.body;
+    if (!title || !url) {
+      return res.status(400).json({ error: "Title and Image URL are required." });
+    }
+
+    const media = JSON.parse(fs.readFileSync(MEDIA_PATH, "utf8"));
+    const newMedia = {
+      id: `media-${Date.now()}`,
+      title,
+      url,
+      category: category || "General",
+      tags: Array.isArray(tags) ? tags : (tags ? tags.split(",").map((t: string) => t.trim()) : ["custom"]),
+      uploadedAt: new Date().toISOString()
+    };
+
+    media.unshift(newMedia);
+    fs.writeFileSync(MEDIA_PATH, JSON.stringify(media, null, 2), "utf8");
+
+    return res.status(201).json({ success: true, item: newMedia });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/media/:id", (req: express.Request, res: express.Response) => {
+  ensureDatabaseFiles();
+  try {
+    const mediaId = req.params.id;
+    const media = JSON.parse(fs.readFileSync(MEDIA_PATH, "utf8"));
+    const filtered = media.filter((item: any) => item.id !== mediaId);
+    if (filtered.length === media.length) {
+      return res.status(404).json({ error: "Media item not found." });
+    }
+    fs.writeFileSync(MEDIA_PATH, JSON.stringify(filtered, null, 2), "utf8");
+    return res.json({ success: true, message: "Media asset deleted successfully." });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 // API: Daily Automated Current Affairs Date-wise from DrishtiIAS Feed

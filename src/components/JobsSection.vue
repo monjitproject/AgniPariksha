@@ -373,8 +373,50 @@ const handleDeletePost = (id: string) => {
             </div>
           </div>
 
-          <div v-if="filteredJobs().length === 0" class="text-center py-10 bg-gray-50 rounded-xl">
-            <p class="text-xs text-gray-500 italic">No recruitment found.</p>
+          <div v-if="filteredJobs().length === 0" class="p-5 bg-amber-50/50 border border-amber-100 rounded-xl text-left space-y-4 animate-fade-in" id="jobs-empty-state-guidance">
+            <div class="flex items-start space-x-2.5">
+              <span class="bg-amber-100 text-amber-800 p-1.5 rounded-lg flex-shrink-0">
+                <Search class="h-5 w-5 text-amber-700" />
+              </span>
+              <div>
+                <h6 class="font-extrabold text-[14px] text-amber-900 leading-tight">No Active Recruitment Found</h6>
+                <p class="text-[11.5px] text-amber-800/85 leading-relaxed mt-1">
+                  We couldn't find any active recruitment postings matching your search query or selected category. Here is expert guidance and related links to continue your preparation:
+                </p>
+              </div>
+            </div>
+
+            <!-- Actionable Tips -->
+            <div class="bg-white p-3 rounded-lg border border-amber-200 text-[11px] text-gray-700 space-y-1.5">
+              <span class="font-bold text-gray-900 uppercase block tracking-wider font-mono text-[9px]">💡 Recommended Steps</span>
+              <ul class="list-disc list-inside space-y-1">
+                <li v-if="searchTerm">
+                  <button @click="searchTerm = ''" class="text-blue-700 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer">Clear search term</button> to see all available vacancies.
+                </li>
+                <li v-if="selectedCategory !== 'All'">
+                  <button @click="selectedCategory = 'All'" class="text-blue-700 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer">Switch to 'All Categories'</button> for wider listings.
+                </li>
+                <li>
+                  Click the <button @click="fetchJobs(true)" class="text-orange-700 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer">Research & Publish Live</button> button to fetch the latest SarkariResult feed.
+                </li>
+              </ul>
+            </div>
+
+            <!-- Helpful Navigation Guides -->
+            <div class="space-y-2">
+              <span class="font-bold text-gray-400 uppercase block tracking-wider font-mono text-[9px]">📚 Related Career Portals</span>
+              <div class="grid grid-cols-1 gap-1.5">
+                <button 
+                  v-for="cat in ['SSC', 'Railway', 'Banking', 'Police', 'Defence', 'Teaching']" 
+                  :key="cat"
+                  @click="selectedCategory = cat; searchTerm = ''"
+                  class="w-full text-left p-2.5 bg-white hover:bg-slate-50 border border-gray-150 rounded-lg text-xs font-semibold text-gray-700 flex justify-between items-center transition-colors cursor-pointer"
+                >
+                  <span>🎓 {{ cat }} Comprehensive Guide & Exam Blueprint</span>
+                  <ExternalLink class="h-3.5 w-3.5 text-gray-400" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

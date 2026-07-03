@@ -270,6 +270,7 @@ const articlesData = {
     title: "SSC GD Constable 2026 Recruitment Notification: Apply Online for 45,284 Vacancies, Syllabus & Exam Date",
     shortTitle: "SSC GD Constable 2026",
     intro: `The Staff Selection Commission (SSC) has released the authoritative and final recruitment directive for <strong>General Duty (GD) Constable</strong> vacancies for the year 2026. This mega recruitment notification offers a historic tally of <strong>45,284 vacancies</strong> inside highly prominent central paramilitary forces (CAPFs) including BSF, CISF, CRPF, ITBP, SSB, SSF, and Assam Rifles. This selection pipeline serves as one of the most reliable and respected career launching pads for matriculate youth across India seeking durable government service. Sourced directly from official Gazette notifications, we make this guide 100% transparent and fact-checked to shield aspirants from malicious speculative websites. Under the modern <strong>7th Central Pay Commission (CPC) Pay Matrix Level-3</strong>, starting salary brackets are accompanied by robust Dearness Allowance multipliers, free boarding facilities, and healthcare coverage for dependents. Applications must be deposited strictly via the authorized digital window of ssc.gov.in.`,
+    whyMatters: "The SSC GD 2026 recruitment represents one of the largest employment announcements in recent history, releasing 45,284 vacancies. For millions of young matriculates from rural and semi-urban India, this recruitment is not merely a job listing; it is an economic lifeline, a path to financial stability, and a prestigious opportunity to serve the country in uniforms of BSF, CISF, and CRPF. The long-term career safety, complete lack of corporate volatility, housing allowances, free comprehensive medical treatment, and central pension backing under the NPS make this selection highly prized. Preparing for this recruitment is an investment that transforms family livelihoods across generations.",
     organization: "Staff Selection Commission (SSC), Ministry of Home Affairs",
     vacancies: "45,284 Vacancies (40,275 Male & 5,009 Female posts)",
     payScale: "Pay Level-3 (Rs. 21,700 to Rs. 69,100) under 7th Pay Commission with Dearness Allowances",
@@ -301,6 +302,7 @@ const articlesData = {
         { name: "English / Hindi language section", questions: "20", marks: "40" }
       ]
     },
+    syllabusOverview: "The comprehensive syllabus overview details the precise topics candidates must focus on to clear the CBT written exam:\n\n• General Intelligence & Reasoning: Analogy, classification, spatial visualization, coding-decoding, series completion, blood relations, and non-verbal reasoning patterns.\n• General Knowledge & General Awareness: Indian History, Culture, Geography, Economic Scene, General Polity, Indian Constitution, General Science (Physics, Chemistry, Biology up to 10th level), and national/international current events.\n• Elementary Mathematics: Number Systems, Computation of Whole Numbers, Decimals & Fractions, Relationship between Numbers, Fundamental Arithmetical Operations, Percentages, Ratio & Proportion, Averages, Interest, Profit & Loss, Discount, Mensuration, Time & Distance, and Time & Work.\n• English / Hindi: Spotting the error, fill in the blanks, synonyms, antonyms, spelling detection, idioms & phrases, one-word substitution, improvement of sentences, and reading comprehension passage analysis.",
     salaryBenefits: "Under the Seventh Pay Commission guidelines, the Constable (GD) rank is designated in Pay Level 3 matrix. Starting base pay is Rs. 21,700, with maximum index stretching up to Rs. 69,100. Over and above this, candidates are entitled to: Dearness Allowance (DA) current multiplier rate, House Rent Allowance (HRA) categorized by City tier (X, Y, Z), Transport Allowance (TA), Free Uniform Allowances, Ration Money allowances, and subsidized Central Government Health Scheme (CGHS) benefits.",
     appFee: "Rs. 100 for General/OBC/EWS males. Scheduled Castes (SC), Scheduled Tribes (ST), Ex-Servicemen (ESM), and all Female candidates are 100% exempted from paying any fee.",
     dates: [
@@ -335,6 +337,12 @@ const articlesData = {
       "Read Daily Current Affairs: Solve the bilingual quizzes on AgniPariksha every morning to score high in General Awareness.",
       "Attempt Daily Mocks: Solve at least 3 full-length time-boxed mock tests per week under 60-minute strict restrictions.",
       "Maintain Physical Fitness: Do not ignore physical running; practice early morning 5km pacing alongside written preparation."
+    ],
+    commonMistakes: [
+      "Over-attempting Questions with Guesswork: Since there is a negative penalty of 0.25 marks, blindly guessing answers in the mathematics and reasoning sections can severely damage your raw score.",
+      "Neglecting English/Hindi Grammar Basics: Many candidates assume the language section is easy and skip practicing core grammar rules, resulting in high error rates in error-spotting questions.",
+      "Delaying Physical Practice Until Written Results: The most tragic error is passing the written exam but failing the 5km run because of lack of cardiovascular preparation. Physical training must be done in parallel with written prep.",
+      "Using Stale General Knowledge Reference Guides: Studying outdated static GK books will not prepare you for current affairs questions on recent treaties, economic changes, or defense exercises."
     ],
     faqs: [
       {
@@ -378,6 +386,7 @@ const articlesData = {
     title: "Indian Army Agniveer Rally Recruitment 2026: Online Notification, Vacancies, Selection Process & Rally Dates",
     shortTitle: "Army Agniveer 2026",
     intro: `The Indian Army has announced the fresh notification for recruitment of youth as <strong>Agniveers</strong> under the visionary <strong>Agnipath Scheme</strong> for the financial year 2026. This selection program seeks to recruit thousands of passionate, young patriots across various trades including General Duty (GD), Technical, Clerk/Store Keeper Technical, and Tradesmen (10th & 8th pass). Under this national service scheme, selected Agniveers will serve for a tenure of four years, during which they will receive fully-paid comprehensive training, customizable insurance envelopes, and a highly lucrative <strong>Seva Nidhi Package</strong> totaling over Rs. 11.71 Lakhs upon retirement. Additionally, a highly competitive 25% of the outgoing cohort will be permanently absorbed into the regular cadres of the Indian Army based on merit metrics. Applications are hosted exclusively online via joinindianarmy.nic.in, backed by state-of-the-art automated recruitment rallies across all army ZRO/ARO hubs.`,
+    whyMatters: "The Agnipath Scheme for Indian Army recruits represents a monumental shift in national military service. Securing a berth as an Agniveer is an unmatched opportunity for young patriots to gain world-class tactical training, elite physical standard capabilities, and an active career on the frontline of our national defense. Additionally, the final payout of the Seva Nidhi Package (amounting to over Rs. 11.71 Lakhs tax-free) serves as a stellar financial launchpad for young recruits to start entrepreneurial ventures, pursue professional education, or establish agricultural assets. For those selected in the 25% permanent absorption quota, it is the ultimate entry into the regular standing forces of the Indian Army.",
     organization: "Indian Army, Ministry of Defence (Government of India)",
     vacancies: "Estimated 25,000+ across all Army Recruiting Offices (AROs)",
     payScale: "Rs. 30,000 to Rs. 40,000 monthly consolidated pay plus Seva Nidhi corpus",
@@ -407,6 +416,7 @@ const articlesData = {
         { name: "Logical Reasoning (तर्कशक्ति)", questions: "5", marks: "10" }
       ]
     },
+    syllabusOverview: "The Agniveer written examination syllabus is highly structured and focuses on foundational science and arithmetic:\n\n• General Knowledge: Indian history, geography, constitution, international boundaries, sports, awards, major international institutions, and military defense forces.\n• General Science: Basic high school physics, chemistry, and biology topics including human anatomy, periodic table laws, work, power, energy, and environmental sciences.\n• Mathematics: Numbers, HCF/LCM, fractions, ratios, percentages, average, profit & loss, simple & compound interest, basic algebra, geometry, and trigonometric concepts.\n• Logical Reasoning: Direct relational puzzles, direction-sense tests, number series, alphabet coding, and analogical classification.",
     salaryBenefits: "Agniveers are compensated on a customized monthly salary scale: 1st Year: Rs. 30,000 consolidated; 2nd Year: Rs. 33,000; 3rd Year: Rs. 36,500; 4th Year: Rs. 40,000. Under the Seva Nidhi Scheme, 30% of monthly pay is contributed to a retirement corpus matching an identical grant from the Government of India, culminating in an interest-free payment of Rs. 11.71 Lakhs. It also includes free boarding, life insurance cover of Rs. 48 Lakhs, and military medical amenities.",
     appFee: "Rs. 250 registration charge, plus transaction gateway convenience fees, payable online through integrated net banking or card portals.",
     dates: [
@@ -441,6 +451,12 @@ const articlesData = {
       "Master Speed Calculations: Practice mental math and elementary calculations to save precious time inside the CEE.",
       "Build Physical Endurance: PFT requires completing 1.6km in less than 5 minutes and 30 seconds for Group-I status (60 marks). Run regularly.",
       "Solve CEE Sample papers: Attempt the online sample tests daily on AgniPariksha to match real-time test difficulty."
+    ],
+    commonMistakes: [
+      "Sprinting Too Early in the 1.6km Run: Rallies are extremely crowded. Sprinting right from the start line exhausts candidates within the first 400 meters. Pacing yourself across the four laps is critical to qualify.",
+      "Sloppy Documentation at the Rally Site: Many candidates are disqualified before they even run because of missing signatures, unverified stamp layouts on character certificates, or misspelled names in domicile proofs.",
+      "Ignoring the Common Entrance Exam (CEE) Difficulty: Assuming that the physical rally is the only tough part is a mistake. The CEE is now the first filtering stage, meaning academic preparation is absolutely mandatory to qualify.",
+      "Concealing Past Injuries or Minor Medical Conditions: Not seeking professional consultation for minor issues like earwax blockages, knock-knees, or dental cavities beforehand can lead to immediate temporary rejection during the DME."
     ],
     faqs: [
       {
@@ -822,6 +838,17 @@ watch(viewMode, () => {
             </p>
           </section>
 
+          <!-- Why This Recruitment Matters -->
+          <section class="space-y-3 bg-indigo-50/20 p-5 border border-indigo-100/50 rounded-2xl" id="doc-whymatters">
+            <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-1.5 border-b border-indigo-100/30 pb-1.5">
+              <span class="bg-[#000080] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono">★</span>
+              Why This Recruitment Matters / इस भर्ती का सामाजिक एवं आर्थिक महत्व
+            </h3>
+            <p class="leading-relaxed text-xs sm:text-sm text-slate-650 font-medium">
+              {{ activeArticle.whyMatters }}
+            </p>
+          </section>
+
           <!-- 4. Vacancy Details -->
           <section class="space-y-3" id="doc-vacancies">
             <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
@@ -940,6 +967,17 @@ watch(viewMode, () => {
                 <strong class="text-amber-900 block font-sans">Mandatory Timing & Negative Penalty Rules:</strong>
                 <span>CBT Written Exam Window is strictly timed for <strong>{{ activeArticle.examPattern.duration }}</strong>. Beware that a negative marking of <strong>{{ activeArticle.examPattern.negativeMark }}</strong> will apply to each wrong answer selection. Plan your guesses with maximum caution.</span>
               </div>
+            </div>
+          </section>
+
+          <!-- Syllabus Overview -->
+          <section class="space-y-3" id="doc-syllabustopics">
+            <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+              <span class="bg-[#000080] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono">06A</span>
+              Detailed Syllabus Overview / विस्तृत विषय-वार पाठ्यक्रम विवरण
+            </h3>
+            <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl whitespace-pre-line text-xs leading-relaxed text-slate-650 font-medium font-sans">
+              {{ activeArticle.syllabusOverview }}
             </div>
           </section>
 
@@ -1168,6 +1206,31 @@ watch(viewMode, () => {
                 <p class="text-xs text-slate-650 font-semibold leading-relaxed">
                   {{ tip }}
                 </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Common Mistakes Section -->
+          <section class="space-y-3" id="doc-commonmistakes">
+            <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+              <span class="bg-[#000080] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono">14A</span>
+              Common Mistakes to Avoid / अभ्यर्थियों द्वारा की जाने वाली सामान्य गलतियाँ
+            </h3>
+            <div class="grid grid-cols-1 gap-3.5">
+              <div 
+                v-for="(mistake, idx) in activeArticle.commonMistakes" 
+                :key="idx"
+                class="p-4 bg-red-50/45 border border-red-200/55 rounded-2xl flex items-start gap-3"
+              >
+                <div class="w-6 h-6 bg-red-600 text-white flex items-center justify-center rounded-full text-xs font-black shrink-0 mt-0.5">
+                  ✕
+                </div>
+                <div>
+                  <h4 class="font-bold text-red-950 text-xs font-mono leading-none mb-1">Critical Mistake #{{ idx + 1 }}</h4>
+                  <p class="text-xs text-slate-650 font-medium leading-relaxed">
+                    {{ mistake }}
+                  </p>
+                </div>
               </div>
             </div>
           </section>

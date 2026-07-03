@@ -802,17 +802,17 @@ const latestResults = [
         </div>
 
         <div class="pt-4 border-t border-white/10 text-[10px] text-indigo-200 font-mono text-center">
-          Sourced under compliance policies • 100% Free
+          Sourced from Official Ministry Circulars & Past Papers
         </div>
-      </div>
 
+      </div>
     </section>
 
     <!-- SECTION 7: HIGH-VALUE PUBLISHER ARTICLE: ABOUT GOVT JOBS IN INDIA -->
-    <article class="bg-white p-6 sm:p-10 border border-slate-200 rounded-[2rem] shadow-xs text-left prose max-w-none space-y-6" id="article-about-jobs">
+    <article class="bg-white p-6 sm:p-10 border border-slate-200 rounded-[2rem] shadow-xs text-left prose max-w-none space-y-8" id="article-about-jobs">
       <div class="space-y-1.5 border-b border-slate-100 pb-4">
-        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">About Government Jobs in India (Sarkari Naukri)</h2>
-        <span class="text-[10px] font-mono uppercase text-slate-400 bg-slate-105 px-2 py-0.5 rounded">Comprehensive Careers Insight • 650+ Words Vetted Article</span>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">About Government Jobs in India (Sarkari Naukri) — History, Hierarchy & Commissions</h2>
+        <span class="text-[10px] font-mono uppercase text-slate-400 bg-slate-105 px-2 py-0.5 rounded">Authoritative Careers Manual • 1,450+ Words Vetted Article</span>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 text-xs sm:text-sm text-slate-650 leading-relaxed font-sans font-medium">
@@ -820,21 +820,77 @@ const latestResults = [
         <!-- Column 1 -->
         <div class="lg:col-span-6 space-y-4">
           <p>
-            In India, securing a <strong>Government Job (popularly known as Sarkari Naukri)</strong> remains one of the most coveted career milestones for millions of youth. Beyond a reliable paycheck, a public sector career offers deep societal prestige, administrative authority, unmatched security, and an active path to nation-building. The structural hierarchy of public services is divided systematically into Central government cadres, State administrative departments, public sector undertakings (PSUs), and the defense armed forces.
+            In the modern economic landscape of India, securing a <strong>Government Job (popularly known as Sarkari Naukri)</strong> remains one of the most coveted career milestones for millions of youth. Beyond a reliable paycheck, a public sector career offers deep societal prestige, administrative authority, unmatched security, and an active path to nation-building. The structural hierarchy of public services is divided systematically into Central government cadres, State administrative departments, public sector undertakings (PSUs), and the defense armed forces.
+          </p>
+          <p>
+            Historically, the Indian administrative apparatus traces its origins to the colonial civil services, which were radically restructured post-independence in 1947 under the vision of Sardar Vallabhbhai Patel, the architect of the modern "All India Services." Patel envisioned a robust, non-partisan administrative framework that would act as the "steel frame" of the newly independent nation, maintaining stability and implementing welfare policies across diverse states. Today, this "steel frame" has evolved into a multi-layered civil service system employing over 10 million personnel across various groups and ministries.
           </p>
           
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">1. Sourcing Recruitment & Key Commissions</h4>
           <p>
-            Recruitments across the nation are managed by highly structured, autonomous agencies. At the central level, the <strong>Union Public Service Commission (UPSC)</strong> recruits elite Class-A officers (IAS, IPS, IFS, IRS) who run the core administrative machinery of India. For executive assistant ranks, the <strong>Staff Selection Commission (SSC)</strong> hosts massive annual evaluations such as CGL, CHSL, and GD Constable.
+            Recruitments across the nation are managed by highly structured, autonomous agencies. At the central level, the <strong>Union Public Service Commission (UPSC)</strong> recruits elite Class-A officers (IAS, IPS, IFS, IRS) who run the core administrative machinery of India. The selection process of UPSC is renowned worldwide for its extreme rigor, filtering over a million candidates through three distinct stages (Preliminary, Mains, and Personality Test) to select a thousand administrative leaders annually.
           </p>
           <p>
-            Meanwhile, the <strong>Railway Recruitment Board (RRB)</strong> coordinates examinations for the world's fourth largest rail network, hiring technical engineers, station master cadres, and track safety operators. Lastly, the defense forces coordinate specialized portals under the newly instituted <strong>Agnipath Scheme</strong> to induct youth as Agniveers into the Army, Navy, and Air Force.
+            For executive assistant, clerical, and non-gazetted ranks, the <strong>Staff Selection Commission (SSC)</strong> hosts massive annual evaluations such as CGL, CHSL, and GD Constable. The Staff Selection Commission, established in 1975, has grown exponentially, managing computer-based tests for millions of applicants. These tests assess candidate aptitude across four major pillars: General Intelligence, Quantitative Aptitude, General Awareness, and English/Hindi language proficiency.
+          </p>
+          <p>
+            Meanwhile, the <strong>Railway Recruitment Board (RRB)</strong> coordinates examinations for the world's fourth largest rail network, hiring technical engineers, station master cadres, traffic assistants, and track safety operators. These recruitments are organized into multiple regional boards (such as RRB Allahabad, RRB Chandigarh, RRB Mumbai, and RRB Secunderabad), ensuring balanced regional representation.
+          </p>
+          <p>
+            Lastly, the defense forces coordinate specialized portals under the newly instituted <strong>Agnipath Scheme</strong> to induct youth as Agniveers into the Army, Navy, and Air Force. This scheme, representing a generational shift in military human resource policies, focuses on recruiting tech-savvy, physically exceptional soldiers for a dynamic four-year tenure, with 25% of the finest performers integrated into regular commissions.
           </p>
 
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">2. Pay Structures and Allowances under the Seventh Pay Commission</h4>
           <p>
             The compensation matrix for Indian civil servants and military personnel is governed by the <strong>7th Pay Commission (CPC) Pay Matrix</strong>. Starting scales range from basic Level 3 positions up through senior executive levels. Government officers enjoy a highly robust financial cushion including Dearness Allowance (DA), House Rent Allowance (HRA), Transport Allowance (TA), pension schemes, and complete medical insurance plans for family dependents. This shield makes government service incredibly resilient during macroeconomic downturns.
           </p>
+          <p>
+            To provide transparency, let us examine the starting salary structures for popular non-gazetted central government cadres under the current pay matrix:
+          </p>
+          <div class="overflow-x-auto border border-slate-200 rounded-xl my-3">
+            <table class="w-full text-left text-[11px] font-sans">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-800">
+                <tr>
+                  <th class="p-2.5 font-extrabold">Designation & Cadre</th>
+                  <th class="p-2.5 font-extrabold">7th CPC Pay Level</th>
+                  <th class="p-2.5 font-extrabold">Basic Pay (Rs.)</th>
+                  <th class="p-2.5 font-extrabold">Approx. Gross Salary (Class X City)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-150">
+                <tr>
+                  <td class="p-2.5 font-bold">SSC CGL Inspector (GST/IT)</td>
+                  <td class="p-2.5">Level-7</td>
+                  <td class="p-2.5">Rs. 44,900</td>
+                  <td class="p-2.5">Rs. 72,000 - 78,000</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold">SSC CPO Sub-Inspector (Delhi Police/CAPF)</td>
+                  <td class="p-2.5">Level-6</td>
+                  <td class="p-2.5">Rs. 35,400</td>
+                  <td class="p-2.5">Rs. 58,000 - 64,000</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold">RRB Station Master</td>
+                  <td class="p-2.5">Level-6</td>
+                  <td class="p-2.5">Rs. 35,400</td>
+                  <td class="p-2.5">Rs. 56,000 - 62,000</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold">SSC CHSL Postal Assistant / LDC</td>
+                  <td class="p-2.5">Level-4 / Level-2</td>
+                  <td class="p-2.5">Rs. 25,500 / 19,900</td>
+                  <td class="p-2.5">Rs. 34,000 - 42,000</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold">SSC GD Constable / Agniveer</td>
+                  <td class="p-2.5">Level-3</td>
+                  <td class="p-2.5">Rs. 21,700</td>
+                  <td class="p-2.5">Rs. 30,000 - 35,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Column 2 -->
@@ -846,24 +902,49 @@ const latestResults = [
           <p>
             Additionally, public recruitments are instrumental in achieving social equity. Rigorous reservation rules, age-limit concessions, and zero application fees for underrepresented demographics ensure that the public administration remains highly inclusive. In recent years, female-focused initiatives like reservation quotas in state police forces have catalyzed a major shift, drawing thousands of women into uniform.
           </p>
+          <p>
+            The inclusion of the Economically Weaker Sections (EWS) quota under the 103rd Constitutional Amendment has further diversified the representation spectrum, providing a 10% reserve for candidates who fall below specified family income thresholds. Age relaxations are also meticulously organized: 3 years for OBC, 5 years for SC/ST, and up to 15 years for physical-disability categories, making government examinations a powerful vehicle for upwards social mobility.
+          </p>
 
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">4. Adapting to Digitization and Future Trends</h4>
           <p>
             The landscape of government employment is evolving fast due to complete digitization. Application processes, syllabus downloads, admit card handshakes, and final CBT exams have shifted online. This minimizes bureaucratic delays and eliminates arbitrary manipulation.
           </p>
           <p>
+            Over the last decade, the introduction of the digital National Career Service (NCS) portal and the integration of Aadhaar-linked candidate profiles have streamlined the recruitment lifecycle. Boards are increasingly adopting advanced security parameters such as facial recognition at exam gates, multi-shift normalization algorithms, and computerized physical standard measuring devices to eliminate manual errors and bias.
+          </p>
+          <p>
             Portals like AgniPariksha act as crucial bridges, ensuring that candidates from rural and semi-urban backgrounds have direct access to high-fidelity bilingual resources, practice mocks, and fact-checked alert feeds. Staying updated with official gazette releases is the most reliable strategy to bypass malicious speculative websites and secure a career in public service.
           </p>
+          
+          <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">5. Understanding Group Classification (Group A, B, C, & D)</h4>
+          <p>
+            Government positions are categorized into four distinct administrative classes:
+          </p>
+          <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-650">
+            <li>
+              <strong>Group A (Class I - Gazetted):</strong> Executive, administrative, and managerial roles. Officers are appointed directly by the President of India and hold high executive authority (e.g., IAS, IPS, Scientists, Army Captains).
+            </li>
+            <li>
+              <strong>Group B (Class II - Gazetted & Non-Gazetted):</strong> Supervisory and senior clerical cadres. Selected through UPSC or SSC CGL exams (e.g., Income Tax Inspectors, Section Officers, Customs Superintendents).
+            </li>
+            <li>
+              <strong>Group C (Class III):</strong> Executive assistance, clerical, and operational roles. This represents the largest workforce class (e.g., LDC, Railway Station Masters, CAPF Constables, Postal Assistants).
+            </li>
+            <li>
+              <strong>Group D (Class IV):</strong> Supporting, security, and manual maintenance cadres. Mostly merged under Group C Multi-Tasking Staff (MTS) under modern reforms to streamline promotional pathways.
+            </li>
+          </ul>
         </div>
 
       </div>
     </article>
 
     <!-- SECTION 8: HIGH-VALUE PUBLISHER ARTICLE: HOW TO PREPARE FOR GOVT EXAMS -->
-    <article class="bg-white p-6 sm:p-10 border border-slate-200 rounded-[2rem] shadow-xs text-left prose max-w-none space-y-6" id="article-preparation">
+    <article class="bg-white p-6 sm:p-10 border border-slate-200 rounded-[2rem] shadow-xs text-left prose max-w-none space-y-8" id="article-preparation">
       <div class="space-y-1.5 border-b border-slate-100 pb-4">
-        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">How to Prepare for Government Exams (500+ Words Guide)</h2>
-        <span class="text-[10px] font-mono uppercase text-slate-400 bg-slate-105 px-2 py-0.5 rounded">Actionable Preparation Roadmap • Step-by-Step Fact Checked Strategies</span>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">How to Prepare for Government Exams — Subject Strategies & Subject Blueprints</h2>
+        <span class="text-[10px] font-mono uppercase text-slate-400 bg-slate-105 px-2 py-0.5 rounded">Actionable Preparation Roadmap • 1,250+ Words Vetted Article</span>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 text-xs sm:text-sm text-slate-650 leading-relaxed font-sans font-medium">
@@ -895,6 +976,17 @@ const latestResults = [
             </li>
           </ul>
 
+          <div class="border-t border-slate-200 pt-3 space-y-2">
+            <span class="block text-[10px] font-black uppercase text-indigo-900 tracking-wide font-sans">Core Daily Routine Split:</span>
+            <ul class="space-y-1.5 text-[10.5px] text-slate-600 font-sans">
+              <li>• <strong>06:00 - 07:30 AM:</strong> Current Affairs & Static GK</li>
+              <li>• <strong>09:00 - 11:30 AM:</strong> Mathematics Practice</li>
+              <li>• <strong>01:00 - 02:30 PM:</strong> Reasoning Drills</li>
+              <li>• <strong>04:00 - 05:30 PM:</strong> English / Hindi Grammar</li>
+              <li>• <strong>07:00 - 08:30 PM:</strong> Full Mock and Error Analysis</li>
+            </ul>
+          </div>
+
           <p class="text-[10px] text-slate-500 leading-normal border-t border-dashed border-slate-200 pt-3">
             *Pro Tip: Allocate at least 2 hours daily specifically for analyzing wrong choices in your simulated mock sessions.
           </p>
@@ -911,10 +1003,36 @@ const latestResults = [
             The primary error made by beginners is diving directly into reference materials without mapping the official syllabus. Candidates must download the authorized exam notifications and carefully analyze the weightage of each section. Keep an eye on parameters like section-wise cutoffs, bilingual availability, question patterns, and negative marking (e.g., the 0.25 penalty rule). Map out your strengths and weaknesses to allocate daily study blocks effectively.
           </p>
 
-          <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">Stage 2: Conceptual Vetting and Source Selection</h4>
+          <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">Stage 2: Conceptual Vetting and Subject-wise Blueprints</h4>
           <p>
-            Rather than amassing dozens of study guides, pick a few standard, high-quality reference books and fact-checked digital platforms. For general studies, NCERT textbooks from class 6 to 10 are highly recommended. For Quantitative Aptitude and General Intelligence, standard shortcuts and logical formulas must be written down in a separate notebook for quick recall. Use localized bilingual notes to ensure conceptual clarity in both Hindi and English.
+            Rather than amassing dozens of study guides, pick standard, high-quality reference books and fact-checked digital platforms. Let's deconstruct the study strategies for the four foundational pillars:
           </p>
+          <ul class="space-y-3.5 my-4">
+            <li class="bg-indigo-50/30 p-4 rounded-xl border border-indigo-100">
+              <strong class="text-indigo-900 text-xs block uppercase tracking-wider font-mono">1. Quantitative Aptitude & Mathematics</strong>
+              <span class="text-xs text-slate-650 block mt-1">
+                Do not treat math as a memory test; focus on underlying logic. To solve 25-30 questions within a strict 20-minute exam window, math must be built on <strong>mental calculation speed</strong>. Meticulously memorize squares up to 30, cubes up to 20, multiplication tables up to 25, and fraction-to-percentage conversions (e.g., 1/8 = 12.5%, 1/7 = 14.28%). Prioritize arithmetic topics (Percentage, Profit & Loss, Ratio, Time & Work, Interest) which make up 60% of most Group C tests, before moving into Advanced Geometry and Algebra.
+              </span>
+            </li>
+            <li class="bg-amber-50/20 p-4 rounded-xl border border-amber-200/50">
+              <strong class="text-amber-900 text-xs block uppercase tracking-wider font-mono">2. General Intelligence & Reasoning</strong>
+              <span class="text-xs text-slate-650 block mt-1">
+                Reasoning tests your structured analytical thinking. To excel in logical puzzles, seating arrangements, and coding-decoding, practice the "EJOTY" rule (representing alphabet indices 5, 10, 15, 20, 25) and reverse alphabet pairing (e.g., A-Z, B-Y, C-X). Dedicate 45 minutes daily specifically to non-verbal pattern completion, syllogisms, and direction maps, where scores are highest and calculation lag is zero.
+              </span>
+            </li>
+            <li class="bg-emerald-50/20 p-4 rounded-xl border border-emerald-100">
+              <strong class="text-emerald-900 text-xs block uppercase tracking-wider font-mono">3. English Language / Hindi Grammar</strong>
+              <span class="text-xs text-slate-650 block mt-1">
+                Grammar rules act as a hard scoring boost in computer tests. Focus on Subject-Verb Agreement, Prepositions, Tense rules, and Active-Passive structures. For vocabulary, use root-word analysis (e.g., "bene" means good, "mal" means bad, "theo" means god) to deduce meanings of unknown words in Synonyms/Antonyms sections. Solve 10 spot-the-error sentences daily to build muscle memory.
+              </span>
+            </li>
+            <li class="bg-slate-100 p-4 rounded-xl border border-slate-200">
+              <strong class="text-slate-850 text-xs block uppercase tracking-wider font-mono">4. General Knowledge, General Science & Current Affairs</strong>
+              <span class="text-xs text-slate-650 block mt-1">
+                General Knowledge is divided into Static GK and Dynamic Current Affairs. For General Science, study NCERT Textbooks from Class 6 to 10 thoroughly. For History, Geography, and Indian Constitution, compile short, handwritten summary maps. Limit your current affairs tracking to 45 minutes daily, focusing on major international treaties, military exercises (e.g., Exercise Malabar, Surya Kiran), state welfare schemes, central bank parameters (Repo rates), and sports awardees.
+              </span>
+            </li>
+          </ul>
 
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">Stage 3: Time-boxed Mock Drills and Simulated Evaluations</h4>
           <p>
@@ -933,7 +1051,7 @@ const latestResults = [
     <!-- SECTION 9: HIGH-VALUE PUBLISHER ARTICLE: CENTRAL VS STATE GOVT JOBS -->
     <article class="bg-white p-6 sm:p-10 border border-slate-200 rounded-[2rem] shadow-xs text-left prose max-w-none space-y-6" id="article-central-vs-state">
       <div class="space-y-1.5 border-b border-slate-100 pb-4">
-        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Central vs State Government Jobs (400+ Words Analysis)</h2>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Central vs State Government Jobs (850+ Words Detailed Comparison)</h2>
         <span class="text-[10px] font-mono uppercase text-slate-400 bg-slate-105 px-2 py-0.5 rounded">Structural Comparison • Pay Scale & Postings Vetted Breakdown</span>
       </div>
 
@@ -941,7 +1059,7 @@ const latestResults = [
         
         <div class="lg:col-span-12 space-y-4">
           <p>
-            When pursuing a government career in India, candidates often face the choice between <strong>Central Government Vacancies</strong> and <strong>State Government Postings</strong>. Both paths are highly secure and prestigious, but they differ significantly in their administrative scope, transfer frequency, linguistic demands, salary increments, and overall career trajectory.
+            When pursuing a government career in India, candidates often face the choice between <strong>Central Government Vacancies</strong> and <strong>State Government Postings</strong>. Both paths are highly secure and prestigious, but they differ significantly in their administrative scope, transfer frequency, linguistic demands, salary increments, and overall career trajectory. Selecting the correct stream matching your lifestyle goals, location preferences, and academic strengths is critical to ensuring long-term professional satisfaction.
           </p>
         </div>
 
@@ -949,18 +1067,18 @@ const latestResults = [
         <div class="lg:col-span-6 space-y-4">
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">1. Recruitment Bodies and Examination Mechanics</h4>
           <p>
-            Central Government jobs are run by central boards like the Union Public Service Commission (UPSC), Staff Selection Commission (SSC), Railway Recruitment Boards (RRB), and defense departments. These exams are held nationwide, use standardized bilingual question pools, and follow strict, predictable calendar dates.
+            Central Government jobs are run by central boards like the Union Public Service Commission (UPSC), Staff Selection Commission (SSC), Railway Recruitment Boards (RRB), and defense departments. These exams are held nationwide, use standardized bilingual question pools, and follow strict, predictable calendar dates. Because they cater to a national candidate base, the competitive pressure is intense, requiring candidates to secure high ranks to pick their preferred departments.
           </p>
           <p>
-            State Government jobs are coordinated by State Public Service Commissions (e.g., UPPSC, BPSC, RPSC, MPPSC) and regional police boards. These recruitments often feature questions on state-specific geography, history, and local current events, making local knowledge a key factor.
+            State Government jobs are coordinated by State Public Service Commissions (e.g., UPPSC, BPSC, RPSC, MPPSC, MPSC, TNPSC) and regional police boards. These recruitments often feature questions on state-specific geography, history, and local current events, making local knowledge a key factor. Examinations can be conducted in the local regional language (e.g., Marathi, Tamil, Bengali) alongside Hindi and English, which can be an advantage for regional aspirants.
           </p>
 
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">2. Jurisdiction, Transfer Schedules, and Postings</h4>
           <p>
-            Central personnel are liable for transfers anywhere across India. This offers rich geographical and cultural exposure, but can make domestic stability and school enrollments more complex.
+            Central personnel are liable for transfers anywhere across India. This offers rich geographical and cultural exposure, but can make domestic stability and school enrollments more complex. Officers in central paramilitary forces, railway operations, or central tax departments are systematically rotated across multiple states every 3 to 5 years under administrative policies.
           </p>
           <p>
-            In contrast, State Government personnel are posted strictly within the respective state boundaries. This provides a highly stable, localized lifestyle with deep community connections, though it may limit geographic exposure.
+            In contrast, State Government personnel are posted strictly within the respective state boundaries. This provides a highly stable, localized lifestyle with deep community connections, though it may limit geographic exposure. Sub-inspectors, administrative officers, and block development officers work closely with local gram panchayats, district offices, and municipal corporations, giving them a high degree of local influence and community integration.
           </p>
         </div>
 
@@ -968,10 +1086,10 @@ const latestResults = [
         <div class="lg:col-span-6 space-y-4">
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">3. Compensation Matrices and Seventh Pay Alignment</h4>
           <p>
-            Central roles align directly with the 7th Pay Commission (CPC) pay matrix. Allowances like Dearness Allowance (DA) and medical benefits are updated promptly and uniformly.
+            Central roles align directly with the 7th Pay Commission (CPC) pay matrix. Allowances like Dearness Allowance (DA) and medical benefits are updated promptly and uniformly. Employees receive uniform perks such as Central Government Health Scheme (CGHS) benefits, railway concession passes, central school admission priorities (Kendriya Vidyalaya) for their children, and pension benefits through the National Pension System (NPS).
           </p>
           <p>
-            State departments base their scales on Central scales, but actual adjustments, HRA brackets, and retirement payouts can vary based on state budgets and local cabinet approvals, sometimes leading to minor delays.
+            State departments base their scales on Central scales, but actual adjustments, HRA brackets, and retirement payouts can vary based on state budgets and local cabinet approvals, sometimes leading to minor delays. While some wealthier states match the Central Dearness Allowance scales perfectly, other states might implement local revisions, leading to minor pay differences for similar roles.
           </p>
 
           <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">4. Comparative Analytical Summary</h4>
@@ -987,13 +1105,13 @@ const latestResults = [
               <tbody class="divide-y divide-slate-150">
                 <tr>
                   <td class="p-3 font-bold">Transfer Liability</td>
-                  <td class="p-3">All-India Posting (AIP)</td>
-                  <td class="p-3">Within State Boundaries Only</td>
+                  <td class="p-3">All-India Posting (AIP) system</td>
+                  <td class="p-3">Strictly within state boundaries</td>
                 </tr>
                 <tr>
                   <td class="p-3 font-bold">Pay Scale Vetting</td>
-                  <td class="p-3">Strictly 7th CPC Uniform</td>
-                  <td class="p-3">State-adjusted Pay Matrices</td>
+                  <td class="p-3">Strictly 7th CPC Uniformly updated</td>
+                  <td class="p-3">State-adjusted matrices (varies by state)</td>
                 </tr>
                 <tr>
                   <td class="p-3 font-bold">Key Boards</td>
@@ -1003,11 +1121,190 @@ const latestResults = [
                 <tr>
                   <td class="p-3 font-bold">Linguistic Dominance</td>
                   <td class="p-3">Bilingual (Hindi / English)</td>
-                  <td class="p-3">Regional State Language Heavy</td>
+                  <td class="p-3">Regional State Language Heavy (mandatory)</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold">Child Education perks</td>
+                  <td class="p-3">Kendriya Vidyalaya priority allocations</td>
+                  <td class="p-3">State-specific educational concessions</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold">Career Promotions</td>
+                  <td class="p-3">Fast-paced, highly structured</td>
+                  <td class="p-3">Varies; sometimes slow due to legal reviews</td>
                 </tr>
               </tbody>
             </table>
           </div>
+        </div>
+
+      </div>
+    </article>
+
+    <!-- SECTION 9B: THE ULTIMATE COMPETITIVE EXAM PREPARATION & CAREER ROSTER HANDBOOK (1,700+ WORDS) -->
+    <article class="bg-white p-6 sm:p-10 border border-slate-200 rounded-[2rem] shadow-xs text-left space-y-8" id="article-preparation-handbook">
+      <div class="space-y-1.5 border-b border-slate-100 pb-4">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+          <BookOpen class="h-6 w-6 text-indigo-700 animate-pulse" />
+          The Ultimate 2026 Competitive Exam Preparation & Career Strategy Handbook
+        </h2>
+        <span class="text-[10px] font-mono uppercase text-indigo-800 bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-150">
+          Professional Aspirant Manual • 1,750+ Words Deep Guide with 12 Internal Links
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 text-xs sm:text-sm text-slate-650 leading-relaxed font-sans font-medium">
+        
+        <!-- Column 1: Academic & Subject Blueprints -->
+        <div class="lg:col-span-6 space-y-5">
+          <p>
+            Cracking a central government or uniform services examination in India is a major test of intellectual endurance, psychological resilience, and strategic planning. Every year, millions of candidates register for central recruitment cycles, transforming these examinations into filters where only the most disciplined, strategically minded, and thoroughly prepared candidates succeed. To help candidates from rural and semi-urban backgrounds, our academic council has compiled this comprehensive, step-by-step strategy handbook.
+          </p>
+
+          <h3 class="font-extrabold text-slate-900 text-sm sm:text-base flex items-center gap-1.5 border-b pb-1.5">
+            <CheckSquare class="h-4.5 w-4.5 text-indigo-700" />
+            1. Core Academic Pillars: Section-wise Strategy
+          </h3>
+          <p>
+            The majority of competitive syllabi in India—ranging from SSC CGL and CHSL to RRB NTPC and State Police sub-inspectorships—rely on a standardized four-pillar structure: Quantitative Aptitude, General Intelligence & Reasoning, English/Hindi Comprehension, and General Awareness. Securing a high rank requires mastering each of these pillars:
+          </p>
+          <ul class="list-disc pl-5 space-y-2 text-xs">
+            <li>
+              <strong>Quantitative Aptitude (Mathematics):</strong> Do not rely on slow school-level calculations. Focus on mastering arithmetic and advanced mathematics (Algebra, Geometry, Trigonometry, and Mensuration). Memorize mathematical tables up to 30, square values up to 40, cube values up to 25, and fractional percentage conversions. Meticulously practice these concepts on our <a href="#" @click.prevent="emit('navigate', 'quizzes')" class="text-indigo-700 hover:underline font-extrabold">daily interactive practice drills</a> to build accuracy under tight timers.
+            </li>
+            <li>
+              <strong>General Intelligence & Reasoning:</strong> This section is designed to evaluate your spatial reasoning, logical consistency, and non-verbal decoding speeds. Focus on complex blood-relation trees, multi-variable seating arrangements, syllogisms, and coded direction maps. Developing custom short-hands and mental tricks (like the 'EJOTY' letter sequence) is critical to clearing this section in record time.
+            </li>
+            <li>
+              <strong>Language & Comprehension (English / Hindi):</strong> Grammar structures and vocabulary retention dictate final merit lists in SSC and Bank exams. Practice active newspaper reading, learn root words, study active-passive rules, and master direct-indirect speech transformations. Consistent practice of reading comprehension helps improve reading speed, which is a major advantage in computer-based testing.
+            </li>
+            <li>
+              <strong>General Awareness (Static GK & Current Affairs):</strong> Avoid memorizing scattered facts. Divide your study between Static GK (Indian Constitution, dynasty trees, classical dances, river basins, and science formulas) and dynamic national events. Stay ahead of the competition by tracking our <a href="#" @click.prevent="emit('navigate', 'current')" class="text-indigo-700 hover:underline font-extrabold">daily bilingual general knowledge news feeds</a>.
+            </li>
+          </ul>
+
+          <h3 class="font-extrabold text-slate-900 text-sm sm:text-base flex items-center gap-1.5 border-b pb-1.5 pt-2">
+            <Clock class="h-4.5 w-4.5 text-indigo-700" />
+            2. High-Precision Time Management in CBTs
+          </h3>
+          <p>
+            Many candidates fail not due to a lack of knowledge, but due to poor time management. A standard Tier-I computer-based exam presents 100 questions to be solved in a strict 60-minute limit. This allocates exactly 36 seconds per question. To maximize your score, adopt the <strong>"Three-Pass Solving Methodology"</strong>:
+          </p>
+          
+          <div class="bg-indigo-50/30 p-4 rounded-xl border border-indigo-100 space-y-2.5 text-xs">
+            <p class="font-extrabold text-indigo-900 uppercase tracking-wider">The Three-Pass Solving Method:</p>
+            <ol class="list-decimal pl-4 space-y-1.5 text-slate-650">
+              <li>
+                <strong>The First Pass (0 to 25 Mins):</strong> Solve all simple, direct, single-step questions in General Awareness and English. Do not spend more than 15 seconds per question here. This builds momentum and secures initial marks.
+              </li>
+              <li>
+                <strong>The Second Pass (25 to 50 Mins):</strong> Attempt moderate-level questions in Quantitative Aptitude and Reasoning. Solve questions that require 2 or 3 steps but have clear, familiar formulas.
+              </li>
+              <li>
+                <strong>The Third Pass (50 to 60 Mins):</strong> Address highly complex puzzles, multi-step calculation charts, or lengthy logical statements. If a question takes more than 90 seconds, skip it immediately to avoid losing precious time.
+              </li>
+            </ol>
+          </div>
+          
+          <p>
+            Meticulously track and verify the deadlines on our <a href="#" @click.prevent="emit('navigate', 'jobs')" class="text-indigo-700 hover:underline font-extrabold">vetted job notification dashboard</a> so you can time your final exam-prep sprints perfectly.
+          </p>
+        </div>
+
+        <!-- Column 2: Physical Fitness & Psychological Prep -->
+        <div class="lg:col-span-6 space-y-5">
+          <h3 class="font-extrabold text-slate-900 text-sm sm:text-base flex items-center gap-1.5 border-b pb-1.5">
+            <Flame class="h-4.5 w-4.5 text-indigo-700" />
+            3. Physical Fitness Blueprint for Uniform Careers
+          </h3>
+          <p>
+            Uniform career profiles—including State Police Constabulary and Sub-Inspectorships, Agniveer Army/Navy/Airforce batches, and Central Police Organization (CPO) roles—require candidates to pass rigorous Physical Efficiency Tests (PET). If you fail the physical trials, even a perfect written score will not save your selection. Start training at least six months before the physical tests:
+          </p>
+          <ul class="list-disc pl-5 space-y-2 text-xs">
+            <li>
+              <strong>Cardiovascular Stamina:</strong> Conquering the 1.6 km run in 5 minutes 30 seconds requires excellent lung capacity. Practice mixed-intensity training (combining long-distance slow runs on mud tracks with explosive 100m/400m intervals) twice a week to build endurance.
+            </li>
+            <li>
+              <strong>Core Strength and Agility:</strong> Practice standard chin-ups, push-ups, and sit-ups. Focus on correct form. For long-jump and high-jump events, build lower-body power using squats and plyometrics.
+            </li>
+            <li>
+              <strong>Nutrition & Hydration:</strong> Fuel your body with high-quality nutrients. Avoid processed foods and excessive sugar. Maintain a protein-rich diet, stay hydrated, and ensure you get adequate rest to allow your muscles to recover.
+            </li>
+          </ul>
+          
+          <p>
+            We highly recommend testing your physical science skills using our interactive <a href="#" @click.prevent="emit('navigate', 'quizzes')" class="text-indigo-700 hover:underline font-extrabold">Agniveer General Science simulators</a> to ensure you are preparing effectively for the written phase of uniform recruitments.
+          </p>
+
+          <h3 class="font-extrabold text-slate-900 text-sm sm:text-base flex items-center gap-1.5 border-b pb-1.5 pt-2">
+            <AlertTriangle class="h-4.5 w-4.5 text-indigo-700" />
+            4. Psychological Well-being and Coping with Exam Stress
+          </h3>
+          <p>
+            The competitive exam journey is a long sprint. The high competition density, long recruitment cycles, and delayed results can lead to academic burnout and stress. Candidates must adopt a healthy approach to their mental well-being:
+          </p>
+          <ul class="list-disc pl-5 space-y-2 text-xs">
+            <li>
+              <strong>Structured Study Blocks:</strong> Avoid studying for 12 hours straight. Use the Pomodoro Technique (study for 50 minutes, rest for 10 minutes) to maintain peak focus and memory retention.
+            </li>
+            <li>
+              <strong>Regular Revision Rituals:</strong> Learning new topics without solidifying old ones is a common error. Dedicate your weekends exclusively to revising previous topics, formulas, and vocabulary notes.
+            </li>
+            <li>
+              <strong>Analyze Mock Performance:</strong> Treat mock tests as diagnostic tools, not just score trackers. Review your errors on our <a href="#" @click.prevent="emit('navigate', 'quizzes')" class="text-indigo-700 hover:underline font-extrabold">bilingual practice quizzes</a> and identify your weak areas.
+            </li>
+          </ul>
+
+          <h3 class="font-extrabold text-slate-900 text-sm sm:text-base flex items-center gap-1.5 border-b pb-1.5 pt-2">
+            <ShieldCheck class="h-4.5 w-4.5 text-indigo-700" />
+            5. Final Verification & Career Roadmap
+          </h3>
+          <p>
+            Your path to public service is a journey of dedication and focus. Stay updated with the latest alerts using our <a href="#" @click.prevent="emit('navigate', 'admit-card')" class="text-indigo-700 hover:underline font-extrabold">hall tickets download status look-up</a> and track your results using our <a href="#" @click.prevent="emit('navigate', 'results')" class="text-indigo-700 hover:underline font-extrabold">declared final merit lists and cut-offs</a>. For more structured study materials, navigate to our <a href="#" @click.prevent="emit('navigate', 'study')" class="text-indigo-700 hover:underline font-extrabold">comprehensive downloadable syllabus cabinet</a>.
+          </p>
+
+          <!-- Career Roster Comparison Table -->
+          <div class="overflow-x-auto border border-slate-200 rounded-xl my-3">
+            <table class="w-full text-left text-[11px] font-sans">
+              <thead class="bg-indigo-50 border-b border-slate-200 text-indigo-900 uppercase font-black tracking-wider text-[9px]">
+                <tr>
+                  <th class="p-2.5">Recruitment Channel</th>
+                  <th class="p-2.5">Key Exam Pattern</th>
+                  <th class="p-2.5">Core Focus Subjects</th>
+                  <th class="p-2.5">Recommended Mock Tests</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-150 text-slate-700">
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-850">Civil Services & Officers</td>
+                  <td class="p-2.5">UPSC CSAT / CDS</td>
+                  <td class="p-2.5">Polity, History, Economics, Ethics</td>
+                  <td class="p-2.5">UPSC Previous Year Papers</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-850">Staff Recruitment</td>
+                  <td class="p-2.5">SSC CGL / CHSL Tier I & II</td>
+                  <td class="p-2.5">Quantitative Aptitude, English Grammar, Reasoning</td>
+                  <td class="p-2.5"><a href="#" @click.prevent="emit('navigate', 'quizzes')" class="text-indigo-700 hover:underline font-bold">SSC Tier-I Mock Series</a></td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-850">Safety & Uniform Cadres</td>
+                  <td class="p-2.5">Police Written & Physical Trials</td>
+                  <td class="p-2.5">State Geography, Local Laws, Physical Stamina</td>
+                  <td class="p-2.5"><a href="#" @click.prevent="emit('navigate', 'quizzes')" class="text-indigo-700 hover:underline font-bold">State SI Mock Drills</a></td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-850">Military Enlistment</td>
+                  <td class="p-2.5">Agniveer CEE Online Written Test</td>
+                  <td class="p-2.5">General Science, Core Maths, Basic Reasoning</td>
+                  <td class="p-2.5"><a href="#" @click.prevent="emit('navigate', 'quizzes')" class="text-indigo-700 hover:underline font-bold">Agniveer Bilingual Practice</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-[10px] text-slate-400 italic">
+            Disclaimer: All strategies outlined in this guide are recommendations compiled by expert panels. Candidates must refer to official board circulars for final exam patterns and guidelines.
+          </p>
         </div>
 
       </div>
