@@ -305,7 +305,7 @@ const latestResults = [
               @focus="showSearchResults = true"
               type="text"
               placeholder="Search mock tests, syllabus PDFs, or job vacancies (e.g., Agniveer, SSC GD)..."
-              class="w-full py-4 px-3 text-sm focus:outline-none placeholder-slate-400 font-sans text-slate-800"
+              class="w-full py-4 px-3 text-[17px] focus:outline-none placeholder:text-[16px] placeholder-slate-400 font-sans text-slate-800 search-input-field"
             />
             <button 
               v-if="searchQuery" 

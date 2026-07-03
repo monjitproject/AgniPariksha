@@ -56,23 +56,23 @@ const footerLinksGroup3 = [
               AGNI<span class="text-[#FF9933]">PARIKSHA</span>
             </span>
           </div>
-          <p class="text-xs text-gray-400 leading-relaxed font-sans">
+          <p class="text-[16px] text-gray-400 leading-relaxed font-sans">
             AgniPariksha.com is India's premier, fully integrated free GK quiz, simulated mock exams, and state job notification board. Designed systematically for Armed Forces, Agniveer, NDA, CDS, airmen, sailors and general civil candidates.
           </p>
-          <div class="flex space-x-3 text-xs" id="footer-accreditation">
-            <span class="bg-[#FF9933]/15 text-[#FF9933] px-2 py-1 rounded font-bold border border-[#FF9933]/30">🇮🇳 Pride of India</span>
-            <span class="bg-[#138808]/15 text-[#138808] px-2 py-1 rounded font-bold border border-[#138808]/30">✔ AdSense Compliant</span>
+          <div class="flex space-x-3 text-[15px]" id="footer-accreditation">
+            <span class="bg-[#FF9933]/15 text-[#FF9933] px-3 py-1 rounded-xl font-bold border border-[#FF9933]/30">🇮🇳 Pride of India</span>
+            <span class="bg-[#138808]/15 text-[#138808] px-3 py-1 rounded-xl font-bold border border-[#138808]/30">✔ AdSense Compliant</span>
           </div>
         </div>
 
         <!-- Quick Links -->
         <div id="footer-support-column">
-          <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4 border-l-2 border-[#FF9933] pl-2">Preparation Portal</h4>
-          <ul class="space-y-2 text-xs font-sans">
+          <h4 class="text-white font-bold text-[18px] uppercase tracking-wider mb-4 border-l-2 border-[#FF9933] pl-2">Preparation Portal</h4>
+          <ul class="space-y-3 text-[16px] font-sans footer-text">
             <li v-for="link in footerLinksGroup1" :key="link.id">
               <button
                 @click="handlePolicyClick(link.id)"
-                class="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
+                class="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer text-left"
               >
                 {{ link.name }}
               </button>
@@ -82,12 +82,12 @@ const footerLinksGroup3 = [
 
         <!-- Legal Compliance Block 1 -->
         <div id="footer-regulatory-column">
-          <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4 border-l-2 border-white pl-2">Legal Disclosures</h4>
-          <ul class="space-y-2 text-xs font-sans">
+          <h4 class="text-white font-bold text-[18px] uppercase tracking-wider mb-4 border-l-2 border-white pl-2">Legal Disclosures</h4>
+          <ul class="space-y-3 text-[16px] font-sans footer-text">
             <li v-for="link in footerLinksGroup2" :key="link.id">
               <button
                 @click="handlePolicyClick(link.id)"
-                class="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
+                class="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer text-left"
               >
                 {{ link.name }}
               </button>
@@ -97,12 +97,12 @@ const footerLinksGroup3 = [
 
         <!-- Legal Compliance Block 2 -->
         <div id="footer-editorial-column">
-          <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4 border-l-2 border-[#138808] pl-2">Trust & Sitemap</h4>
-          <ul class="space-y-2 text-xs font-sans">
+          <h4 class="text-white font-bold text-[18px] uppercase tracking-wider mb-4 border-l-2 border-[#138808] pl-2">Trust & Sitemap</h4>
+          <ul class="space-y-3 text-[16px] font-sans footer-text">
             <li v-for="link in footerLinksGroup3" :key="link.id">
               <button
                 @click="handlePolicyClick(link.id)"
-                class="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
+                class="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer text-left"
               >
                 {{ link.name }}
               </button>
@@ -112,7 +112,7 @@ const footerLinksGroup3 = [
                 href="/sitemap.xml" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                class="text-[#FF9933] hover:underline font-bold"
+                class="text-[#FF9933] hover:underline font-bold text-[16px]"
               >
                 XML Sitemap File ↗
               </a>

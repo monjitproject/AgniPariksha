@@ -455,7 +455,7 @@ const getFilteredPdfs = () => {
           id="pdf-search-input"
           v-model="searchTerm"
           placeholder="Search documents by title..."
-          class="w-full text-xs font-bold p-3 pl-10 border border-gray-200 rounded-xl focus:outline-none bg-gray-50"
+          class="w-full text-[17px] font-semibold p-3 pl-10 border border-gray-200 rounded-xl focus:outline-none bg-gray-50 placeholder:text-[16px] search-input-field"
         />
         <Search class="h-4.5 w-4.5 text-gray-400 absolute left-3.5 top-3.5" />
       </div>
@@ -884,9 +884,9 @@ const getFilteredPdfs = () => {
           <button
             id="btn-viewer-download"
             @click="handleDownloadPdf(viewingPdf)"
-            class="w-full bg-[#FF9933] hover:bg-[#dd8822] text-black font-black py-2.5 rounded-2xl text-[10px] uppercase flex items-center justify-center space-x-2 shadow-md transition-all active:scale-98 cursor-pointer focus:outline-none"
+            class="w-full bg-[#FF9933] hover:bg-[#dd8822] text-black font-semibold h-[52px] rounded-xl text-[17px] uppercase flex items-center justify-center space-x-2 shadow-md transition-all active:scale-98 cursor-pointer focus:outline-none pdf-download-btn"
           >
-            <Download class="h-4 w-4" />
+            <Download class="h-5 w-5 shrink-0" />
             <span>
               {{ downloadingId === viewingPdf.id 
                 ? `Downloading: ${downloadingProgress}%` 

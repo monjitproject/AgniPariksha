@@ -78,9 +78,9 @@ const handleNav = (tabId: string) => {
             :id="`nav-tab-${item.id}`"
             @click="handleNav(item.id)"
             :class="[
-              'px-3 py-2 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer',
+              'px-3.5 py-2.5 rounded-xl text-[16px] font-medium tracking-[0.2px] transition-all duration-200 cursor-pointer nav-desktop-item',
               (item.id === currentTab) || (item.id === 'current' && currentTab === 'study_not_used') || (item.id === 'mock-tests' && currentTab === 'quizzes_not_used')
-                ? 'bg-[#FF9933]/15 text-[#aa5500]'
+                ? 'bg-[#FF9933]/15 text-[#aa5500] font-semibold'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             ]"
           >
@@ -137,7 +137,7 @@ const handleNav = (tabId: string) => {
           <button
             id="btn-header-start-quiz"
             @click="handleNav('quizzes')"
-            class="bg-[#138808] hover:bg-[#117706] text-white text-sm font-extrabold px-5 py-2.5 rounded-xl shadow-md transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer ml-1"
+            class="bg-[#138808] hover:bg-[#117706] text-white text-[16px] font-semibold h-[48px] px-6 rounded-xl shadow-md transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer ml-1 btn-typography"
           >
             Start Quiz
           </button>
