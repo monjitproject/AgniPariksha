@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { 
   Menu, X, Shield, Award, BookOpen, 
-  Briefcase, FileText, LayoutDashboard, Globe, Bell
+  Briefcase, FileText, LayoutDashboard, Globe, Bell, UserCheck
 } from 'lucide-vue-next';
 
 interface HeaderProps {
@@ -26,11 +26,13 @@ const menuItems = [
   { id: 'home', label: 'Home', icon: Shield },
   { id: 'quizzes', label: 'Quizzes', icon: Award },
   { id: 'study', label: 'Study Material', icon: BookOpen },
-  { id: 'current', label: 'Current Affairs', icon: BookOpen },
   { id: 'jobs', label: 'Latest Jobs', icon: Briefcase },
+  { id: 'admit-card', label: 'Admit Cards', icon: FileText },
+  { id: 'results', label: 'Results', icon: Award },
   { id: 'pdfs', label: 'PDF Library', icon: FileText },
   { id: 'mock-tests', label: 'Mock Tests', icon: Shield },
   { id: 'blog', label: 'Blog', icon: Globe },
+  { id: 'authors', label: 'Authors', icon: UserCheck },
 ];
 
 const handleNav = (tabId: string) => {

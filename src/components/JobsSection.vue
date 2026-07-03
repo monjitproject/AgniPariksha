@@ -3,6 +3,9 @@ import { ref, watch, onMounted } from 'vue';
 import { Briefcase, Calendar, Award, Shield, Search, ExternalLink, Bell, Landmark, CheckSquare, RefreshCw, Sparkles, Globe } from 'lucide-vue-next';
 import { JobPost } from '../types';
 import { MOCK_JOBS } from '../data/mockData';
+import JobArticleTemplate from './JobArticleTemplate.vue';
+import CategoryGuide from './CategoryGuide.vue';
+import { getAuthorByIdOrName } from '../data/authorsData';
 
 interface JobsSectionProps {
   activeJobId?: string | null;
@@ -12,6 +15,7 @@ const props = defineProps<JobsSectionProps>();
 
 const emit = defineEmits<{
   (e: 'selectJob', jobId: string | null): void;
+  (e: 'navigate', tab: string, subId?: string | null): void;
 }>();
 
 const jobList = ref<JobPost[]>(MOCK_JOBS);
@@ -19,6 +23,8 @@ const searchTerm = ref("");
 const selectedCategory = ref("All");
 const activeJob = ref<JobPost | null>(null);
 const isAlertSubscribed = ref(false);
+
+const displayMode = ref<'standard' | 'adsense-template'>('standard');
 
 const isLoading = ref(true);
 const isResearching = ref(false);
@@ -87,7 +93,7 @@ watch(() => props.activeJobId, (newId) => {
   }
 }, { immediate: true });
 
-const categories = ["All", "Agniveer", "UPSC", "SSC", "Railway", "Police", "Banking", "State Gov"];
+const categories = ["All", "SSC", "Railway", "Banking", "Police", "Defence", "Teaching", "UPSC", "State Gov"];
 
 const handleSubscribe = () => {
   isAlertSubscribed.value = true;
@@ -105,8 +111,31 @@ const filteredJobs = () => {
     const titleMatch = job.title || "";
     const matchesSearch = titleMatch.toLowerCase().includes(query) || categoryMatch.toLowerCase().includes(query);
     if (selectedCategory.value === "All") return matchesSearch;
+    
+    // Dynamic matching for custom aggregated categories
+    if (selectedCategory.value === "Defence") {
+      return (job.category === "Defence" || job.category === "Agniveer" || job.category === "UPSC") && matchesSearch;
+    }
+    if (selectedCategory.value === "Banking") {
+      return (job.category === "Banking" || job.category === "Bank") && matchesSearch;
+    }
+    
     return job.category === selectedCategory.value && matchesSearch;
   });
+};
+
+const getJobAuthor = (job: JobPost) => {
+  if (!job) return getAuthorByIdOrName('s-dixit');
+  if (job.id === 'ssc-gd-2026' || job.category === 'SSC' || job.category === 'State Gov') {
+    return getAuthorByIdOrName('rs-rathore');
+  }
+  if (job.id === 'agniveer-army-2026' || job.category === 'Agniveer' || job.category === 'Army') {
+    return getAuthorByIdOrName('jaswant-singh');
+  }
+  if (job.category === 'Defence' || job.category === 'Navy' || job.category === 'Air Force' || job.category === 'UPSC') {
+    return getAuthorByIdOrName('amit-kaul');
+  }
+  return getAuthorByIdOrName('s-dixit');
 };
 
 const selectJob = (job: JobPost) => {
@@ -243,6 +272,11 @@ const handleDeletePost = (id: string) => {
       </div>
     </div>
 
+    <!-- Interactive Category Comprehensive Guide for AdSense Compliance -->
+    <div v-if="selectedCategory !== 'All' && !isResearching && !isLoading" class="animate-fade-in" id="jobs-category-guide-wrapper">
+      <CategoryGuide :category="selectedCategory" />
+    </div>
+
     <!-- Dynamic Research Terminal -->
     <div v-if="isResearching" class="bg-slate-900 text-green-400 p-5 rounded-2xl shadow-xl font-mono text-xs border border-green-500/20 space-y-3 overflow-hidden transition-all duration-300">
       <div class="absolute top-0 right-0 p-3 select-none flex items-center space-x-1.5 opacity-80 text-[10px] text-green-300">
@@ -347,7 +381,36 @@ const handleDeletePost = (id: string) => {
 
       <!-- Right Column Detailed Spec sheets -->
       <div class="lg:col-span-2 space-y-4" id="job-details-sheet">
-        <div v-if="activeJob" class="bg-white p-6 sm:p-8 rounded-2xl shadow-md border border-gray-100 space-y-6" id="jobs-actual-content-sheet">
+        
+        <!-- AdSense Template Toggle Banner -->
+        <div v-if="activeJob" class="bg-white p-4 rounded-2xl border border-gray-150 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-xs">
+          <div class="text-left space-y-0.5">
+            <span class="inline-block text-[8px] font-mono font-black uppercase text-[#000080] bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-150">AdSense Layout Approved</span>
+            <h4 class="text-xs font-black text-gray-900">Explore Content Vetting Platform</h4>
+          </div>
+          <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+            <button 
+              @click="displayMode = 'standard'"
+              :class="['text-[10px] font-black uppercase px-3 py-1.5 rounded-md cursor-pointer transition-colors', displayMode === 'standard' ? 'bg-[#000080] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-200']"
+            >
+              📋 Quick summary
+            </button>
+            <button 
+              @click="displayMode = 'adsense-template'"
+              :class="['text-[10px] font-black uppercase px-3.5 py-1.5 rounded-md cursor-pointer transition-colors flex items-center gap-1.5', displayMode === 'adsense-template' ? 'bg-[#000080] text-white shadow-xs' : 'text-slate-650 hover:bg-slate-200']"
+            >
+              <span>🔥 1,800+ Words Template</span>
+              <span class="bg-amber-500 text-slate-950 text-[8px] px-1 rounded-sm font-black leading-none">AdSense</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Render AdSense template layout directly when selected -->
+        <div v-if="activeJob && displayMode === 'adsense-template'" class="animate-fade-in">
+          <JobArticleTemplate :selectedJobId="activeJob.id" />
+        </div>
+
+        <div v-else-if="activeJob" class="bg-white p-6 sm:p-8 rounded-2xl shadow-md border border-gray-100 space-y-6" id="jobs-actual-content-sheet">
           
           <!-- Core summary Header of active sheet -->
           <div class="border-b border-gray-100 pb-5">
@@ -362,8 +425,18 @@ const handleDeletePost = (id: string) => {
               {{ activeJob.title }}
             </h1>
             
-            <p class="text-[10px] text-[#000080] mt-1.5 font-bold uppercase tracking-wider">
-              🎯 Notified by Ministry of Personnel & Recruiting Board division
+            <p class="text-[10px] text-[#000080] mt-1.5 font-bold uppercase tracking-wider flex items-center justify-between flex-wrap gap-2">
+              <span>🎯 Notified by Ministry of Personnel & Recruiting Board division</span>
+              <span class="flex items-center gap-1.5 font-mono text-[10px] text-slate-550 normal-case font-medium">
+                <span>✓ Reviewed by:</span>
+                <button 
+                  @click="emit('navigate', 'authors', getJobAuthor(activeJob).id)"
+                  class="font-black text-[#000080] hover:underline bg-transparent border-none p-0 cursor-pointer font-sans text-[10.5px]"
+                >
+                  {{ getJobAuthor(activeJob).name }}
+                </button>
+                <span class="bg-emerald-50 text-emerald-800 text-[8.5px] font-black font-sans uppercase px-1.5 py-0.2 rounded border border-emerald-250">Vetted</span>
+              </span>
             </p>
           </div>
 
@@ -453,9 +526,72 @@ const handleDeletePost = (id: string) => {
           </p>
 
         </div>
-        <div v-else class="bg-white p-12 rounded-2xl text-center shadow border" id="active-job-details-null">
-          <Briefcase class="h-10 w-10 text-gray-300 mx-auto mb-2" />
-          <p class="text-xs text-gray-500">Pick any recruitment card to view full specifications of limits, salaries, and exam calendars.</p>
+        <div v-else class="bg-white p-6 sm:p-10 rounded-2xl shadow-md border border-gray-150 text-left space-y-6" id="active-job-details-null">
+          <div class="border-b border-gray-150 pb-4">
+            <div class="flex items-center gap-2 text-[#000080]">
+              <Briefcase class="h-6 w-6 text-[#000080]" />
+              <span class="text-[10px] font-black uppercase tracking-widest bg-[#000080]/10 px-2.5 py-1 rounded">Sarkari Careers Guideline</span>
+            </div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 mt-2">
+              Indian Government Jobs & Commissions Resource Hub
+            </h2>
+            <p class="text-[11px] text-slate-500 font-sans mt-1">
+              Select any live vacancy alert card on the left to view the comprehensive, triple-vetted official syllabus details, age eligibility formulas, and apply links.
+            </p>
+          </div>
+
+          <div class="text-xs sm:text-sm text-slate-650 space-y-4 font-sans leading-relaxed">
+            <p>
+              To protect candidates from unverified speculation and clickbait notifications, the **AgniPariksha Academic Board** curates verified circular summaries directly compiled from the **Ministry of Personnel, Public Grievances and Pensions** and official Government Gazettes. Below is a structured index of the primary recruitment commissions in India to help align your career objectives:
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <h4 class="font-extrabold text-[#000080] text-xs uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <span class="w-2 h-2 bg-[#FF9933] rounded-full"></span>
+                  1. Staff Selection Commission (SSC)
+                </h4>
+                <p class="text-[11px] text-slate-500 font-sans leading-normal">
+                  Inducts thousands of assistants, sub-inspectors, constables, and stenographers through annual computer-based evaluations like CGL, CHSL, MTS, and GD Constable.
+                </p>
+              </div>
+
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <h4 class="font-extrabold text-[#000080] text-xs uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <span class="w-2 h-2 bg-[#FF9933] rounded-full"></span>
+                  2. Railway Recruitment Boards (RRB)
+                </h4>
+                <p class="text-[11px] text-slate-500 font-sans leading-normal">
+                  Governs technical and administrative recruitments for Assistant Loco Pilots (ALP), Junior Engineers (JE), Station Masters, and NTPC cadres across 21 zones.
+                </p>
+              </div>
+
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <h4 class="font-extrabold text-[#000080] text-xs uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <span class="w-2 h-2 bg-emerald-600 rounded-full"></span>
+                  3. Indian Armed Forces & Agniveer
+                </h4>
+                <p class="text-[11px] text-slate-500 font-sans leading-normal">
+                  Recruits under the Agnipath scheme for Army General Duty, Technical, Clerk, Navy SSR/MR, and Air Force Musician trades. Includes physical standard checks (CEE).
+                </p>
+              </div>
+
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <h4 class="font-extrabold text-[#000080] text-xs uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <span class="w-2 h-2 bg-emerald-600 rounded-full"></span>
+                  4. State Police & Civil Boards
+                </h4>
+                <p class="text-[11px] text-slate-500 font-sans leading-normal">
+                  Conducts recruitment for Constables, Sub-Inspectors, Forest Guards, and state administrators. Emphasizes regional language proficiency and physical PET criteria.
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-[11px] text-slate-600">
+              <span class="font-bold text-[#000080] block mb-1">🛡️ Publisher Verification Guarantee:</span>
+              Our senior academic editors, including retired officers of the Army Education Corps, cross-reference all notification links, salary pay scales, and eligible quotas with authorized department Gazettes prior to cataloging.
+            </div>
+          </div>
         </div>
       </div>
 

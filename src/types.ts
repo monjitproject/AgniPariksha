@@ -59,7 +59,7 @@ export interface BlogPost {
   id: string;
   title: string;
   excerpt: string;
-  category: "GK Articles" | "Exam Strategies" | "Jobs Updates" | "Study Tips" | "Current Affairs" | "Motivation";
+  category: string;
   content: string;
   author: string;
   date: string;

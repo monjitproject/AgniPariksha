@@ -485,9 +485,54 @@ const handlePublishNotes = async () => {
 
           </div>
 
-          <div v-else class="bg-white rounded-2xl p-12 text-center shadow border border-gray-100" id="reading-pane-fallback">
-            <BookOpen class="h-10 w-10 text-gray-400 mx-auto mb-2" />
-            <p class="text-xs text-gray-500 font-bold">Select a study guide from the left directory to open the PDF viewer here.</p>
+          <div v-else class="bg-white rounded-[2rem] p-6 sm:p-10 text-left border border-gray-150 shadow-md space-y-6" id="reading-pane-fallback">
+            <div class="border-b border-gray-150 pb-4">
+              <div class="flex items-center gap-2 text-indigo-700">
+                <BookOpen class="h-6 w-6 text-indigo-700" />
+                <span class="text-[10px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded">Study Companion</span>
+              </div>
+              <h2 class="text-lg sm:text-xl font-black text-slate-900 mt-2">
+                Bilingual Competitive Exam Preparation Manual
+              </h2>
+              <p class="text-[11px] text-slate-500 font-sans mt-1">
+                Select any study guide from the left directory to load the interactive PDF reader and print-ready study notes.
+              </p>
+            </div>
+
+            <div class="text-xs sm:text-sm text-slate-650 space-y-4 font-sans leading-relaxed">
+              <p>
+                Securing a rank in competitive government recruitments (such as Staff Selection, Railway Boards, and Indian Armed Services) requires a highly structured study regimen. At **AgniPariksha.com**, our academic desk curates precise, NCERT-synced chapters to streamline your revision process.
+              </p>
+
+              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider">Recommended Daily Study Distribution Formula</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-150">
+                  <span class="font-bold text-[#000080] text-xs block mb-1">⏱️ General Studies (35%)</span>
+                  <p class="text-[11px] text-slate-500 leading-normal">
+                    Focus on core NCERT histories, Indian Constitution fundamentals (Articles 12-35), and physical and economic geography maps.
+                  </p>
+                </div>
+
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-150">
+                  <span class="font-bold text-[#000080] text-xs block mb-1">⏱️ Logic & Aptitude (40%)</span>
+                  <p class="text-[11px] text-slate-500 leading-normal">
+                    Solve at least 25 conceptual questions daily covering percentages, ratio proportions, time-work rules, and logical coding series.
+                  </p>
+                </div>
+
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-150">
+                  <span class="font-bold text-[#000080] text-xs block mb-1">⏱️ Current Affairs (25%)</span>
+                  <p class="text-[11px] text-slate-500 leading-normal">
+                    Dedicate 45 minutes to national security developments, defense exercises, bilateral treaties, and major sports accolades.
+                  </p>
+                </div>
+              </div>
+
+              <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-150 text-[11px] text-slate-600">
+                <span class="font-bold text-[#000080] block mb-1">📝 Strategic Revision Tip:</span>
+                Active recall is proven to boost memorization by up to 150%. After reading any chapter in our workspace, immediately navigate to the **GK Quizzes** tab to test your retention with real-time feedback.
+              </div>
+            </div>
           </div>
         </div>
 

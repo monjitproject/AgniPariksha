@@ -38,6 +38,7 @@ const footerLinksGroup2 = [
 const footerLinksGroup3 = [
   { id: 'editorial', name: 'Editorial Policy' },
   { id: 'factcheck', name: 'Fact Check Policy' },
+  { id: 'correction', name: 'Correction Policy' },
   { id: 'refund', name: 'Refund Policy' },
   { id: 'sitemap-doc', name: 'HTML Sitemap' },
 ];

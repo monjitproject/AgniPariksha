@@ -1700,13 +1700,35 @@ app.get("/sitemap.xml", (req, res) => {
   res.setHeader("Content-Type", "application/xml");
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core Static/SPA Routes -->
   <url><loc>https://agnipariksha.com/</loc><priority>1.00</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/quiz-categories</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://agnipariksha.com/latest-jobs</loc><priority>0.90</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://agnipariksha.com/quizzes</loc><priority>0.90</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://agnipariksha.com/mock-tests</loc><priority>0.90</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://agnipariksha.com/latest-jobs</loc><priority>0.95</priority><changefreq>daily</changefreq></url>
   <url><loc>https://agnipariksha.com/study-material</loc><priority>0.85</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://agnipariksha.com/pdf-library</loc><priority>0.85</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://agnipariksha.com/current-affairs</loc><priority>0.90</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://agnipariksha.com/leaderboard</loc><priority>0.70</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/admit-card</loc><priority>0.80</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://agnipariksha.com/results</loc><priority>0.80</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://agnipariksha.com/authors</loc><priority>0.70</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://agnipariksha.com/about</loc><priority>0.60</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://agnipariksha.com/contact</loc><priority>0.60</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://agnipariksha.com/faq</loc><priority>0.70</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog</loc><priority>0.85</priority><changefreq>daily</changefreq></url>
+
+  <!-- 12 Premium MAICINDIA.COM Articles / Guides -->
+  <url><loc>https://agnipariksha.com/blog/ultimate-monthly-current-affairs-blueprint-2026-india-s-geopolitical-shifts-defense-treaties-economy-keys</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/complete-indian-constitution-polity-study-notes-fundamental-rights-schedules-landmark-amendments</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/सम्पूर्ण-सामान्य-ज्ञान-गाइड-2026-भारतीय-इतिहास-भूगोल-और-महत्वपूर्ण-राष्ट्रीय-तथ्य-hindi-gk-study-notes</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/comprehensive-guide-to-logical-reasoning-syllogism-blood-relations-analytical-coding-hacks</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/superfast-vedic-math-tricks-speed-calculation-hacks-for-competitive-exams</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/high-yield-english-grammar-guide-active-passive-voice-tense-mechanics-spotting-errors</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/ssb-government-job-interview-mastery-body-language-psychological-vetting-question-banks</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/ssc-cgl-gd-2026-preparation-masterclass-tier-wise-strategy-cutoff-analysis-time-management</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/rrb-ntpc-alp-group-d-blueprint-comprehensive-syllabus-technical-subjects-score-optimization</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/ibps-sbi-po-clerk-vetting-quantitative-aptitude-banking-awareness-speed-drilling-framework</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/upsc-cse-civil-services-strategy-answer-writing-dynamics-optional-vetting-prelims-filtering</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://agnipariksha.com/blog/comprehensive-nda-cds-and-capf-preparation-manual-physical-drills-written-syllabus-officer-qualities</loc><priority>0.80</priority><changefreq>weekly</changefreq></url>
 </urlset>`;
   res.send(sitemap);
 });
