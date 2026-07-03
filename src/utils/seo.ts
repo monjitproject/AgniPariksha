@@ -105,7 +105,7 @@ export function injectSeoInternalLinks(html: string, categoryName: string = "GK"
       <div class="border-b border-slate-200 pb-3">
         <span class="text-[#FF9933] font-black uppercase tracking-widest text-[9px] block">Aspirant Interconnected Studies</span>
         <h3 class="text-sm sm:text-base font-black text-[#000080] tracking-tight">
-          AgniPariksha Careers & Study Resource Hub
+          MAIC India Careers & Study Resource Hub
         </h3>
         <p class="text-[11px] text-slate-500 font-sans mt-1">
           Accelerate your preparation! Use our 100% free interconnected navigation nodes vetted strictly by the Academic Editorial Board:
@@ -144,17 +144,17 @@ export function injectSeoInternalLinks(html: string, categoryName: string = "GK"
  * Combines Website, SearchAction, Organization, Breadcrumbs, Article, and FAQ into a single schema block.
  */
 export function generateStructuredSchema(meta: SeoMetaData): Record<string, any> {
-  const baseUrl = "https://agnipariksha.com";
+  const baseUrl = "https://maicindia.com";
   
   // 1. Organization Schema
   const organizationSchema = {
     "@type": "EducationalOrganization",
-    "@id": `${baseUrl}/#organization`,
-    "name": "AgniPariksha",
+    "@id": `\${baseUrl}/#organization`,
+    "name": "MAIC India",
     "url": baseUrl,
     "logo": {
       "@type": "ImageObject",
-      "url": `${baseUrl}/assets/logo-og.png`,
+      "url": `\${baseUrl}/assets/logo-og.png`,
       "width": "512",
       "height": "512"
     },
@@ -171,13 +171,13 @@ export function generateStructuredSchema(meta: SeoMetaData): Record<string, any>
       "@type": "ContactPoint",
       "telephone": "+91-141-2450011",
       "contactType": "Academic Support",
-      "email": "support@agnipariksha.com",
+      "email": "support@maicindia.com",
       "availableLanguage": ["Hindi", "English"]
     },
     "sameAs": [
-      "https://facebook.com/agnipariksha",
-      "https://twitter.com/agnipariksha",
-      "https://youtube.com/agnipariksha"
+      "https://facebook.com/maicindia",
+      "https://twitter.com/maicindia",
+      "https://youtube.com/maicindia"
     ]
   };
 
@@ -186,7 +186,7 @@ export function generateStructuredSchema(meta: SeoMetaData): Record<string, any>
     "@type": "WebSite",
     "@id": `${baseUrl}/#website`,
     "url": baseUrl,
-    "name": "AgniPariksha",
+    "name": "MAIC India",
     "description": "Free Interactive Mock Tests & Syllabus Notes for Indian Armed Forces and Sarkari Jobs",
     "publisher": {
       "@id": `${baseUrl}/#organization`
@@ -302,9 +302,9 @@ export function updatePageSeo(
   policyId?: string | null,
   dynamicContent?: any
 ) {
-  const baseUrl = "https://agnipariksha.com";
+  const baseUrl = "https://maicindia.com";
   let meta: SeoMetaData = {
-    title: "AgniPariksha - Armed Forces & Govt Jobs Preparation Portal",
+    title: "MAIC India - Armed Forces & Govt Jobs Preparation Portal",
     description: "Access 100% free interactive mock tests, syllabus-aligned study notes, solved previous year papers (PYPs), and live government job alerts.",
     canonical: baseUrl,
     ogType: "website"
@@ -315,68 +315,68 @@ export function updatePageSeo(
 
   // Routing configurations mapped directly to specialized Meta Tags and Canonical Links
   if (tab === "home") {
-    meta.title = "AgniPariksha - Free Armed Forces & Govt Jobs Mock Tests";
+    meta.title = "MAIC India - Free Armed Forces & Govt Jobs Mock Tests";
     meta.description = "Prepare for SSC, Railway, Indian Army Agniveer, NDA, & Air Force. Solve free interactive mock test series, practice questions, and read verified daily job alerts.";
     meta.canonical = baseUrl;
   } else if (tab === "quizzes") {
-    meta.title = "Interactive GK Quizzes & Mock Exams - AgniPariksha";
+    meta.title = "Interactive GK Quizzes & Mock Exams - MAIC India";
     meta.description = "Test your skills! Free timed subject quizzes for Indian Army, Navy, General Awareness, Mathematics formulas, and reasoning logics.";
     meta.canonical = resolveCanonical("quizzes");
     if (subId) {
       // Find matching mock quiz to personalize tags
       const match = MOCK_QUIZZES.find(q => q.id === subId);
       if (match) {
-        meta.title = `${match.title} - Free Practice Mock Quiz | AgniPariksha`;
+        meta.title = `${match.title} - Free Practice Mock Quiz | MAIC India`;
         meta.description = `Take the 100% free practice quiz for ${match.title}. Total ${match.questions.length} objective questions with instant explanations & grading.`;
         meta.canonical = resolveCanonical(`quizzes/${subId}`);
       }
     }
   } else if (tab === "mock-tests") {
-    meta.title = "Full-Length Simulated Practice Mock Tests - AgniPariksha";
+    meta.title = "Full-Length Simulated Practice Mock Tests - MAIC India";
     meta.description = "Agniveer Army General Duty, Technical, Clerk & SSC GD full mock tests simulator. Features live timers, sectional cuts, and official grading criteria.";
     meta.canonical = resolveCanonical("mock-tests");
   } else if (tab === "study") {
-    meta.title = "Syllabus Study Material & Revision Cheat Sheets - AgniPariksha";
+    meta.title = "Syllabus Study Material & Revision Cheat Sheets - MAIC India";
     meta.description = "Bilingual (Hindi/English) study notes, formula lists, historical battles summaries, and static GK tables. Free for competitive jobs preparation.";
     meta.canonical = resolveCanonical("study");
     if (subId) {
-      meta.title = `${subId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")} - Syllabus Study Note | AgniPariksha`;
+      meta.title = `${subId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")} - Syllabus Study Note | MAIC India`;
       meta.canonical = resolveCanonical(`study/${subId}`);
     }
   } else if (tab === "current") {
-    meta.title = "Daily Current Affairs & Geopolitics Updates - AgniPariksha";
+    meta.title = "Daily Current Affairs & Geopolitics Updates - MAIC India";
     meta.description = "Latest bilateral treaties, space milestones, defense updates, and index rankings curated for competitive examinations. Bilingual updates updated daily.";
     meta.canonical = resolveCanonical("current");
     if (subId) {
-      meta.title = `Current Affairs Brief: ${subId.split("-").join(" ")} | AgniPariksha`;
+      meta.title = `Current Affairs Brief: ${subId.split("-").join(" ")} | MAIC India`;
       meta.canonical = resolveCanonical(`current/${subId}`);
     }
   } else if (tab === "pdfs") {
-    meta.title = "Previous Year Solved Papers & PDF Notes Library - AgniPariksha";
+    meta.title = "Previous Year Solved Papers & PDF Notes Library - MAIC India";
     meta.description = "Download 100% free PDF revision files, official recruitment circulars, and bilingually solved previous year papers (PYPs) for SSC & Railway.";
     meta.canonical = resolveCanonical("pdfs");
   } else if (tab === "jobs") {
-    meta.title = "Latest Sarkari Government Job Alerts (Live 2026) - AgniPariksha";
+    meta.title = "Latest Sarkari Government Job Alerts (Live 2026) - MAIC India";
     meta.description = "Live updates on Indian Armed Forces recruitment, CAPF rally notifications, SSC vacancies, and Railway recruitment boards. 100% verified sources.";
     meta.canonical = resolveCanonical("jobs");
     if (subId) {
       const match = MOCK_JOBS.find(j => j.id === subId);
       if (match) {
-        meta.title = `${match.title} - Verified Recruitment Details | AgniPariksha`;
+        meta.title = `${match.title} - Verified Recruitment Details | MAIC India`;
         meta.description = `Official circular details for ${match.title}. Qualification required: ${match.qualification}, Eligibility: ${match.eligibility}, Salary scale: ${match.salary}. Check closing dates.`;
         meta.canonical = resolveCanonical(`jobs/${subId}`);
       }
     }
   } else if (tab === "admit-card") {
-    meta.title = "Sarkari Exam Admit Cards & Schedules - AgniPariksha";
+    meta.title = "Sarkari Exam Admit Cards & Schedules - MAIC India";
     meta.description = "Download upcoming competitive recruitment exam hall tickets and view verified venue schedules. Clean links to official board download utilities.";
     meta.canonical = resolveCanonical("admit-card");
   } else if (tab === "results") {
-    meta.title = "Latest Exam Results, Cut-offs, & Merit Sheets - AgniPariksha";
+    meta.title = "Latest Exam Results, Cut-offs, & Merit Sheets - MAIC India";
     meta.description = "Verified selection lists, category-wise cut-off percentiles, and merit results for SSC CGL, SSC GD, Railway, and state police recruitment boards.";
     meta.canonical = resolveCanonical("results");
   } else if (tab === "blog") {
-    meta.title = "MAIC Vetted Career Guides & Vedic Math Blogs - AgniPariksha";
+    meta.title = "MAIC Vetted Career Guides & Vedic Math Blogs - MAIC India";
     meta.description = "Premium comprehensive study guides (1500-2500 words), Vedic mathematics calculation hacks, logical reasoning frameworks, and interview prep guides.";
     meta.canonical = resolveCanonical("blog");
     
@@ -386,7 +386,7 @@ export function updatePageSeo(
       const activePost = match || dynamicContent;
       
       if (activePost) {
-        meta.title = `${activePost.title} | AgniPariksha Career Guide`;
+        meta.title = `${activePost.title} | MAIC India Career Guide`;
         meta.description = activePost.excerpt || `Read the complete academic study guide for ${activePost.title} published strictly by our educational captains.`;
         meta.canonical = resolveCanonical(`blog/${subId}`);
         meta.ogType = "article";
@@ -401,28 +401,28 @@ export function updatePageSeo(
       }
     }
   } else if (tab === "authors") {
-    meta.title = "Meet Our Exam Curation Advisors & CAPT CAPFs - AgniPariksha";
-    meta.description = "Learn about the retired military captains, Ph.D. scholars, and veteran recruitment advisors who verify and audit all academic content at AgniPariksha.";
+    meta.title = "Meet Our Exam Curation Advisors & CAPT CAPFs - MAIC India";
+    meta.description = "Learn about the retired military captains, Ph.D. scholars, and veteran recruitment advisors who verify and audit all academic content at MAIC India.";
     meta.canonical = resolveCanonical("authors");
   } else if (tab === "chat") {
-    meta.title = "Real-Time AI Academic Tutor Chatroom - AgniPariksha";
+    meta.title = "Real-Time AI Academic Tutor Chatroom - MAIC India";
     meta.description = "Get instant answers! Ask our grounded AI assistant about General Science equations, Indian historical dates, constitutional articles, or math tricks.";
     meta.canonical = resolveCanonical("chat");
   } else if (tab === "policies" && policyId) {
     meta.canonical = resolveCanonical(policyId);
     if (policyId === "about") {
-      meta.title = "About AgniPariksha.com - Free Aspirant Empowerment Portal";
+      meta.title = "About MAIC India - Free Aspirant Empowerment Portal";
       meta.description = "Learn about our foundational vision to eliminate educational paywalls. Discover our academic advisory board and student-first curation workflows.";
     } else if (policyId === "contact") {
-      meta.title = "Contact Us - Submit Support Inquiry Ticket | AgniPariksha";
+      meta.title = "Contact Us - Submit Support Inquiry Ticket | MAIC India";
       meta.description = "Reach out to our Academic support, Job alerts division, or Legal desk. Access our physical office coordinates in Cantonment Main Road, Jaipur.";
     } else if (policyId === "faq") {
-      meta.title = "FAQ & Candidate Helpdesk - AgniPariksha Support";
+      meta.title = "FAQ & Candidate Helpdesk - MAIC India Support";
       meta.description = "Common answers regarding mock test scoring, syllabus updates, negative marking algorithms, and downloading verified study PDFs.";
       meta.faqItems = [
         {
-          question: "Is AgniPariksha affiliated with the Indian Government or Armed Forces?",
-          answer: "No, AgniPariksha.com is a completely independent, student-run educational portal. We are NOT connected in any official capacity with the Ministry of Defence, SSC, RRB, UPSC, or any recruitment board."
+          question: "Is MAIC India affiliated with the Indian Government or Armed Forces?",
+          answer: "No, MAIC India is a completely independent, student-run educational portal. We are NOT connected in any official capacity with the Ministry of Defence, SSC, RRB, UPSC, or any recruitment board."
         },
         {
           question: "Are the mock test series, study PDFs, and certificates entirely free?",
@@ -434,24 +434,24 @@ export function updatePageSeo(
         },
         {
           question: "How can I report a potential correction in a study sheet or answer key?",
-          answer: "Aspirants can click on 'Report Error' or email us directly at corrections@agnipariksha.com. Our senior editors review all reports and apply necessary updates within 24 hours."
+          answer: "Aspirants can click on 'Report Error' or email us directly at corrections@maicindia.com. Our senior editors review all reports and apply necessary updates within 24 hours."
         }
       ];
     } else if (policyId === "privacy") {
-      meta.title = "Privacy Policy - Data Protection & Cookie Consent | AgniPariksha";
+      meta.title = "Privacy Policy - Data Protection & Cookie Consent | MAIC India";
       meta.description = "Read our strict data storage directives, compliance with India's IT Act 2000, and Google DoubleClick DART AdSense transparency terms.";
     } else if (policyId === "terms") {
-      meta.title = "Terms & Conditions - User Curation Agreements | AgniPariksha";
+      meta.title = "Terms & Conditions - User Curation Agreements | MAIC India";
       meta.description = "Review the legal guidelines governing proper usage of our free testing simulators and study notes database. Academic copy rights explained.";
     } else if (policyId === "disclaimer") {
-      meta.title = "Legal Disclaimer - Government Non-Affiliation | AgniPariksha";
+      meta.title = "Legal Disclaimer - Government Non-Affiliation | MAIC India";
       meta.description = "Critical notices regarding government non-affiliation and candidate responsibility to verify key milestones on official department portals.";
     } else if (policyId === "dmca") {
-      meta.title = "DMCA Copyright Compliance Policy - AgniPariksha Integrity";
+      meta.title = "DMCA Copyright Compliance Policy - MAIC India Integrity";
       meta.description = "Learn how we handle copyright claims, intellectual property registrations, counter-notices, and fast 48-hour content removal SLA.";
     } else {
-      meta.title = `${policyId.toUpperCase()} Policy & Disclosures - AgniPariksha`;
-      meta.description = "Official publisher trust, legal disclosures, and regulatory compliance indexes for AgniPariksha.com.";
+      meta.title = `${policyId.toUpperCase()} Policy & Disclosures - MAIC India`;
+      meta.description = "Official publisher trust, legal disclosures, and regulatory compliance indexes for MAIC India.";
     }
   }
 

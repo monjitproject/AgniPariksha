@@ -297,7 +297,7 @@ const pagesList = [
 
           <h3 class="font-black text-slate-850 text-sm mt-6">Open Correction Channels for Aspirants</h3>
           <p>
-            We appreciate the feedback of our student community in maintaining the quality of our content. If you spot a potential error in a study guide, an answer key, or a job post, please use our "Report Error" feature or contact our team directly at <strong>corrections@agnipariksha.com</strong>. We will investigate all reports promptly.
+            We appreciate the feedback of our student community in maintaining the quality of our content. If you spot a potential error in a study guide, an answer key, or a job post, please use our "Report Error" feature or contact our team directly at <strong>corrections@maicindia.com</strong>. We will investigate all reports promptly.
           </p>
         </div>
       </div>
@@ -314,7 +314,7 @@ const pagesList = [
         
         <div class="text-xs sm:text-sm text-slate-600 leading-relaxed space-y-4 font-sans">
           <p>
-            At <strong>AgniPariksha.com</strong>, we are committed to absolute accuracy. Despite our rigorous editorial reviews and double-blind verification systems, errors and typos can occasionally occur. When an error is discovered, we aim to correct it promptly and transparently. Our Correction Policy outlines how we manage and document these updates.
+            At <strong>MAIC India</strong> (maicindia.com), we are committed to absolute accuracy. Despite our rigorous editorial reviews and double-blind verification systems, errors and typos can occasionally occur. When an error is discovered, we aim to correct it promptly and transparently. Our Correction Policy outlines how we manage and document these updates.
           </p>
           
           <h3 class="font-black text-slate-850 text-sm mt-6">1. Our Commitment to Transparency</h3>
@@ -349,7 +349,7 @@ const pagesList = [
             Our team reviews all error reports and aims to apply necessary corrections within **24 hours** of verification. The review process is managed by our senior editorial team:
           </p>
           <ul class="list-disc pl-5 space-y-2 text-xs text-slate-650">
-            <li><strong>Step 1: Receipt</strong> – Error reports submitted via the "Report Error" button or emailed to <strong>corrections@agnipariksha.com</strong> are logged immediately.</li>
+            <li><strong>Step 1: Receipt</strong> – Error reports submitted via the "Report Error" button or emailed to <strong>corrections@maicindia.com</strong> are logged immediately.</li>
             <li><strong>Step 2: Analysis</strong> – Academic editors cross-check the flagged content against official source documents.</li>
             <li><strong>Step 3: Update</strong> – If an error is verified, the content is updated, and a correction notice is posted if necessary.</li>
           </ul>
@@ -385,25 +385,25 @@ const pagesList = [
             <div class="p-5 rounded-2xl border border-slate-150 bg-slate-50 space-y-1">
               <span class="font-extrabold text-[#000080] text-xs uppercase tracking-wider block">Academic & Syllabus Support Desk</span>
               <p class="text-xs text-slate-500 font-sans">For questions about quiz content, answer explanations, or syllabus charts.</p>
-              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">academic@agnipariksha.com</p>
+              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">academic@maicindia.com</p>
             </div>
             
             <div class="p-5 rounded-2xl border border-slate-150 bg-slate-50 space-y-1">
               <span class="font-extrabold text-[#000080] text-xs uppercase tracking-wider block">Job Notifications Desk</span>
               <p class="text-xs text-slate-500 font-sans">To report missing recruitment announcements or incorrect application links.</p>
-              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">alerts@agnipariksha.com</p>
+              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">alerts@maicindia.com</p>
             </div>
 
             <div class="p-5 rounded-2xl border border-slate-150 bg-slate-50 space-y-1">
               <span class="font-extrabold text-[#000080] text-xs uppercase tracking-wider block">Legal & DMCA Desk</span>
               <p class="text-xs text-slate-500 font-sans">For all copyright issues, licensing questions, and regulatory compliance inquiries.</p>
-              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">legal@agnipariksha.com</p>
+              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">legal@maicindia.com</p>
             </div>
 
             <div class="p-5 rounded-2xl border border-slate-150 bg-slate-50 space-y-1">
               <span class="font-extrabold text-[#000080] text-xs uppercase tracking-wider block">General Inquiries Desk</span>
               <p class="text-xs text-slate-500 font-sans">For advertising inquiries, partnership opportunities, and general suggestions.</p>
-              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">support@agnipariksha.com</p>
+              <p class="font-mono text-xs font-bold text-indigo-700 pt-1">support@maicindia.com</p>
             </div>
           </div>
 
@@ -488,7 +488,7 @@ const pagesList = [
         <p class="text-[10px] font-mono font-bold text-slate-400">Last Updated: July 02, 2026</p>
         
         <p>
-          At <strong>AgniPariksha</strong>, accessible from <strong>AgniPariksha.com</strong>, the privacy of our visitors is one of our highest priorities. This Privacy Policy outlines the types of information we collect and record, and how we use it to improve our educational platform.
+          At <strong>MAIC India</strong>, accessible from <strong>maicindia.com</strong>, the privacy of our visitors is one of our highest priorities. This Privacy Policy outlines the types of information we collect and record, and how we use it to improve our educational platform.
         </p>
 
         <h3 class="font-black text-slate-850 text-sm mt-6">1. Information Collection and Sourcing</h3>
@@ -502,26 +502,26 @@ const pagesList = [
 
         <h3 class="font-black text-slate-850 text-sm mt-6">2. Automated Log Files</h3>
         <p>
-          AgniPariksha follows a standard procedure of using log files. These files log visitors when they visit websites. The information collected by log files includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of this information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.
+          MAIC India follows a standard procedure of using log files. These files log visitors when they visit websites. The information collected by log files includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of this information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.
         </p>
 
         <h3 class="font-black text-slate-850 text-sm mt-6">3. Cookies and Web Beacons</h3>
         <p>
-          Like almost all professional websites, AgniPariksha uses cookies. These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.
+          Like almost all professional websites, MAIC India uses cookies. These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.
         </p>
 
         <h3 class="font-black text-slate-850 text-sm mt-6">4. Google DoubleClick DART Cookies & AdSense Disclosures</h3>
         <p>
-          Google is one of the third-party vendors on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to AgniPariksha.com and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy at the following URL:
+          Google is one of the third-party vendors on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to maicindia.com and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy at the following URL:
           <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" class="text-indigo-700 underline font-mono">https://policies.google.com/technologies/ads</a>.
         </p>
         <p>
-          Our third-party advertising partners utilize technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on AgniPariksha, which are sent directly to users' browsers. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit. Note that AgniPariksha has no access to or control over these cookies that are used by third-party advertisers.
+          Our third-party advertising partners utilize technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on MAIC India, which are sent directly to users' browsers. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit. Note that MAIC India has no access to or control over these cookies that are used by third-party advertisers.
         </p>
 
         <h3 class="font-black text-slate-850 text-sm mt-6">5. Data Protection Rights & IT Act, 2000 Compliance</h3>
         <p>
-          We are committed to securing your data. All candidate data stored on our servers is protected using industry-standard security protocols. In accordance with Section 43A of the Indian Information Technology Act, 2000, we maintain reasonable security practices to protect your data. You have the right to request access to, correction of, or deletion of your personal data stored on our platform. Please contact us at <strong>privacy@agnipariksha.com</strong> to submit a request.
+          We are committed to securing your data. All candidate data stored on our servers is protected using industry-standard security protocols. In accordance with Section 43A of the Indian Information Technology Act, 2000, we maintain reasonable security practices to protect your data. You have the right to request access to, correction of, or deletion of your personal data stored on our platform. Please contact us at <strong>privacy@maicindia.com</strong> to submit a request.
         </p>
       </div>
 
@@ -537,7 +537,7 @@ const pagesList = [
         <p class="text-[10px] font-mono font-bold text-slate-400">Last Modified: July 02, 2026</p>
         
         <p>
-          Welcome to <strong>AgniPariksha</strong>! These terms and conditions outline the rules and regulations for using AgniPariksha's website, located at <strong>AgniPariksha.com</strong>.
+          Welcome to <strong>MAIC India</strong>! These terms and conditions outline the rules and regulations for using MAIC India's website, located at <strong>maicindia.com</strong>.
         </p>
         <p>
           By accessing this website, we assume you accept these terms and conditions. Do not continue to use AgniPariksha if you do not agree to all of the terms and conditions stated on this page.
@@ -545,14 +545,14 @@ const pagesList = [
 
         <h3 class="font-black text-slate-850 text-sm mt-6">1. Intellectual Property Rights</h3>
         <p>
-          Unless otherwise stated, AgniPariksha and/or its licensors own the intellectual property rights for all material on AgniPariksha.com. This includes our proprietary quiz questions, custom explanation guides, interface graphics, and code. All intellectual property rights are reserved. 
+          Unless otherwise stated, MAIC India and/or its licensors own the intellectual property rights for all material on maicindia.com. This includes our proprietary quiz questions, custom explanation guides, interface graphics, and code. All intellectual property rights are reserved. 
         </p>
         <p>
-          You are permitted to access and print pages from AgniPariksha.com for your personal, non-commercial educational use, subject to the following restrictions:
+          You are permitted to access and print pages from maicindia.com for your personal, non-commercial educational use, subject to the following restrictions:
         </p>
         <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-650">
           <li>You must not republish, sell, rent, or sub-license any content, quiz questions, or study material from our platform.</li>
-          <li>You must not duplicate, copy, or scrape material from AgniPariksha for commercial purposes.</li>
+          <li>You must not duplicate, copy, or scrape material from MAIC India for commercial purposes.</li>
           <li>You must not use automated data mining tools, web scrapers, or similar data gathering methods on our site.</li>
         </ul>
 
@@ -594,12 +594,12 @@ const pagesList = [
             ⚠️ ABSOLUTE GOVERNMENT NON-AFFILIATION DISCLOSURE:
           </strong>
           <p class="text-xs leading-relaxed font-semibold">
-            AgniPariksha.com is a completely independent, student-run educational preparation platform. <strong>We are NOT affiliated with, authorized by, sponsored by, or connected in any capacity to the Staff Selection Commission (SSC), Railway Recruitment Boards (RRB), Union Public Service Commission (UPSC), Indian Armed Forces, Ministry of Defence, or any other government department, ministry, or recruitment board.</strong>
+            maicindia.com is a completely independent, student-run educational preparation platform. <strong>We are NOT affiliated with, authorized by, sponsored by, or connected in any capacity to the Staff Selection Commission (SSC), Railway Recruitment Boards (RRB), Union Public Service Commission (UPSC), Indian Armed Forces, Ministry of Defence, or any other government department, ministry, or recruitment board.</strong>
           </p>
         </div>
 
         <p class="mt-4">
-          The information, guides, quiz questions, syllabus breakdowns, and dates published on AgniPariksha.com are provided strictly for general educational and preparation purposes. While our academic team makes every effort to verify all content, we make no warranties of any kind regarding the completeness, accuracy, or reliability of this information.
+          The information, guides, quiz questions, syllabus breakdowns, and dates published on maicindia.com are provided strictly for general educational and preparation purposes. While our academic team makes every effort to verify all content, we make no warranties of any kind regarding the completeness, accuracy, or reliability of this information.
         </p>
 
         <h3 class="font-black text-slate-850 text-sm mt-6">1. Fallback to Official Portals</h3>
@@ -614,7 +614,7 @@ const pagesList = [
 
         <h3 class="font-black text-slate-850 text-sm mt-6">3. External Links</h3>
         <p>
-          Through this website, you can link to other websites which are not under the control of AgniPariksha. We have no control over the nature, content, and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them.
+          Through this website, you can link to other websites which are not under the control of MAIC India. We have no control over the nature, content, and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them.
         </p>
       </div>
 
@@ -630,12 +630,12 @@ const pagesList = [
         <p class="text-[10px] font-mono font-bold text-slate-400">Last Modified: July 02, 2026</p>
         
         <p>
-          AgniPariksha respects the intellectual property rights of others. In accordance with the Digital Millennium Copyright Act (DMCA) and the Indian Copyright Act, 1957, we will respond promptly to clear notices of alleged copyright infringement.
+          MAIC India respects the intellectual property rights of others. In accordance with the Digital Millennium Copyright Act (DMCA) and the Indian Copyright Act, 1957, we will respond promptly to clear notices of alleged copyright infringement.
         </p>
 
         <h3 class="font-black text-slate-850 text-sm mt-6">1. Submission Guidelines for Copyright Claims</h3>
         <p>
-          If you are a copyright owner or an authorized agent and believe that any content hosted on AgniPariksha.com infringes upon your copyright, please submit a written notification to our Designated Copyright Agent at <strong>copyright@agnipariksha.com</strong>.
+          If you are a copyright owner or an authorized agent and believe that any content hosted on maicindia.com infringes upon your copyright, please submit a written notification to our Designated Copyright Agent at <strong>copyright@maicindia.com</strong>.
         </p>
         <p>
           To help us process your request quickly, please include the following details:
@@ -649,7 +649,7 @@ const pagesList = [
             Identification of the copyrighted work claimed to have been infringed (e.g., links to the original work or registration details).
           </li>
           <li>
-            Identification of the specific material on AgniPariksha.com that you claim is infringing, including the exact URL.
+            Identification of the specific material on maicindia.com that you claim is infringing, including the exact URL.
           </li>
           <li>
             Your contact details, including your full name, physical address, telephone number, and email address.
@@ -680,7 +680,7 @@ const pagesList = [
         <p class="text-[10px] font-mono font-bold text-slate-400">Last Updated: July 02, 2026</p>
         
         <p>
-          This is the Cookie Policy for AgniPariksha, accessible from <strong>AgniPariksha.com</strong>.
+          This is the Cookie Policy for MAIC India, accessible from <strong>maicindia.com</strong>.
         </p>
         <p>
           As is common practice with almost all professional websites, this site uses cookies—tiny files that are downloaded to your computer—to improve your browsing and learning experience. This page describes what information they gather, how we use them, and why we sometimes need to store these cookies.
@@ -741,17 +741,17 @@ const pagesList = [
         <p class="text-[10px] font-mono font-bold text-slate-400">Last Modified: July 02, 2026</p>
         
         <p>
-          At <strong>AgniPariksha.com</strong>, our core mission is to make high-quality exam preparation resources accessible to every student in India. 
+          At <strong>maicindia.com</strong>, our core mission is to make high-quality exam preparation resources accessible to every student in India. 
         </p>
         <div class="bg-emerald-50 text-emerald-800 p-5 rounded-2xl border border-emerald-150 font-sans font-bold text-xs leading-relaxed my-4">
           💯 100% FREE ACCESS GUARANTEE:
-          All mock test simulators, quantitative reasoning quizzes, custom certification programs, and downloadable PDF study guides hosted on AgniPariksha are completely free. We do not charge registration fees, sell premium plans, or require subscriptions.
+          All mock test simulators, quantitative reasoning quizzes, custom certification programs, and downloadable PDF study guides hosted on MAIC India are completely free. We do not charge registration fees, sell premium plans, or require subscriptions.
         </div>
         <p>
           Because all our services, mock databases, and certifications are entirely **free of charge**, we do not process financial transactions, charge subscription fees, or collect candidate banking details. Consequently, a refund policy is not required for our platform.
         </p>
         <p>
-          If you encounter any website, service, or individual claiming to represent AgniPariksha and requesting payment for mock tests or certificates, please report it immediately to our safety team at <strong>security@agnipariksha.com</strong>.
+          If you encounter any website, service, or individual claiming to represent MAIC India and requesting payment for mock tests or certificates, please report it immediately to our safety team at <strong>security@maicindia.com</strong>.
         </p>
       </div>
 
@@ -767,9 +767,9 @@ const pagesList = [
 
         <div class="space-y-4 text-xs font-sans leading-relaxed" id="faq-accordions">
           <div class="bg-slate-50 p-5 rounded-2xl border border-slate-150 space-y-1.5">
-            <span class="font-extrabold text-slate-900 block text-xs">Q: Is AgniPariksha affiliated with the SSC or the Indian Army?</span>
+            <span class="font-extrabold text-slate-900 block text-xs">Q: Is MAIC India affiliated with the SSC or the Indian Army?</span>
             <p class="text-slate-600">
-              No. AgniPariksha is a completely independent, non-governmental student-run educational resource center. We are not endorsed by or affiliated with the Indian Army, Staff Selection Commission, UPSC, or any government department.
+              No. MAIC India is a completely independent, non-governmental student-run educational resource center. We are not endorsed by or affiliated with the Indian Army, Staff Selection Commission, UPSC, or any government department.
             </p>
           </div>
 
@@ -781,9 +781,9 @@ const pagesList = [
           </div>
 
           <div class="bg-slate-50 p-5 rounded-2xl border border-slate-150 space-y-1.5">
-            <span class="font-extrabold text-slate-900 block text-xs">Q: Are there any hidden fees or paid features on AgniPariksha?</span>
+            <span class="font-extrabold text-slate-900 block text-xs">Q: Are there any hidden fees or paid features on MAIC India?</span>
             <p class="text-slate-600">
-              No. All mock tests, answer key guides, study materials, certificates, and daily quiz updates on AgniPariksha are 100% free of charge. We are funded entirely through non-intrusive advertisements (Google AdSense).
+              No. All mock tests, answer key guides, study materials, certificates, and daily quiz updates on MAIC India are 100% free of charge. We are funded entirely through non-intrusive advertisements (Google AdSense).
             </p>
           </div>
         </div>
@@ -795,7 +795,7 @@ const pagesList = [
           <span class="text-[#000080] font-black uppercase tracking-widest text-[9px] block">Join Our Mission</span>
           <h1 class="text-xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
             <Award class="h-7 w-7 text-[#000080]" />
-            Careers at AgniPariksha Academy
+            Careers at MAIC India Academy
           </h1>
         </div>
         <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
@@ -832,13 +832,13 @@ const pagesList = [
           </h1>
         </div>
         <p class="text-xs sm:text-sm text-slate-500 font-sans">
-          This directory outlines all accessible pages on AgniPariksha.com for search engine indexing and easy candidate navigation:
+          This directory outlines all accessible pages on maicindia.com for search engine indexing and easy candidate navigation:
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs font-mono" id="visual-sitemap-index">
           <div class="space-y-2 bg-slate-50 p-5 rounded-2xl border border-slate-150 text-left">
             <span class="font-black text-[#000080] block text-xs mb-2 font-sans border-b pb-1">Primary Academic Hubs:</span>
-            <p>• <span class="text-slate-700 font-sans">AgniPariksha Home - <code>/home</code></span></p>
+            <p>• <span class="text-slate-700 font-sans">MAIC India Home - <code>/home</code></span></p>
             <p>• <span class="text-slate-700 font-sans">GK Quizzes Board - <code>/quizzes</code></span></p>
             <p>• <span class="text-slate-700 font-sans">Study Materials & Notes - <code>/study</code></span></p>
             <p>• <span class="text-slate-700 font-sans">Sarkari Admit Cards - <code>/admit-card</code></span></p>

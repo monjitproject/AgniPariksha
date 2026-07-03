@@ -58,8 +58,8 @@ export const metadata: Metadata = {
     title: 'SSC GD Constable 2026 Notification, Eligibility & Apply Guide',
     description: 'Direct apply online link, physical standards, syllabus, and official PDF details.',
     type: 'article',
-    url: 'https://agnipariksha.com/jobs/ssc-gd-constable-2026',
-    images: [{ url: 'https://agnipariksha.com/assets/ssc-gd-banner.jpg', width: 1200, height: 630 }]
+    url: 'https://maicindia.com/jobs/ssc-gd-constable-2026',
+    images: [{ url: 'https://maicindia.com/assets/ssc-gd-banner.jpg', width: 1200, height: 630 }]
   }
 };
 
