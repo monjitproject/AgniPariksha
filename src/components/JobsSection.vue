@@ -352,24 +352,24 @@ const handleDeletePost = (id: string) => {
             :id="`job-card-select-${job.id}`"
             @click="selectJob(job)"
             :class="[
-              'p-4 rounded-xl border-2 cursor-pointer transition-all hover:scale-[1.01] hover:shadow-sm duration-150',
+              'p-4 rounded-xl border-2 cursor-pointer transition-all hover:translate-x-1 duration-200',
               activeJob?.id === job.id
-                ? 'bg-white border-[#000080] shadow-md'
-                : 'bg-white border-gray-100 hover:border-gray-200'
+                ? 'bg-white border-[#000080] shadow-md ring-2 ring-[#000080]/10'
+                : 'bg-white border-gray-100 hover:border-gray-250 hover:shadow-sm'
             ]"
           >
             <div class="flex justify-between items-start mb-2">
-              <span class="text-[8px] font-black uppercase text-white bg-[#FF9933] px-1.5 py-0.2 rounded font-mono">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[#000080] bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">
                 {{ job.category }}
               </span>
-              <span class="text-[8px] text-gray-400 font-bold font-mono">Ends: {{ job.importantDates.end }}</span>
+              <span class="text-[11px] text-red-650 font-semibold font-mono">Ends: {{ job.importantDates.end }}</span>
             </div>
 
-            <h5 class="font-black text-xs text-gray-800 leading-snug">{{ job.title }}</h5>
+            <h5 class="font-bold text-[15px] text-slate-900 leading-snug hover:text-[#000080] transition-colors">{{ job.title }}</h5>
 
-            <div class="flex justify-between items-center text-[10px] text-gray-500 mt-4 border-t border-gray-50 pt-2">
-              <span class="font-semibold text-green-700">{{ job.salary ? job.salary.split(" ")[0] : "Salary scale" }}</span>
-              <span class="font-mono text-[9px]">Age: {{ job.ageLimit ? job.ageLimit.split(" ")[0] : "Details" }}</span>
+            <div class="flex justify-between items-center text-[12px] text-gray-500 mt-4 border-t border-gray-100 pt-2 font-sans">
+              <span class="font-semibold text-emerald-700">{{ job.salary ? job.salary.split(" ")[0] : "Salary scale" }}</span>
+              <span class="font-medium">Age Limit: {{ job.ageLimit ? job.ageLimit.split(" ")[0] : "Details" }}</span>
             </div>
           </div>
 
@@ -504,17 +504,17 @@ const handleDeletePost = (id: string) => {
               :href="activeJob.applyLink"
               target="_blank"
               rel="noopener noreferrer"
-              class="flex-1 bg-[#000080] hover:bg-[#000060] text-white text-xs font-black py-3.5 px-6 rounded-lg text-center uppercase tracking-wider shadow duration-150 flex items-center justify-center space-x-1"
+              class="h-[52px] rounded-xl text-[16px] font-semibold uppercase tracking-wider flex-1 bg-[#000080] hover:bg-[#000060] hover:shadow-md text-white transition-all flex items-center justify-center gap-1.5 duration-200 cursor-pointer shadow-sm focus:outline-none"
             >
               <span>Apply on Official Portal</span>
-              <ExternalLink class="h-4 w-4" />
+              <ExternalLink class="h-5 w-5" />
             </a>
 
             <!-- Simulated notifications alerts trigger -->
             <button
               id="btn-fake-download-alert"
               @click="triggerFakeDownload(activeJob.title)"
-              class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black py-3 px-5 rounded-lg text-center uppercase transition-all cursor-pointer"
+              class="h-[52px] rounded-xl text-[16px] font-semibold uppercase tracking-wider bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 transition-all duration-200 hover:shadow-sm cursor-pointer focus:outline-none"
             >
               Official Syllabus Schema
             </button>

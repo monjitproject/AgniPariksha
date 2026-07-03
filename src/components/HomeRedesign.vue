@@ -408,35 +408,59 @@ const latestResults = [
         </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-gap-standard">
         <div 
           v-for="job in MOCK_JOBS.slice(0, 3)" 
           :key="job.id" 
           @click="emit('navigate', 'jobs', job.id)"
-          class="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4"
+          class="bg-white p-6 rounded-[16px] border border-slate-200 shadow-sm hover:shadow-lg hover:border-slate-300 hover:-translate-y-1 hover:scale-[1.02] active:scale-98 transition-all duration-250 ease-out cursor-pointer flex flex-col justify-between space-y-4 card-padding-standard relative group"
         >
-          <div class="space-y-2.5">
+          <!-- Top Metas & Bookmark -->
+          <div class="space-y-3">
             <div class="flex justify-between items-center">
-              <span class="text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200">
-                Active Vacancy
+              <span class="text-[12px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full border border-indigo-100 category-tag-standard">
+                {{ job.category }}
               </span>
-              <span class="text-[10px] text-slate-400 font-mono">{{ job.postedDate }}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-[13px] text-slate-400 font-sans font-medium">Updated: {{ job.importantDates?.start }}</span>
+                <button @click.stop class="text-slate-400 hover:text-amber-500 transition-colors p-1 rounded-full hover:bg-slate-50" title="Bookmark Job">
+                  <Bookmark class="h-4 w-4" />
+                </button>
+              </div>
             </div>
             
-            <h3 class="font-bold text-base text-slate-800 leading-snug hover:text-[#000080] transition-colors">
+            <h3 class="font-bold text-[22px] text-slate-900 leading-snug hover:text-[#000080] transition-colors card-title-standard">
               {{ job.title }}
             </h3>
             
-            <div class="space-y-1 text-xs text-slate-600 font-sans">
-              <p class="flex items-center gap-1.5"><Briefcase class="h-3.5 w-3.5 text-slate-400 shrink-0" /> <span class="font-semibold">{{ job.department }}</span></p>
-              <p class="flex items-center gap-1.5"><MapPin class="h-3.5 w-3.5 text-slate-400 shrink-0" /> <span>{{ job.location }}</span></p>
-              <p class="flex items-center gap-1.5"><DollarSign class="h-3.5 w-3.5 text-slate-400 shrink-0" /> <span class="text-emerald-700 font-semibold">{{ job.salaryRange }}</span></p>
+            <div class="space-y-2 text-[16px] text-slate-650 font-sans card-desc-standard pt-1">
+              <p class="flex items-start gap-2">
+                <Briefcase class="h-5 w-5 text-indigo-600 shrink-0 mt-0.5" />
+                <span>
+                  <strong class="text-slate-800 font-semibold">Eligibility:</strong> 
+                  {{ job.qualification }}
+                </span>
+              </p>
+              <p class="flex items-start gap-2">
+                <DollarSign class="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                <span>
+                  <strong class="text-slate-800 font-semibold">Salary Matrix:</strong> 
+                  {{ job.salary }}
+                </span>
+              </p>
             </div>
           </div>
 
-          <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
-            <span class="text-red-600 font-bold">Apply by: {{ job.deadline }}</span>
-            <span class="text-[#000080] font-black group-hover:underline flex items-center gap-0.5">Details ➔</span>
+          <!-- Bottom Action Details -->
+          <div class="pt-4 border-t border-slate-100 flex justify-between items-center text-[15px] small-text-standard">
+            <div class="flex flex-col">
+              <span class="text-slate-400 text-[11px] uppercase tracking-wider font-semibold">Deadline</span>
+              <span class="text-red-600 font-bold font-sans">Apply by: {{ job.importantDates?.end }}</span>
+            </div>
+            <button class="bg-[#000080] hover:bg-[#000060] text-white font-semibold px-4 py-2 rounded-xl text-[14px] flex items-center gap-1.5 transition-colors shadow-sm">
+              <span>Read More</span>
+              <span class="transition-transform group-hover:translate-x-1">➔</span>
+            </button>
           </div>
         </div>
       </div>
