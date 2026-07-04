@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /preview/
+Disallow: /search
+Disallow: /*?*
+Disallow: /private/
+Disallow: /draft/
+Disallow: /tmp/
+Disallow: /_next/
+
+Sitemap: https://maicindia.com/sitemap_index.xml

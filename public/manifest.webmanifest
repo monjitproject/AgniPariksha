@@ -1,0 +1,20 @@
+{
+  "name": "MAIC India - Armed Forces & Govt Jobs Preparation Portal",
+  "short_name": "MAIC India",
+  "description": "Prepare for SSC, Railway, Indian Army Agniveer, NDA, & Air Force with free mock tests and job alerts.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "/assets/logo-og.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

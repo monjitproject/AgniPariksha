@@ -26,9 +26,9 @@ const filesToValidate = [
     check: (content: string) => content.includes("<browserconfig>") && content.includes("square150x150logo")
   },
   {
-    name: "_redirects",
+    name: "../functions/[[path]].ts",
     type: "text",
-    check: (content: string) => content.includes("/* /index.html 200")
+    check: (content: string) => content.includes("onRequest") && content.includes("checkPathValidity")
   },
   {
     name: "sitemap_index.xml",

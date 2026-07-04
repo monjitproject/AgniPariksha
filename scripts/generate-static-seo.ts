@@ -89,12 +89,11 @@ fs.writeFileSync(path.join(publicDir, "browserconfig.xml"), browserconfig, "utf8
 console.log("- Generated public/browserconfig.xml successfully");
 
 // -------------------------------------------------------------
-// 4. Generate Cloudflare Pages Redirects File (_redirects)
+// 4. Disable Cloudflare Pages Redirects File (_redirects)
 // -------------------------------------------------------------
-// This guarantees that Cloudflare Pages serves index.html for all SPA routes with a 200 status code.
-const redirects = `/* /index.html 200`;
-fs.writeFileSync(path.join(publicDir, "_redirects"), redirects, "utf8");
-console.log("- Generated public/_redirects successfully");
+// We now use Cloudflare Pages Functions (/functions/[[path]].ts) for advanced routing and dynamic SEO.
+// Leaving _redirects active would bypass our dynamic functions completely.
+console.log("- Skipping _redirects generation in favor of /functions routing");
 
 // -------------------------------------------------------------
 // 5. Calculate Latest Dates for Sitemaps
