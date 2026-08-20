@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsx scripts/generate-static-seo.ts && vite build && tsx scripts/validate-deployment.ts",
+    "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
@@ -15,8 +15,6 @@
     "@tailwindcss/vite": "^4.1.14",
     "canvas-confetti": "^1.9.4",
     "dotenv": "^17.2.3",
-    "express": "^4.21.2",
-    "fast-xml-parser": "^5.11.0",
     "lucide-react": "^0.546.0",
     "lucide-vue-next": "^1.0.0",
     "motion": "^12.23.24",
@@ -25,14 +23,11 @@
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
-    "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-vue": "^6.0.7",
     "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.3"
+    "typescript": "~5.8.2"
   }
 }
