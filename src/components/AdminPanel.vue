@@ -22,8 +22,179 @@ const emit = defineEmits<{
 }>();
 
 // Navigation Tabs
-type AdminTab = 'manage' | 'editor' | 'media' | 'bulk' | 'mcq';
+type AdminTab = 'manage' | 'editor' | 'media' | 'bulk' | 'mcq' | 'pdf_rss';
 const currentTab = ref<AdminTab>('manage');
+
+// RSS & PDF Ingestion Pipeline Management State
+const rssSources = ref<any[]>([]);
+const ingestionLogs = ref<any[]>([]);
+const copyrightReports = ref<any[]>([]);
+const isLoadingPdfRss = ref(false);
+const isTestingFeedId = ref<string | null>(null);
+const feedTestResult = ref<any | null>(null);
+const isSyncingAllRss = ref(false);
+
+// New RSS Source form
+const newSourceName = ref('');
+const newSourceFeedUrl = ref('');
+const newSourceCategory = ref('SSC');
+const newSourceLanguage = ref('Hindi + English');
+const newSourceTrust = ref('HIGH');
+const newSourceRedistribution = ref(false);
+
+const fetchPdfRssData = async () => {
+  isLoadingPdfRss.value = true;
+  try {
+    const [srcRes, logsRes, repRes] = await Promise.all([
+      fetch('/api/rss-sources'),
+      fetch('/api/ingestion-logs'),
+      fetch('/api/copyright-reports')
+    ]);
+    if (srcRes.ok) {
+      const d = await srcRes.json();
+      rssSources.value = d.sources || [];
+    }
+    if (logsRes.ok) {
+      const d = await logsRes.json();
+      ingestionLogs.value = d.logs || [];
+    }
+    if (repRes.ok) {
+      const d = await repRes.json();
+      copyrightReports.value = d.reports || [];
+    }
+  } catch (e) {
+    console.error('Failed to load PDF RSS sources in Admin Panel', e);
+  } finally {
+    isLoadingPdfRss.value = false;
+  }
+};
+
+const handleTestRssSource = async (source: any) => {
+  isTestingFeedId.value = source.id;
+  feedTestResult.value = null;
+  try {
+    const res = await fetch(`/api/rss-sources/${source.id}/test`, { method: 'POST' });
+    const data = await res.json();
+    feedTestResult.value = {
+      sourceName: source.name,
+      ...data
+    };
+    if (res.ok) {
+      triggerToast(`Feed live test passed! Found ${data.itemsFound} items (${data.pdfItemsCount} PDF attachments)`, 'success');
+    } else {
+      triggerToast(`Feed test failed: ${data.error}`, 'error');
+    }
+  } catch (err: any) {
+    triggerToast('Network error reaching feed URL', 'error');
+  } finally {
+    isTestingFeedId.value = null;
+  }
+};
+
+const handleToggleRssSource = async (source: any) => {
+  try {
+    const res = await fetch(`/api/rss-sources/${source.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: !source.enabled })
+    });
+    if (res.ok) {
+      source.enabled = !source.enabled;
+      triggerToast(`Feed ${source.name} ${source.enabled ? 'activated' : 'paused'}`, 'success');
+    }
+  } catch (e) {
+    triggerToast('Failed to update feed state', 'error');
+  }
+};
+
+const handleDeleteRssSource = async (sourceId: string) => {
+  if (!confirm('Are you sure you want to remove this RSS source?')) return;
+  try {
+    const res = await fetch(`/api/rss-sources/${sourceId}`, { method: 'DELETE' });
+    if (res.ok) {
+      rssSources.value = rssSources.value.filter(s => s.id !== sourceId);
+      triggerToast('RSS source deleted successfully', 'success');
+    }
+  } catch (e) {
+    triggerToast('Failed to delete source', 'error');
+  }
+};
+
+const handleCreateRssSource = async () => {
+  if (!newSourceName.value.trim() || !newSourceFeedUrl.value.trim()) {
+    triggerToast('Feed Name and URL are required', 'error');
+    return;
+  }
+  try {
+    const res = await fetch('/api/rss-sources', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: newSourceName.value.trim(),
+        feedUrl: newSourceFeedUrl.value.trim(),
+        category: newSourceCategory.value,
+        language: newSourceLanguage.value,
+        trustLevel: newSourceTrust.value,
+        enabled: true,
+        redistributionAllowed: newSourceRedistribution.value
+      })
+    });
+    const d = await res.json();
+    if (res.ok) {
+      rssSources.value.push(d.source);
+      newSourceName.value = '';
+      newSourceFeedUrl.value = '';
+      triggerToast('New RSS feed source registered successfully', 'success');
+    } else {
+      triggerToast(`Failed: ${d.error}`, 'error');
+    }
+  } catch (e) {
+    triggerToast('Network error creating RSS source', 'error');
+  }
+};
+
+const handleTriggerFullRssSync = async () => {
+  if (isSyncingAllRss.value) return;
+  isSyncingAllRss.value = true;
+  triggerToast('Triggering full Previous Year Paper ingestion pipeline...', 'info');
+  try {
+    const res = await fetch('/api/rss-sources/sync', { method: 'POST' });
+    const data = await res.json();
+    if (res.ok && data.report) {
+      triggerToast(`Sync complete: ${data.report.successfulSources} feeds scanned, ${data.report.newDocumentsCount} new verified PDFs ingested!`, 'success');
+      await fetchPdfRssData();
+    } else {
+      triggerToast('Sync completed with warnings.', 'info');
+    }
+  } catch (e) {
+    triggerToast('Sync failed to execute', 'error');
+  } finally {
+    isSyncingAllRss.value = false;
+  }
+};
+
+const handleResolveCopyrightReport = async (reportId: string, newStatus: 'REVIEWED' | 'REMOVED' | 'KEPT') => {
+  try {
+    const res = await fetch(`/api/copyright-reports/${reportId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (res.ok) {
+      const rep = copyrightReports.value.find(r => r.id === reportId);
+      if (rep) rep.status = newStatus;
+      triggerToast(`Report status updated to ${newStatus}`, 'success');
+    }
+  } catch (e) {
+    triggerToast('Failed to update report status', 'error');
+  }
+};
+
+watch(currentTab, (newTab) => {
+  if (newTab === 'pdf_rss') {
+    fetchPdfRssData();
+  }
+});
 
 // Role-Based Access Control
 const userRole = ref<'Admin' | 'Editor'>('Admin');
@@ -781,6 +952,12 @@ const simulateVisitor = () => {
         :class="['px-4 py-2 text-xs font-extrabold rounded-t-xl border-t-2 border-x transition-colors cursor-pointer', currentTab === 'mcq' ? 'bg-white border-t-[#000080] border-x-gray-200 text-[#000080]' : 'bg-gray-100/70 border-t-transparent border-x-transparent text-gray-500 hover:text-gray-800']"
       >
         📝 MCQ Quiz Deck
+      </button>
+      <button 
+        @click="currentTab = 'pdf_rss'"
+        :class="['px-4 py-2 text-xs font-extrabold rounded-t-xl border-t-2 border-x transition-colors cursor-pointer', currentTab === 'pdf_rss' ? 'bg-white border-t-[#000080] border-x-gray-200 text-[#000080]' : 'bg-gray-100/70 border-t-transparent border-x-transparent text-gray-500 hover:text-gray-800']"
+      >
+        📄 PDF Library & RSS Feeds ({{ rssSources.length }})
       </button>
     </div>
 
@@ -1592,6 +1769,275 @@ const simulateVisitor = () => {
           </button>
 
         </form>
+      </div>
+
+    </div>
+
+    <!-- TAB 6: PDF LIBRARY & RSS INGESTION SOURCES -->
+    <div v-if="currentTab === 'pdf_rss'" class="space-y-6" id="tab-pdf-rss-viewport">
+      
+      <!-- Top Action Bar -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h3 class="text-sm font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
+            <FileText class="w-4 h-4 text-[#000080]" />
+            Official RSS Feed Ingestion Pipeline
+          </h3>
+          <p class="text-xs text-gray-500 mt-0.5">
+            Automated discovery of genuine Previous Year Papers, Answer Keys, and notices from official government commissions.
+          </p>
+        </div>
+
+        <button
+          @click="handleTriggerFullRssSync"
+          :disabled="isSyncingAllRss"
+          class="px-4 py-2 bg-[#000080] hover:bg-[#000066] text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 disabled:opacity-60 cursor-pointer shadow-sm"
+        >
+          <RefreshCw class="w-3.5 h-3.5" :class="{ 'animate-spin': isSyncingAllRss }" />
+          <span>{{ isSyncingAllRss ? 'Ingesting Feeds...' : 'Sync All Feeds Now' }}</span>
+        </button>
+      </div>
+
+      <!-- Feed Live Test Results Banner -->
+      <div v-if="feedTestResult" class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs space-y-2">
+        <div class="flex items-center justify-between font-bold text-indigo-900">
+          <span>Feed Test: {{ feedTestResult.sourceName }}</span>
+          <button @click="feedTestResult = null" class="text-indigo-500 hover:text-indigo-800">
+            <X class="w-4 h-4" />
+          </button>
+        </div>
+        <p class="text-slate-700">
+          Status: <strong>{{ feedTestResult.status }}</strong> • Title: <em>{{ feedTestResult.feedTitle }}</em> • Items Found: <strong>{{ feedTestResult.itemsFound }}</strong> • PDFs Attached: <strong>{{ feedTestResult.pdfItemsCount }}</strong>
+        </p>
+        <div v-if="feedTestResult.sampleItems && feedTestResult.sampleItems.length > 0" class="pt-1">
+          <p class="font-bold text-indigo-950 mb-1">Latest Sample Items:</p>
+          <ul class="list-disc pl-4 space-y-0.5 text-[11px] text-slate-600">
+            <li v-for="(it, idx) in feedTestResult.sampleItems" :key="idx">
+              {{ it.title }} <span v-if="it.pdfUrl" class="text-emerald-700 font-semibold">[PDF Attached]</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Grid of Configured Sources -->
+      <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold uppercase text-gray-700 tracking-wider">
+            Active Feed Sources ({{ rssSources.length }})
+          </h4>
+          <span class="text-[11px] text-gray-500">Auto-synced every 6 hours</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-gray-150 text-[10.5px] uppercase font-mono text-gray-400 bg-gray-50/50">
+                <th class="py-2.5 px-3">Organization / Feed Name</th>
+                <th class="py-2.5 px-3">Category</th>
+                <th class="py-2.5 px-3">Language</th>
+                <th class="py-2.5 px-3">Trust</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Last Checked</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 font-sans">
+              <tr v-for="source in rssSources" :key="source.id" class="hover:bg-slate-50/80 transition-colors">
+                <td class="py-3 px-3">
+                  <p class="font-bold text-gray-900">{{ source.name }}</p>
+                  <a :href="source.feedUrl" target="_blank" class="text-[10.5px] text-indigo-600 hover:underline font-mono truncate max-w-xs block">
+                    {{ source.feedUrl }}
+                  </a>
+                </td>
+                <td class="py-3 px-3">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800">
+                    {{ source.category }}
+                  </span>
+                </td>
+                <td class="py-3 px-3">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-medium" :class="source.language.includes('Hindi') ? 'bg-amber-100 text-amber-800' : 'bg-blue-50 text-blue-800'">
+                    {{ source.language }}
+                  </span>
+                </td>
+                <td class="py-3 px-3">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="source.trustLevel === 'HIGH' ? 'bg-emerald-100 text-emerald-800' : 'bg-yellow-100 text-yellow-800'">
+                    {{ source.trustLevel }}
+                  </span>
+                </td>
+                <td class="py-3 px-3">
+                  <button 
+                    @click="handleToggleRssSource(source)"
+                    class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors"
+                    :class="source.enabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-500 border border-gray-200'"
+                  >
+                    {{ source.enabled ? '● Active' : '○ Paused' }}
+                  </button>
+                </td>
+                <td class="py-3 px-3 text-gray-500 text-[11px]">
+                  {{ source.lastFetchedAt ? new Date(source.lastFetchedAt).toLocaleString() : 'Pending first sync' }}
+                </td>
+                <td class="py-3 px-3 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button
+                      @click="handleTestRssSource(source)"
+                      :disabled="isTestingFeedId === source.id"
+                      class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[11px] font-semibold transition-colors disabled:opacity-50"
+                      title="Test feed connectivity"
+                    >
+                      {{ isTestingFeedId === source.id ? 'Testing...' : 'Test' }}
+                    </button>
+                    <button
+                      @click="handleDeleteRssSource(source.id)"
+                      class="p-1 text-gray-400 hover:text-red-600 rounded transition-colors"
+                      title="Remove source"
+                    >
+                      <Trash2 class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Add New RSS Source Form -->
+      <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm space-y-4">
+        <h4 class="text-xs font-bold uppercase text-gray-700 tracking-wider">
+          Add New Government / Educational RSS Feed
+        </h4>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="block text-[11px] font-bold text-gray-600 mb-1">Source Name / Authority *</label>
+            <input
+              v-model="newSourceName"
+              type="text"
+              placeholder="e.g., Delhi Police Recruitment Bureau RSS"
+              class="w-full p-2 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#000080] text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-600 mb-1">RSS / Atom Feed URL *</label>
+            <input
+              v-model="newSourceFeedUrl"
+              type="url"
+              placeholder="https://example.gov.in/feed.xml"
+              class="w-full p-2 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#000080] text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-600 mb-1">Exam Category</label>
+            <select
+              v-model="newSourceCategory"
+              class="w-full p-2 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#000080] text-gray-900"
+            >
+              <option value="SSC">SSC (Staff Selection Commission)</option>
+              <option value="Railway">Railway Recruitment Boards</option>
+              <option value="Police">State Police & Paramilitary</option>
+              <option value="Defence">Armed Forces & Agniveer</option>
+              <option value="UPSC">UPSC (Civil / NDA / CDS)</option>
+              <option value="Teaching">Teaching & CTET</option>
+              <option value="Banking">Banking & IBPS</option>
+              <option value="State Exams">State Public Service Commission</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-600 mb-1">Language Medium</label>
+            <select
+              v-model="newSourceLanguage"
+              class="w-full p-2 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#000080] text-gray-900"
+            >
+              <option value="Hindi">Hindi (हिंदी माध्यम)</option>
+              <option value="Hindi + English">Bilingual (द्विभाषी)</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          @click="handleCreateRssSource"
+          class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
+        >
+          <Plus class="w-3.5 h-3.5" />
+          <span>Register New RSS Source</span>
+        </button>
+      </div>
+
+      <!-- Ingestion History & Copyright Moderation Tabs -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
+        
+        <!-- Ingestion Logs Stream -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm space-y-3">
+          <h4 class="font-bold uppercase text-gray-700 tracking-wider">
+            Recent Ingestion Stream Logs
+          </h4>
+          <div class="max-h-64 overflow-y-auto space-y-2 pr-1">
+            <div
+              v-for="log in ingestionLogs.slice(0, 15)"
+              :key="log.id"
+              class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 text-[11px] space-y-1"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-gray-800">{{ log.sourceName || 'General Pipeline' }}</span>
+                <span 
+                  class="px-1.5 py-0.2 rounded text-[9.5px] font-mono uppercase font-bold"
+                  :class="log.status === 'SUCCESS' ? 'bg-emerald-100 text-emerald-800' : log.status === 'SOURCE_ONLY' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'"
+                >
+                  {{ log.status }}
+                </span>
+              </div>
+              <p class="text-gray-600">{{ log.documentTitle || log.reason || log.errorMessage }}</p>
+              <p class="text-[9.5px] text-gray-400 font-mono">{{ new Date(log.timestamp).toLocaleString() }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Copyright Reports Moderation -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm space-y-3">
+          <h4 class="font-bold uppercase text-gray-700 tracking-wider">
+            User Feedback & Copyright Notices ({{ copyrightReports.filter(r => r.status === 'PENDING').length }} Pending)
+          </h4>
+          <div class="max-h-64 overflow-y-auto space-y-2 pr-1">
+            <div v-if="copyrightReports.length === 0" class="p-6 text-center text-gray-400">
+              No copyright notices or broken link reports pending.
+            </div>
+            <div
+              v-for="rep in copyrightReports"
+              :key="rep.id"
+              class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 text-[11px] space-y-1.5"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-gray-900">{{ rep.documentTitle }}</span>
+                <span class="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-bold bg-amber-100 text-amber-800">
+                  {{ rep.issueType }}
+                </span>
+              </div>
+              <p class="text-slate-600">{{ rep.description }}</p>
+              <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                <span class="text-[9.5px] text-gray-400 font-mono">{{ rep.reporterEmail }}</span>
+                <div class="flex items-center gap-1.5">
+                  <button
+                    @click="handleResolveCopyrightReport(rep.id, 'REVIEWED')"
+                    class="px-2 py-0.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded text-[10px] font-bold"
+                  >
+                    Resolve
+                  </button>
+                  <button
+                    @click="handleResolveCopyrightReport(rep.id, 'REMOVED')"
+                    class="px-2 py-0.5 bg-red-100 hover:bg-red-200 text-red-800 rounded text-[10px] font-bold"
+                  >
+                    Remove Doc
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>

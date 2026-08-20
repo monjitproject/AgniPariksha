@@ -42,6 +42,7 @@ const selectedPolicyId = ref<string>("about");
 // Router child item selected states
 const selectedQuizId = ref<string | null>(null);
 const selectedNoteId = ref<string | null>(null);
+const selectedPdfId = ref<string | null>(null);
 const activeBlogId = ref<string | null>(null);
 const activeJobId = ref<string | null>(null);
 const selectedNewsId = ref<string | null>(null);
@@ -185,6 +186,7 @@ const handleNavigation = (tab: string, subId?: string | null, policyId?: string 
   activeBlogId.value = subId || null;
   activeJobId.value = subId || null;
   selectedNewsId.value = subId || null;
+  selectedPdfId.value = subId || null;
   activeAuthorId.value = subId || null;
   
   navigateTo(tab, subId, policyId);
@@ -199,6 +201,7 @@ const handlePopState = () => {
   }
   selectedQuizId.value = parsed.subId || null;
   selectedNoteId.value = parsed.subId || null;
+  selectedPdfId.value = parsed.subId || null;
   activeBlogId.value = parsed.subId || null;
   activeJobId.value = parsed.subId || null;
   selectedNewsId.value = parsed.subId || null;
@@ -544,7 +547,10 @@ const handleAdminAddJob = (newJob: JobPost) => {
 
       <!-- VERIFIED GOVERNMENT PDF CABINET -->
       <div v-if="currentTab === 'pdfs'" class="animate-fade-in">
-        <PdfLibrary />
+        <PdfLibrary 
+          :selectedPdfId="selectedPdfId"
+          @selectPdf="(pdfId) => handleNavigation('pdfs', pdfId)"
+        />
       </div>
 
       <!-- LATEST RALLIES VACANCIES SECTION -->

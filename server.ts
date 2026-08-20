@@ -9,6 +9,18 @@ import { createServer as createViteServer } from "vite";
 import { MAIC_BLOGS } from "./src/data/maicBlogsData";
 import { MOCK_QUIZZES, MOCK_JOBS, MOCK_NOTES, MOCK_PDFS, MOCK_BLOGS } from "./src/data/mockData";
 import { checkPathValidity, getPageSeoData, injectMetadata, toSlug } from "./src/utils/dynamicSeo";
+import {
+  getDocuments,
+  saveDocuments,
+  getRssSources,
+  saveRssSources,
+  getIngestionLogs,
+  getCopyrightReports,
+  saveCopyrightReport,
+  syncAllRssSources,
+  parseRssFeed,
+  isSafeUrl
+} from "./src/server/pdfIngestionPipeline";
 
 // Initialize environment variables
 dotenv.config();
@@ -2009,144 +2021,365 @@ They were added to the Indian Constitution by the **42nd Amendment Act of 1976**
   return res.json({ reply: defaultReply });
 });
 
-// API: Fetch Original Previous Year Papers from Adda247 PYP database using Gemini Search Grounding
-app.get("/api/adda247-papers", async (req: express.Request, res: express.Response) => {
-  const force = req.query.force === "true";
-  console.log(`Adda247 PYP Auto-Fetch requested. Force bypass: ${force}`);
+// =============================================================
+// AUTHENTIC PREVIOUS YEAR PAPERS & PDF LIBRARY API PIPELINE
+// =============================================================
 
-  // High-fidelity fallback list featuring original real previous papers from Adda247
-  const fallbackPapers = [
-    {
-      id: "pyp-adda-ssc-gd-2025",
-      title: "Adda247 Solved: SSC GD Constable General Duty Previous Year Paper",
-      category: "SSC Exam Notes",
-      type: "Previous Paper",
-      publishDate: "2026-06-20",
-      downloadCount: 12450,
-      size: "2.8 MB",
-      contentSnippet: "Official authentic Previous Year paper of SSC GD Constable synced from Adda247 database. Full syllabus solved: General Intelligence & Reasoning (20 Qs), GK (20 Qs), Elementary Math (20 Qs), Hindi/English (20 Qs)."
-    },
-    {
-      id: "pyp-adda-up-police-constable",
-      title: "Adda247 Approved: UP Police Constable Solved Question Paper with Answers",
-      category: "UP Police Notes",
-      type: "Previous Paper",
-      publishDate: "2026-06-19",
-      downloadCount: 15600,
-      size: "3.1 MB",
-      contentSnippet: "Original solved previous year questions asked in UP Police Constable Exam. Offers deep explanations in Hindi and English, shortcut mathematical workflows, and static and contemporary GK analysis."
-    },
-    {
-      id: "pyp-adda-rrb-ntpc-2024",
-      title: "Adda247 Railways: RRB NTPC Non-Technical CBT Stage-1 Solved paper",
-      category: "Railway Exam Notes",
-      type: "Previous Paper",
-      publishDate: "2026-06-18",
-      downloadCount: 9820,
-      size: "2.5 MB",
-      contentSnippet: "Railway Recruitment Board NTPC Stage-1 CBT authentic paper. Comprehensive analytical breakdown of General Intelligence, Reasoning, and high-yield general static science concepts."
-    },
-    {
-      id: "pyp-adda-agniveer-army-gd",
-      title: "Adda247 Defence: Indian Army Agniveer GD Original Previous Written Exam Paper",
-      category: "Agniveer Notes",
-      type: "Previous Paper",
-      publishDate: "2026-06-17",
-      downloadCount: 8140,
-      size: "1.8 MB",
-      contentSnippet: "Official standard military paper for Agnipath Agniveer GD. Verified solutions and explanations for general logic, physical science formulas, and Indian military historical battles."
-    },
-    {
-      id: "pyp-adda-ssc-cgl-tier1",
-      title: "Adda247 premium: SSC CGL Tier-1 Combined Graduate Level Solved Exam Paper",
-      category: "SSC Exam Notes",
-      type: "Previous Paper",
-      publishDate: "2026-06-16",
-      downloadCount: 11340,
-      size: "3.4 MB",
-      contentSnippet: "Original practice and previous paper for CGL Tier-1 with bilingual answer key. Includes Quantitative Aptitude, General English Language, and General Awareness indices with precise syllabus references."
-    },
-    {
-      id: "pyp-adda-rpf-sub-inspector",
-      title: "Adda247 Special: RPF Sub Inspector (SI) Solved Question Series Paper",
-      category: "Railway Exam Notes",
-      type: "Previous Paper",
-      publishDate: "2026-06-15",
-      downloadCount: 7890,
-      size: "2.2 MB",
-      contentSnippet: "Standard solved paper from Adda247 RPF series. Highlights section tests for Arithmetic (35 Marks) and General Intelligence Logic (35 Marks), and detailed defense-oriented static awareness."
-    },
-    {
-      id: "pyp-adda-upsc-capf-pyp",
-      title: "Adda247: UPSC CAPF Central Armed Police Forces Assistant Commandant Solved Paper",
-      category: "UPSC Civil Services",
-      type: "Previous Paper",
-      publishDate: "2026-06-14",
-      downloadCount: 5430,
-      size: "4.2 MB",
-      contentSnippet: "UPSC CAPF Assistant Commandant GS paper 1 solution. Features extensive notes on contemporary Indian polity, general geography diagrams, international affairs, and ecological science articles."
-    },
-    {
-      id: "pyp-adda-agniveer-navy-ssr",
-      title: "Adda247 Indian Navy: Agniveer SSR (Senior Secondary Recruit) Official Solved PYP",
-      category: "Agniveer Notes",
-      type: "Previous Paper",
-      publishDate: "2026-06-13",
-      downloadCount: 6540,
-      size: "2.0 MB",
-      contentSnippet: "High-yield mock based on original Navy recruitment boards for Senior Secondary Recruit. Details standard formulas, core trigonometry shortcuts, and high-frequency English vocabulary rules."
+// GET /api/pdf-library: Retrieve filtered, searched, sorted genuine PDF documents
+app.get("/api/pdf-library", (req: express.Request, res: express.Response) => {
+  try {
+    const { 
+      search = "", 
+      category = "All", 
+      year = "All", 
+      language = "All", 
+      documentType = "All",
+      status = "All",
+      sort = "year_desc",
+      page = "1",
+      limit = "20"
+    } = req.query;
+
+    let docs = getDocuments();
+
+    // Normal users only see VERIFIED or SOURCE_ONLY documents (never REJECTED/BROKEN)
+    if (status === "All") {
+      docs = docs.filter(d => d.status === "VERIFIED" || d.status === "SOURCE_ONLY");
+    } else {
+      docs = docs.filter(d => d.status === status);
     }
-  ];
 
-  if (ai) {
-    try {
-      console.log("Searching and parsing Adda247 Previous Year Papers using Gemini web grounding...");
-      const promptString = `Search the web for previous year question papers listed at https://www.adda247.com/jobs/previous-year-question-papers/.
-Query authentic recruitment boards like SSC (GD/CGL), UP Police, Group D, NTPC, and Defence forces.
-Extract a list of 8 to 10 authentic papers with real titles, and return them strictly as a valid JSON array.
+    // 1. Text Search across Title, Exam, Organization, Subject, Snippet
+    if (search && typeof search === "string" && search.trim()) {
+      const q = search.trim().toLowerCase();
+      docs = docs.filter(d => 
+        (d.title && d.title.toLowerCase().includes(q)) ||
+        (d.hindiTitle && d.hindiTitle.toLowerCase().includes(q)) ||
+        (d.exam && d.exam.toLowerCase().includes(q)) ||
+        (d.organization && d.organization.toLowerCase().includes(q)) ||
+        (d.subject && d.subject.toLowerCase().includes(q)) ||
+        (d.extractedSnippet && d.extractedSnippet.toLowerCase().includes(q))
+      );
+    }
 
-The response must be valid JSON matching the following schema only:
-[
-  {
-    "id": "pyp-adda-from-search",
-    "title": "Clear English/Hindi title (e.g., 'Adda247: SSC GD Constable 2024 Solved paper')",
-    "category": "One of: 'SSC Exam Notes', 'UP Police Notes', 'Railway Exam Notes', 'Agniveer Notes', 'UPSC Civil Services'",
-    "type": "Previous Paper",
-    "publishDate": "YYYY-MM-DD format based on recent 2025/2026 dates",
-    "downloadCount": 8500,
-    "size": "2.4 MB",
-    "contentSnippet": "2-3 sentences with precise breakdown details of questions, section weightage, and topic index."
-  }
-]
-Do NOT write markdown block wrappers or explanations. Just return the raw JSON array.`;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: promptString,
-        config: {
-          temperature: 0.7,
-          responseMimeType: "application/json",
-          tools: [{ googleSearch: {} }]
-        }
+    // 2. Filter by Category / Exam
+    if (category && category !== "All") {
+      const cat = String(category).toLowerCase();
+      docs = docs.filter(d => {
+        const examName = (d.exam || "").toLowerCase();
+        const docCat = (d.organization || "").toLowerCase();
+        if (cat === "ssc") return examName.includes("ssc");
+        if (cat === "railway") return examName.includes("rrb") || examName.includes("railway") || examName.includes("rpf");
+        if (cat === "banking") return examName.includes("banking") || examName.includes("ibps") || examName.includes("sbi") || examName.includes("rbi");
+        if (cat === "upsc") return examName.includes("upsc") || examName.includes("nda") || examName.includes("cds") || examName.includes("capf");
+        if (cat === "teaching") return examName.includes("ctet") || examName.includes("tet") || examName.includes("ugc") || examName.includes("dsssb");
+        if (cat === "police") return examName.includes("police") || examName.includes("rpf") || examName.includes("gd");
+        if (cat === "defence") return examName.includes("army") || examName.includes("navy") || examName.includes("air force") || examName.includes("agniveer") || examName.includes("nda") || examName.includes("cds");
+        if (cat === "state exams" || cat === "state") return examName.includes("bpsc") || examName.includes("uppsc") || examName.includes("police") || examName.includes("state");
+        return examName.includes(cat) || docCat.includes(cat);
       });
-
-      let jsonText = response.text || "[]";
-      if (jsonText.startsWith("```")) {
-        jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "");
-      }
-      jsonText = jsonText.trim();
-
-      const papers = JSON.parse(jsonText);
-      if (Array.isArray(papers) && papers.length > 0) {
-        console.log(`Successfully fetched ${papers.length} Adda247 papers via Gemini search.`);
-        return res.json({ papers });
-      }
-    } catch (err: any) {
-      console.warn("Gemini Adda247 fetch error/quota limit reached. Serving high-fidelity fallback papers:", err.message || err);
     }
-  }
 
-  return res.json({ papers: fallbackPapers });
+    // 3. Filter by Year
+    if (year && year !== "All") {
+      if (year === "Older") {
+        docs = docs.filter(d => d.year && d.year !== "Unknown" && parseInt(d.year) < 2021);
+      } else {
+        docs = docs.filter(d => d.year === String(year));
+      }
+    }
+
+    // 4. Filter by Language (Hindi priority)
+    if (language && language !== "All") {
+      if (language === "Hindi") {
+        docs = docs.filter(d => d.language === "Hindi" || d.language === "Hindi + English");
+      } else if (language === "Hindi + English") {
+        docs = docs.filter(d => d.language === "Hindi + English");
+      } else if (language === "English") {
+        docs = docs.filter(d => d.language === "English" || d.language === "Hindi + English");
+      }
+    }
+
+    // 5. Filter by Document Type
+    if (documentType && documentType !== "All") {
+      docs = docs.filter(d => d.documentType === String(documentType));
+    }
+
+    // 6. Sorting
+    docs.sort((a, b) => {
+      if (sort === "year_desc") {
+        const ya = parseInt(a.year) || 0;
+        const yb = parseInt(b.year) || 0;
+        if (yb !== ya) return yb - ya;
+        return new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime();
+      }
+      if (sort === "year_asc") {
+        const ya = parseInt(a.year) || 9999;
+        const yb = parseInt(b.year) || 9999;
+        return ya - yb;
+      }
+      if (sort === "views_desc") {
+        return (b.viewCount || 0) - (a.viewCount || 0);
+      }
+      if (sort === "downloads_desc") {
+        return (b.downloadCount || 0) - (a.downloadCount || 0);
+      }
+      if (sort === "oldest") {
+        return new Date(a.publishedAt || 0).getTime() - new Date(b.publishedAt || 0).getTime();
+      }
+      // default: latest_added
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    });
+
+    const total = docs.length;
+    const pageNum = Math.max(1, parseInt(String(page)) || 1);
+    const limitNum = Math.max(1, parseInt(String(limit)) || 20);
+    const startIndex = (pageNum - 1) * limitNum;
+    const paginatedDocs = docs.slice(startIndex, startIndex + limitNum);
+
+    return res.json({
+      documents: paginatedDocs,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / limitNum)
+    });
+  } catch (err: any) {
+    console.error("Error fetching PDF library documents:", err);
+    return res.status(500).json({ error: "Unable to retrieve PDF documents" });
+  }
+});
+
+// GET /api/pdf-library/:idOrSlug: Retrieve a single document and record view
+app.get("/api/pdf-library/:idOrSlug", (req: express.Request, res: express.Response) => {
+  try {
+    const { idOrSlug } = req.params;
+    const docs = getDocuments();
+    const doc = docs.find(d => d.id === idOrSlug || d.slug === idOrSlug);
+
+    if (!doc) {
+      return res.status(404).json({ error: "Verified document not found" });
+    }
+
+    // Increment view count
+    doc.viewCount = (doc.viewCount || 0) + 1;
+    saveDocuments(docs);
+
+    return res.json({ document: doc });
+  } catch (err: any) {
+    console.error("Error fetching single PDF document:", err);
+    return res.status(500).json({ error: "Failed to load document" });
+  }
+});
+
+// POST /api/pdf-library/:id/download-increment: Track verified downloads
+app.post("/api/pdf-library/:id/download-increment", (req: express.Request, res: express.Response) => {
+  try {
+    const { id } = req.params;
+    const docs = getDocuments();
+    const doc = docs.find(d => d.id === id);
+
+    if (!doc) {
+      return res.status(404).json({ error: "Document not found" });
+    }
+
+    doc.downloadCount = (doc.downloadCount || 0) + 1;
+    saveDocuments(docs);
+
+    return res.json({ success: true, downloadCount: doc.downloadCount });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to record download metric" });
+  }
+});
+
+// POST /api/pdf-library/report-issue: User feedback on copyright/broken documents
+app.post("/api/pdf-library/report-issue", (req: express.Request, res: express.Response) => {
+  try {
+    const { documentId, documentTitle, reporterEmail, issueType, description } = req.body;
+    if (!documentId || !description) {
+      return res.status(400).json({ error: "documentId and description are required" });
+    }
+
+    const report = saveCopyrightReport({
+      documentId,
+      documentTitle: documentTitle || "Unknown Document",
+      reporterEmail: reporterEmail || "anonymous@user.com",
+      issueType: issueType || "other",
+      description
+    });
+
+    return res.json({ success: true, report });
+  } catch (err: any) {
+    console.error("Error submitting copyright report:", err);
+    return res.status(500).json({ error: "Failed to submit document report" });
+  }
+});
+
+// GET /api/rss-sources: Retrieve configured RSS sources
+app.get("/api/rss-sources", (req: express.Request, res: express.Response) => {
+  try {
+    const sources = getRssSources();
+    return res.json({ sources });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to read RSS sources" });
+  }
+});
+
+// POST /api/rss-sources: Create new RSS source
+app.post("/api/rss-sources", (req: express.Request, res: express.Response) => {
+  try {
+    const { name, feedUrl, category, language, trustLevel, enabled, redistributionAllowed } = req.body;
+    if (!name || !feedUrl) {
+      return res.status(400).json({ error: "name and feedUrl are required" });
+    }
+
+    const check = isSafeUrl(feedUrl);
+    if (!check.safe) {
+      return res.status(400).json({ error: `SSRF Security Error: ${check.reason}` });
+    }
+
+    const sources = getRssSources();
+    const newSource = {
+      id: `rss-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      name,
+      feedUrl,
+      category: category || "SSC",
+      language: language || "Hindi + English",
+      trustLevel: trustLevel || "MEDIUM",
+      enabled: enabled !== undefined ? enabled : true,
+      redistributionAllowed: Boolean(redistributionAllowed),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    sources.push(newSource);
+    saveRssSources(sources);
+
+    return res.json({ success: true, source: newSource });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to create RSS source" });
+  }
+});
+
+// PATCH /api/rss-sources/:id: Update or toggle RSS source
+app.patch("/api/rss-sources/:id", (req: express.Request, res: express.Response) => {
+  try {
+    const { id } = req.params;
+    const sources = getRssSources();
+    const sourceIndex = sources.findIndex(s => s.id === id);
+
+    if (sourceIndex === -1) {
+      return res.status(404).json({ error: "RSS source not found" });
+    }
+
+    const current = sources[sourceIndex];
+    sources[sourceIndex] = {
+      ...current,
+      ...req.body,
+      id: current.id,
+      updatedAt: new Date().toISOString()
+    };
+
+    saveRssSources(sources);
+    return res.json({ success: true, source: sources[sourceIndex] });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to update RSS source" });
+  }
+});
+
+// DELETE /api/rss-sources/:id: Remove RSS source
+app.delete("/api/rss-sources/:id", (req: express.Request, res: express.Response) => {
+  try {
+    const { id } = req.params;
+    const sources = getRssSources();
+    const filtered = sources.filter(s => s.id !== id);
+    saveRssSources(filtered);
+    return res.json({ success: true, remaining: filtered.length });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to delete RSS source" });
+  }
+});
+
+// POST /api/rss-sources/:id/test: Test a specific RSS feed live
+app.post("/api/rss-sources/:id/test", async (req: express.Request, res: express.Response) => {
+  try {
+    const { id } = req.params;
+    const sources = getRssSources();
+    const source = sources.find(s => s.id === id);
+
+    if (!source) {
+      return res.status(404).json({ error: "RSS source not found" });
+    }
+
+    const result = await parseRssFeed(source.feedUrl);
+    const pdfItemsCount = result.items.filter(it => it.pdfUrl || it.link.toLowerCase().includes(".pdf")).length;
+
+    return res.json({
+      status: "Working",
+      feedTitle: result.title,
+      itemsFound: result.items.length,
+      pdfItemsCount,
+      sampleItems: result.items.slice(0, 5)
+    });
+  } catch (err: any) {
+    return res.status(400).json({ 
+      status: "Failed",
+      error: err.message || "Failed to reach or parse RSS feed" 
+    });
+  }
+});
+
+// POST /api/rss-sources/sync: Trigger full manual or scheduled RSS synchronization
+app.post("/api/rss-sources/sync", async (req: express.Request, res: express.Response) => {
+  try {
+    console.log("[RSS Sync] Starting automated Previous Year Paper ingestion pipeline...");
+    const report = await syncAllRssSources();
+    console.log(`[RSS Sync] Completed: ${report.successfulSources}/${report.totalSources} feeds synced. Found ${report.newDocumentsCount} new verified PDFs.`);
+    return res.json({ success: true, report });
+  } catch (err: any) {
+    console.error("[RSS Sync] Ingestion error:", err);
+    return res.status(500).json({ error: "Sync operation failed", message: err.message });
+  }
+});
+
+// GET /api/ingestion-logs: View sync history logs
+app.get("/api/ingestion-logs", (req: express.Request, res: express.Response) => {
+  try {
+    const logs = getIngestionLogs();
+    return res.json({ logs });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to read ingestion logs" });
+  }
+});
+
+// GET /api/copyright-reports: View copyright reports
+app.get("/api/copyright-reports", (req: express.Request, res: express.Response) => {
+  try {
+    const reports = getCopyrightReports();
+    return res.json({ reports });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to read reports" });
+  }
+});
+
+// PATCH /api/copyright-reports/:id: Moderation status update
+app.patch("/api/copyright-reports/:id", (req: express.Request, res: express.Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const reports = getCopyrightReports();
+    const report = reports.find(r => r.id === id);
+
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    report.status = status;
+    saveDocuments(getDocuments()); // Trigger write
+    return res.json({ success: true, report });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to update report status" });
+  }
 });
 
 
@@ -2697,6 +2930,13 @@ async function bootstrap() {
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server started running on http://localhost:${PORT}`);
+    
+    // Background RSS Ingestion cron interval (every 6 hours)
+    const SIX_HOURS = 6 * 60 * 60 * 1000;
+    setInterval(() => {
+      console.log("[Background Job] Triggering 6-hour RSS sync pipeline...");
+      syncAllRssSources().catch(e => console.error("[Background Job] RSS sync error:", e));
+    }, SIX_HOURS);
   });
 }
 
